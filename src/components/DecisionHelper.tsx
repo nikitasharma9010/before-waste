@@ -119,6 +119,7 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
         <div className={`max-w-3xl ${standalone ? 'mb-5' : 'mb-8'}`}>
           {!standalone && <p className="section-kicker text-forest mb-3">ONE OBJECT. ONE NEXT STEP.</p>}
           <Heading ref={titleRef} tabIndex={-1} id="decision-title" className="scroll-mt-20 font-editorial text-3xl sm:text-4xl lg:text-5xl">{standalone ? 'Ask Before Waste' : 'What should I do with this?'}</Heading>
+          {standalone && generated && <button type="button" className="min-h-[44px] self-start py-2 font-semibold text-forest underline underline-offset-4" onClick={() => { if (!window.confirm('Start a new conversation? The unsaved conversation will be cleared. Your saved action stays.')) return; setGenerated(null); setResult(null); setAnsweredQuestion(''); setEditedPlan(''); setHistory([]); setBackground(''); setConversationKey(key => key + 1); requestAnimationFrame(editQuestion); }}>Start a new conversation</button>}
           <p className={standalone ? 'mt-2 text-base' : 'mt-4 text-lg'}>{standalone ? 'Find a practical next step for your items and lower-waste living.' : 'Before you buy, replace or let something go, find a starting point that fits your life.'}</p>
           <p className="mt-2 text-sm text-ink/80">{standalone ? 'No account needed. Save an action when you’re ready.' : 'Ask about any item, reducing waste or sustainable living. No account needed.'}</p>
           {saved && <a href="#saved-action" onClick={() => savedRef.current?.focus({ preventScroll: true })} className="mt-4 inline-flex min-h-[44px] items-center font-semibold text-forest underline underline-offset-4">Return to my saved action</a>}
@@ -185,7 +186,7 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
           </>}
           {standalone && history.length > 0 && <details className="rounded-xl border border-ink/15 bg-paper p-4"><summary className="min-h-[44px] cursor-pointer py-2 font-semibold">Earlier in this conversation</summary>{history.map((turn, i) => <div key={i} className="mt-4 border-t border-ink/15 pt-4"><p className="whitespace-pre-wrap break-words font-semibold">{turn.question}</p><p className="mt-2 whitespace-pre-wrap break-words text-sm">{turn.answer}</p></div>)}</details>}
           {standalone && composer}
-          {standalone && generated && <button type="button" className="min-h-[44px] self-start py-2 font-semibold text-forest underline underline-offset-4" onClick={() => { if (!window.confirm('Start a new conversation? The unsaved conversation will be cleared. Your saved action stays.')) return; setGenerated(null); setResult(null); setAnsweredQuestion(''); setEditedPlan(''); setHistory([]); setBackground(''); setConversationKey(key => key + 1); requestAnimationFrame(editQuestion); }}>Start a new conversation</button>}
+
         </div>
         <p id="action-storage-status" role="status" className="mt-5 text-sm">{notice}</p>
         {undoAction && <button type="button" className="min-h-[44px] py-2 font-semibold text-forest underline underline-offset-4" onClick={() => {

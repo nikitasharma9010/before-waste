@@ -12,7 +12,7 @@ let root: Root;
 const originalScrollIntoView = HTMLElement.prototype.scrollIntoView;
 beforeEach(() => {
   Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
-  localStorage.clear();
+  localStorage.clear(); sessionStorage.clear();
   host = document.createElement('div');
   document.body.append(host);
   root = createRoot(host);

@@ -128,10 +128,12 @@ it('uses relevant reuse resources and validates older saved records', () => {
   expect(readAction().action).toMatchObject({ note: 'Old note', issue: 'unsure', barrier: undefined });
 });
 
-it('puts the compact assistant entry before the interactive preview and aligns header calls to action', async () => {
+it('puts the story and scenario before the assistant entry and aligns header calls to action', async () => {
   await act(async () => root.render(<App />));
   const children = [...host.querySelector('main')!.children];
-  expect(children.indexOf(host.querySelector('#assistant-entry')!)).toBeLessThan(children.indexOf(host.querySelector('#object-preview')!));
+  expect(children.indexOf(host.querySelector('#follow-one-thing')!)).toBeLessThan(children.indexOf(host.querySelector('#what-would-you-do')!));
+  expect(children.indexOf(host.querySelector('#what-would-you-do')!)).toBeLessThan(children.indexOf(host.querySelector('#assistant-entry')!));
+  expect(host.querySelector('#object-preview')?.closest('details')?.open).toBe(false);
   const cta = [...host.querySelectorAll('header a')].find(a => a.textContent?.includes('Ask Before Waste'));
   expect(cta?.getAttribute('href')).toBe('/ask');
   expect(host.querySelectorAll('h1')).toHaveLength(1);
