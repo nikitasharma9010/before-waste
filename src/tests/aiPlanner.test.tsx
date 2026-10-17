@@ -1,3 +1,4 @@
+import { readSavedAnswers } from '../utils/savedAnswers';
 import { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
@@ -204,9 +205,8 @@ it('supports follow-ups, saves original context and clears only unsaved conversa
   const result = host.querySelector('[aria-label="Your answer"]')!;
   const composer = host.querySelector('form')!;
   expect(result.compareDocumentPosition(composer) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-  await click('Save action on this device');
-  expect(readAction().action?.question).toBe(original);
-  await input('action-note', 'Private note that should stay local');
+  await click('Save answer');
+  expect(readSavedAnswers().answers[0].question).toBe(original);
   await input('ai-description', 'What if I cannot find the spare button?'); await click('Get AI guidance');
   const body = JSON.parse(request.mock.calls[1][1].body);
   expect(body.context[0].question).toBe(original);
@@ -216,7 +216,7 @@ it('supports follow-ups, saves original context and clears only unsaved conversa
   confirm.mockReturnValue(true); await click('Start a new conversation');
   expect(host.textContent).not.toContain('AI-GENERATED DRAFT');
   expect(host.querySelector<HTMLTextAreaElement>('#ai-description')?.value).toBe('');
-  expect(readAction().action?.note).toContain('Private note');
+  expect(readSavedAnswers().answers).toHaveLength(1);
   await input('ai-description', 'How can I reduce packaging waste at home?'); await click('Get AI guidance');
   expect(JSON.parse(request.mock.calls[2][1].body).context).toBeUndefined();
 });
@@ -327,13 +327,13 @@ it('keeps editing direct and copying only in the saved section', async () => {
   expect(host.textContent).not.toContain('Ask a follow-up below');
   expect(host.textContent).not.toContain('Answer these questions below');
   expect(host.querySelector('#conversation-background')?.closest('details')?.querySelector('summary')?.textContent).toBe('Conversation settings');
-  await click('Save action on this device');
-  expect([...host.querySelectorAll('button')].some(button => button.textContent === 'Save action on this device')).toBe(false);
-  expect([...host.querySelectorAll('a')].find(link => link.textContent === 'Saved · View my action')?.getAttribute('href')).toBe('#saved-action');
-  expect(host.querySelector('[aria-label="Assistant sections"] a[href="#saved-action"]')?.textContent).toContain('1');
+  await click('Save answer');
+  expect([...host.querySelectorAll('button')].some(button => button.textContent === 'Save answer')).toBe(false);
+  expect([...host.querySelectorAll('a')].find(link => link.textContent === 'Saved · View saved')?.getAttribute('href')).toBe('#saved');
+  expect(host.querySelector('#saved-tab')?.textContent).toContain('1');
   const copyButtons = [...host.querySelectorAll('button')].filter(button => button.textContent?.startsWith('Copy'));
   expect(copyButtons).toHaveLength(1);
-  expect(copyButtons[0].closest('#saved-action')).not.toBeNull();
+  expect(copyButtons[0].closest('#saved')).not.toBeNull();
 });
 it('provides a permanent saved-action section with an honest empty state', async () => {
   expect(host.querySelector('#saved-section-title')?.textContent).toBe('My saved action');
@@ -387,11 +387,10 @@ it('reports unreadable storage honestly and retries loading without replacing sa
   localStorage.setItem('beforewaste_action_v1', JSON.stringify({item:'clothes',intent:'buy',support:'myself',budget:'free',note:'Keep my original note',outcome:'planned'}));
   const read = vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => { throw new Error('blocked'); });
   await act(async () => root.render(<DecisionHelper key="unreadable" standalone onExploreObject={() => {}} />));
-  expect(host.querySelector('#saved-action')?.textContent).toContain('Saved action unavailable');
-  expect(host.querySelector('#saved-action')?.textContent).not.toContain('No saved action yet');
-  expect(host.querySelector('[aria-label="Assistant sections"]')?.textContent).toContain('Unavailable');
+  expect(host.querySelector('#saved')?.textContent).toContain('Saved answers could not be read');
+  expect(host.querySelector('#saved')?.textContent).not.toContain('No saved action yet');
   read.mockRestore(); await click('Try loading again');
-  expect(host.querySelector<HTMLTextAreaElement>('#action-note')?.value).toBe('Keep my original note');
+  expect(readSavedAnswers().answers[0].legacyNote).toBe('Keep my original note');
   expect(readAction().action?.note).toBe('Keep my original note');
 });
 it('keeps the save retry inside the affected saved-action section', async () => {
@@ -409,8 +408,8 @@ it('explains save availability beside non-action answers and shows Save for read
   for (const status of ['explanation', 'clarify', 'refused', 'unsupported', 'ready'] as const) {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json({...generated,plan:{...generated.plan,status,steps:status === 'ready' ? generated.plan.steps : [],alternative:'',questions:status === 'clarify' ? ['Which material is it?'] : []}})));
     await input('ai-description', 'Please help me understand the next step for my situation.'); await click('Get AI guidance');
-    const save = [...host.querySelectorAll('button')].find(button => button.textContent === 'Save action on this device');
-    if (status === 'ready') {
+    const save = [...host.querySelectorAll('button')].find(button => button.textContent === 'Save answer');
+    if (status === 'ready' || status === 'explanation') {
       expect(save).toBeDefined(); expect(save?.disabled).toBe(false);
       expect(host.querySelector('#answer-save-hint')).toBeNull();
     } else {
@@ -419,6 +418,28 @@ it('explains save availability beside non-action answers and shows Save for read
       else expect(host.querySelector('#answer-save-hint')?.textContent?.length).toBeGreaterThan(20);
     }
   }
+});
+
+it('keeps drafts and answers while switching tabs, saves several answers and supports keyboard navigation', async () => {
+  await act(async () => root.render(<DecisionHelper standalone onExploreObject={() => {}} />));
+  vi.stubGlobal('fetch', vi.fn().mockImplementation(async () => Response.json(generated)));
+  await input('ai-description', 'How can I repair my jacket button?'); await click('Get AI guidance'); await click('Save answer');
+  await input('ai-description', 'Explain how to reduce clothing waste.');
+  await act(async () => host.querySelector<HTMLButtonElement>('#saved-tab')!.click());
+  expect(host.querySelector<HTMLElement>('#ask')?.hidden).toBe(true);
+  expect(host.querySelector<HTMLElement>('#saved')?.hidden).toBe(false);
+  await act(async () => host.querySelector<HTMLButtonElement>('#ask-tab')!.click());
+  expect(host.querySelector<HTMLTextAreaElement>('#ai-description')?.value).toBe('Explain how to reduce clothing waste.');
+  await click('Get AI guidance'); await click('Save answer');
+  expect(readSavedAnswers().answers).toHaveLength(2);
+  await act(async () => host.querySelector('#ask-tab')!.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true })));
+  expect(document.activeElement?.id).toBe('saved-tab');
+  await click('Remove saved answer'); expect(readSavedAnswers().answers).toHaveLength(1);
+  await click('Undo removal'); expect(readSavedAnswers().answers).toHaveLength(2);
+  await act(async () => { history.replaceState(null, '', '#ask'); window.dispatchEvent(new PopStateEvent('popstate')); });
+  expect(host.querySelector<HTMLElement>('#ask')?.hidden).toBe(false);
+  expect(host.querySelector('[aria-label="Your answer"]')?.textContent).toContain(generated.plan.action);
+  expect(fetch).toHaveBeenCalledTimes(2);
 });
 
 it('keeps off-topic redirects brief without references or action controls', async () => {

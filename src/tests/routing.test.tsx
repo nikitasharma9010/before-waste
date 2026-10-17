@@ -31,7 +31,7 @@ it('shows only a compact entry on home and full guidance at a directly loaded as
   expect(host.querySelector('header a[href="/#follow-one-thing"]')?.textContent).toContain('Follow One Thing');
   expect(host.querySelectorAll('header a[href="/#follow-one-thing"]')).toHaveLength(1);
   expect(host.querySelector<HTMLTextAreaElement>('#ai-description')?.value).toContain('small flat');
-  expect(host.querySelector('#saved-action')?.textContent).toContain('Keep my existing action');
+  expect(host.querySelector('#saved')?.textContent).toContain('Keep my existing action');
   expect(sessionStorage.getItem(QUESTION_DRAFT_KEY)).toBeNull();
   expect(request).not.toHaveBeenCalled();
   expect(document.title).toContain('Ask Before Waste');
@@ -130,7 +130,7 @@ it('resumes a selected story and stage after visiting the assistant', async () =
 it('places a saved-action return path in the welcome and focuses saved actions on direct entry', async () => {
   localStorage.setItem(ACTION_KEY,JSON.stringify({item:'clothes',intent:'buy',support:'myself',budget:'free',note:'Keep this note',outcome:'planned'}));
   await act(async () => root.render(<App />));
-  expect(host.querySelector('#hero a[href="/ask#saved-action"]')).not.toBeNull();
+  expect(host.querySelector('#hero a[href="/ask#saved"]')).not.toBeNull();
   await act(async () => root.unmount()); root=createRoot(host);
   window.history.replaceState({}, '', '/ask#saved-action');
   await act(async () => root.render(<App />));
@@ -226,10 +226,10 @@ it('supports an empty saved-action deep link and a direct return to Ask', async 
   history.replaceState({}, '', '/ask#saved-action');
   await act(async () => root.render(<App />));
   expect(document.activeElement?.id).toBe('saved-action');
-  expect(host.querySelector('#saved-action')?.textContent).toContain('No saved action yet');
-  const back = host.querySelector<HTMLAnchorElement>('#saved-action a[href="#decision-title"]')!;
+  expect(host.querySelector('#saved')?.textContent).toContain('No saved answers yet');
+  const back = host.querySelector<HTMLAnchorElement>('#saved a[href="#ask"]')!;
   await act(async () => back.click());
-  expect(document.activeElement?.id).toBe('decision-title');
+  expect(document.activeElement?.id).toBe('ask');
 });
 
 it('provides one data disclosure on ask and opens it from the footer', async () => {
