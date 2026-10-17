@@ -89,7 +89,7 @@ export function AIPlannerForm({ decision, hasDraft, initialQuestion = '', standa
     </div> : <button type="button" className="min-h-[44px] py-2 text-sm font-semibold text-forest underline underline-offset-4" onClick={() => { setShowLocation(true); requestAnimationFrame(() => locationField.current?.focus()); }}>+ Add your location (optional)</button>}
     <p id="ai-privacy-summary" className="text-sm text-ink/80">{standalone ? 'Leave out private information — your question goes to an external AI service.' : 'AI can make mistakes. Leave out private information. You choose what to save.'}</p>
     <details className="text-sm text-ink/80"><summary className="min-h-[44px] cursor-pointer py-3 underline underline-offset-4">How your question is used</summary>
-      <p id="ai-privacy" className="pb-3">Your question, optional location and selected answers are sent to an external AI service to prepare a response. If the first service is unavailable, a backup service may process the same details. Your saved notes are not sent. Answers do not include a live local-service search.</p>
+      <p id="ai-privacy" className="pb-3">Your question, optional location and selected answers are sent to an external AI service to prepare a response. Your saved notes are not sent. Answers do not include a live local-service search.</p>
     </details>
     {hasDraft && <p className="text-sm">Your current draft stays available while you edit or retry. A successful new answer replaces the unsaved draft; your saved action stays.</p>}
     <div className="flex flex-wrap items-center gap-3">
