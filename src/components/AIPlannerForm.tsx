@@ -4,11 +4,12 @@ import type { Decision } from '../data/decisionData';
 import { parseGeneratedPlan, type GeneratedPlan, type PlannerContext } from '../data/aiPlan';
 
 const starters = ['How can I waste less food?', 'What can I do with a broken chair?', 'What does a circular economy mean?'];
-export function AIPlannerForm({ decision, hasDraft, initialQuestion = '', standalone = false, onResult, onFallback, onBusyChange, context = [], followUp = false, background = '' }: {
+export function AIPlannerForm({ decision, hasDraft, initialQuestion = '', standalone = false, onResult, onFallback, onBusyChange, context = [], followUp = false, replyToClarification = false, background = '' }: {
   decision: Decision;
   context?: PlannerContext[];
   background?: string;
   followUp?: boolean;
+  replyToClarification?: boolean;
   initialQuestion?: string;
   hasDraft: boolean;
   standalone?: boolean;
@@ -72,7 +73,7 @@ export function AIPlannerForm({ decision, hasDraft, initialQuestion = '', standa
   }
   return <form aria-label="Ask Before Waste" className="space-y-4" onSubmit={event => { event.preventDefault(); void generate(); }}>
     <div>
-      <label htmlFor="ai-description" className="block font-semibold">{followUp ? 'Ask a follow-up or add details' : 'Ask about an item or sustainable living'}</label>
+      <label htmlFor="ai-description" className="block font-semibold">{replyToClarification ? 'Answer the questions above' : followUp ? 'Ask a follow-up or add details' : 'Ask about an item or sustainable living'}</label>
       <p id="ai-hint" className="mt-2 text-sm text-ink/80">Include relevant details: budget, what you tried and any constraints.</p>
     </div>
     <textarea ref={field} id="ai-description" rows={4} maxLength={1500} value={description}

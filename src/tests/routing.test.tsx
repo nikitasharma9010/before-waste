@@ -221,3 +221,13 @@ it('keeps all learning topics available and preserves exploration when switching
   expect(host.querySelector('#tab-linear')?.getAttribute('aria-pressed')).toBe('true');
   expect(host.querySelectorAll('[data-learning-panel]:not([hidden])')).toHaveLength(1);
 });
+
+it('supports an empty saved-action deep link and a direct return to Ask', async () => {
+  history.replaceState({}, '', '/ask#saved-action');
+  await act(async () => root.render(<App />));
+  expect(document.activeElement?.id).toBe('saved-action');
+  expect(host.querySelector('#saved-action')?.textContent).toContain('No saved action yet');
+  const back = host.querySelector<HTMLAnchorElement>('#saved-action a[href="#decision-title"]')!;
+  await act(async () => back.click());
+  expect(document.activeElement?.id).toBe('decision-title');
+});

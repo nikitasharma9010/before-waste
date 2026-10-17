@@ -16,7 +16,9 @@ beforeEach(async () => {
 });
 afterEach(async () => { await act(async () => root.unmount()); host.remove(); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
 async function input(id: string, value: string) {
+  if (id === 'reviewed-plan' && host.querySelector<HTMLElement>('#reviewed-plan')?.closest('[hidden]')) await click('Edit before saving');
   const el = host.querySelector<HTMLTextAreaElement>(`#${id}`)!;
+  for (let parent = el.parentElement; parent; parent = parent.parentElement) if (parent instanceof HTMLDetailsElement) parent.open = true;
   await act(async () => {
     Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value')!.set!.call(el, value);
     el.dispatchEvent(new Event('input', { bubbles: true }));
@@ -25,6 +27,7 @@ async function input(id: string, value: string) {
 async function click(text: string) {
   const button = [...host.querySelectorAll('button')].find(b => b.textContent?.includes(text));
   if (!button) throw new Error(`Missing ${text}`);
+  for (let parent = button.parentElement; parent; parent = parent.parentElement) if (parent instanceof HTMLDetailsElement) parent.open = true;
   await act(async () => button.click());
 }
 it('generates, edits and saves the actual accepted plan across reload without another model call', async () => {
@@ -33,7 +36,7 @@ it('generates, edits and saves the actual accepted plan across reload without an
   await click('Get AI guidance');
   expect(host.textContent).toContain('AI-GENERATED DRAFT');
   await input('reviewed-plan', 'My edited plan: ask a friend for a matching spare button.');
-  await click('Save this action');
+  await click('Save action on this device');
   expect(readAction().action?.customPlan?.text).toContain('My edited plan');
   await act(async () => root.unmount()); root = createRoot(host);
   await act(async () => root.render(<DecisionHelper onExploreObject={() => {}} />));
@@ -53,7 +56,7 @@ it('asks for clarification and does not allow saving an unready AI draft', async
   vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json({ ...generated, plan: { ...generated.plan, status: 'clarify', alternative: '', steps: [], questions: ['Is the fabric torn or just the stitching?'] } })));
   await input('ai-description', 'There is something wrong with my favourite coat near the shoulder.'); await click('Get AI guidance');
   expect(host.textContent).toContain('Is the fabric torn');
-  expect([...host.querySelectorAll('button')].some(b => b.textContent?.includes('Save this action'))).toBe(false);
+  expect([...host.querySelectorAll('button')].some(b => b.textContent?.includes('Save action on this device'))).toBe(false);
 });
 it('discards stale AI output after a form selection changes', async () => {
   await click('Use guided examples');
@@ -77,7 +80,7 @@ it('keeps provider metadata compatible without displaying provider or model name
   await input('ai-description', 'My coat button is loose and I have no sewing supplies.'); await click('Get AI guidance');
   expect(host.textContent).toContain('AI-GENERATED DRAFT');
   expect(host.textContent).not.toMatch(/Gemini|AICredits|gpt-4o-mini/);
-  await click('Save this action');
+  await click('Save action on this device');
   expect(readAction().action?.customPlan?.provider).toBe('aicredits');
   expect(host.querySelector('#saved-action')?.textContent).not.toMatch(/Gemini|AICredits|gpt-4o-mini/);
 });
@@ -90,7 +93,7 @@ it('starts with free questions and preserves a broad answer across saving and re
     reason: 'Preventing surplus comes before disposal.', steps: ['Check your pantry before making a shopping list.'], resourceIds: ['food'] } }));
   vi.stubGlobal('fetch', request);
   await input('ai-description', 'How can I waste less food in a small household?');
-  await click('Get AI guidance'); await click('Save this action');
+  await click('Get AI guidance'); await click('Save action on this device');
   expect(readAction().action?.item).toBe('anything');
   expect(readAction().action?.customPlan?.text).toContain('Plan around what needs using first');
   await act(async () => root.unmount()); root = createRoot(host);
@@ -149,7 +152,7 @@ it('preserves reviewed draft edits when the question changes and a retry fails',
   await click('Get AI guidance');
   expect(host.querySelector<HTMLTextAreaElement>('#reviewed-plan')?.value).toBe('Keep my carefully edited plan.');
   expect(host.textContent).toContain('Your previous draft is still available.');
-  await click('Save this action');
+  await click('Save action on this device');
   expect(readAction().action?.customPlan?.text).toBe('Keep my carefully edited plan.');
 });
 it('takes clarification directly back to the original question', async () => {
@@ -184,14 +187,16 @@ it('keeps starter suggestions after the question field and offers optional editi
   expect(field.compareDocumentPosition(examples) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json(generated)));
   await input('ai-description', 'My coat button is loose. What should I do?'); await click('Get AI guidance');
-  const review = host.querySelector<HTMLDetailsElement>('#reviewed-plan')!.closest('details')!;
-  expect(review.open).toBe(false);
-  const summary = review.querySelector('summary')!;
-  await act(async () => summary.click());
-  expect(review.open).toBe(true);
+  const editor = host.querySelector('#reviewed-plan')!.parentElement!;
+  expect(editor.hidden).toBe(true);
+  const more = [...host.querySelectorAll('summary')].find(summary => summary.textContent === 'More')!;
+  await act(async () => more.click());
+  await click('Edit before saving');
+  expect(editor.hidden).toBe(false);
+  expect(document.activeElement?.id).toBe('reviewed-plan');
   await input('reviewed-plan', '');
   expect(host.textContent).toContain('Add some text to the draft before saving it.');
-  expect([...host.querySelectorAll('button')].find(b => b.textContent?.includes('Save this action'))?.disabled).toBe(true);
+  expect([...host.querySelectorAll('button')].find(b => b.textContent?.includes('Save action on this device'))?.disabled).toBe(true);
 });
 it('supports follow-ups, saves original context and clears only unsaved conversation', async () => {
   await act(async () => root.render(<DecisionHelper standalone onExploreObject={() => {}} />));
@@ -202,7 +207,7 @@ it('supports follow-ups, saves original context and clears only unsaved conversa
   const result = host.querySelector('[aria-label="Your suggested next step"]')!;
   const composer = host.querySelector('form')!;
   expect(result.compareDocumentPosition(composer) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-  await click('Save this action');
+  await click('Save action on this device');
   expect(readAction().action?.question).toBe(original);
   await input('action-note', 'Private note that should stay local');
   await input('ai-description', 'What if I cannot find the spare button?'); await click('Get AI guidance');
@@ -251,7 +256,7 @@ it('renders explanation and refusal responses without a save button or empty act
     await input('ai-description', 'Explain which options fit the lower-waste theme.'); await click('Get AI guidance');
     expect(host.textContent).not.toContain('Another option:');
     expect(host.querySelector('#reviewed-plan')).toBeNull();
-    expect([...host.querySelectorAll('button')].some(b=>b.textContent?.includes('Save this action'))).toBe(false);
+    expect([...host.querySelectorAll('button')].some(b=>b.textContent?.includes('Save action on this device'))).toBe(false);
   }
 });
 it('prioritizes the first answer and keeps the submitted question in a closed disclosure', async () => {
@@ -291,7 +296,7 @@ it('does not show replacement warnings for a clarification that cannot be saved'
 });
 it('updates the current saved plan without resetting its note and progress', async () => {
   vi.stubGlobal('fetch',vi.fn().mockResolvedValue(Response.json(generated)));
-  await input('ai-description','My coat has a loose button and I need a practical repair.'); await click('Get AI guidance'); await click('Save this action');
+  await input('ai-description','My coat has a loose button and I need a practical repair.'); await click('Get AI guidance'); await click('Save action on this device');
   await input('action-note','Keep my note');
   const outcome=host.querySelector<HTMLSelectElement>('#action-outcome')!;
   await act(async()=>{outcome.value='done';outcome.dispatchEvent(new Event('change',{bubbles:true}));});
@@ -308,9 +313,39 @@ it('offers a retry when browser saving fails, without dropping session edits or 
   vi.stubGlobal('fetch',vi.fn().mockResolvedValue(Response.json(generated)));
   await input('ai-description','My coat has a loose button and I need a repair plan.'); await click('Get AI guidance');
   const write=vi.spyOn(Storage.prototype,'setItem').mockImplementation(()=>{throw new Error('blocked');});
-  await click('Save this action'); await input('action-note','Keep this session note');
+  await click('Save action on this device'); await input('action-note','Keep this session note');
   expect(host.querySelector('#action-storage-status')?.textContent).toContain('session only');
   write.mockRestore(); await click('Try saving again');
   expect(readAction().action?.note).toBe('Keep this session note');
   expect(host.querySelector('#action-storage-status')?.textContent).toContain('Action saved');
+});
+
+it('keeps copy and editing under More and replaces Save with a saved-action link', async () => {
+  await act(async () => root.render(<DecisionHelper standalone onExploreObject={() => {}} />));
+  vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json(generated)));
+  await input('ai-description', 'My coat has a loose button. What should I check?'); await click('Get AI guidance');
+  const copy = [...host.querySelectorAll('button')].find(button => button.textContent === 'Copy answer')!;
+  expect(copy.closest('details')?.querySelector('summary')?.textContent).toBe('More');
+  expect(copy.closest('details')?.open).toBe(false);
+  expect(host.textContent).not.toContain('Ask a follow-up below');
+  expect(host.textContent).not.toContain('Answer these questions below');
+  expect(host.querySelector('#conversation-background')?.closest('details')?.querySelector('summary')?.textContent).toBe('Conversation settings');
+  await click('Save action on this device');
+  expect([...host.querySelectorAll('button')].some(button => button.textContent === 'Save action on this device')).toBe(false);
+  expect([...host.querySelectorAll('a')].find(link => link.textContent === 'Saved · View my action')?.getAttribute('href')).toBe('#saved-action');
+  expect(host.querySelector('[aria-label="Assistant sections"] a[href="#saved-action"]')?.textContent).toContain('1');
+});
+it('provides a permanent saved-action section with an honest empty state', async () => {
+  expect(host.querySelector('#saved-section-title')?.textContent).toBe('My saved action');
+  expect(host.querySelector('#saved-action')?.textContent).toContain('No saved action yet');
+  expect(host.querySelector('#saved-action')?.textContent).toContain('does not sync across devices');
+  expect(host.querySelector('[aria-label="Assistant sections"] a[href="#saved-action"]')?.textContent).toContain('0');
+});
+it('offers a reply input for clarification without save or edit actions', async () => {
+  await act(async () => root.render(<DecisionHelper standalone onExploreObject={() => {}} />));
+  vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json({...generated,plan:{...generated.plan,status:'clarify',steps:[],alternative:'',questions:['Which item needs attention?']}})));
+  await input('ai-description', 'Should I repair or replace it?'); await click('Get AI guidance');
+  expect(host.querySelector('label[for="ai-description"]')?.textContent).toBe('Answer the questions above');
+  expect(host.querySelector('#reviewed-plan')).toBeNull();
+  expect([...host.querySelectorAll('button')].some(button => /Save action on this device|Edit before saving/.test(button.textContent ?? ''))).toBe(false);
 });
