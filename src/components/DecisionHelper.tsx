@@ -20,6 +20,7 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
   const [editedPlan, setEditedPlan] = useState('');
   const [answeredQuestion, setAnsweredQuestion] = useState('');
   const [asking, setAsking] = useState(false);
+  const [background, setBackground] = useState('');
   const [history, setHistory] = useState<PlannerContext[]>([]);
   const [conversationKey, setConversationKey] = useState(0);
   const context = generated ? [...history, { question: answeredQuestion, answer: planText(generated.plan).slice(0, 1000) }].slice(-2) : [];
@@ -96,8 +97,10 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
               </select>
             </label>}
             </>}
-            <AIPlannerForm key={conversationKey} context={context} followUp={!!generated} standalone={standalone} initialQuestion={conversationKey === 0 ? initialQuestion : ''} decision={decision} hasDraft={!!generated} onBusyChange={setAsking} onResult={(snapshot, plan, question) => {
+            {generated && <details className="rounded-xl border border-ink/15 bg-paper p-4"><summary className="min-h-[44px] cursor-pointer py-2 font-semibold">Review conversation background</summary><label htmlFor="conversation-background" className="mt-2 block text-sm">Earlier details to keep using (optional)</label><p id="background-hint" className="mt-2 text-sm text-ink/80">Your first question is kept here so details survive longer conversations. Edit or clear anything that no longer applies. This background is sent with follow-ups and clears when you reload or start again.</p><textarea id="conversation-background" aria-describedby="background-hint" maxLength={1700} disabled={asking} rows={3} value={background} onChange={event => setBackground(event.target.value)} className={`${control} mt-3 disabled:opacity-60`} /></details>}
+            <AIPlannerForm background={background} key={conversationKey} context={context} followUp={!!generated} standalone={standalone} initialQuestion={conversationKey === 0 ? initialQuestion : ''} decision={decision} hasDraft={!!generated} onBusyChange={setAsking} onResult={(snapshot, plan, question) => {
               if (generated) setHistory(context);
+              else if (!background) setBackground(question);
               setAnsweredQuestion(question);
               setResult(snapshot); setGenerated(plan); setEditedPlan(planText(plan.plan));
               requestAnimationFrame(() => resultRef.current?.focus());
@@ -182,7 +185,7 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
           </>}
           {standalone && history.length > 0 && <details className="rounded-xl border border-ink/15 bg-paper p-4"><summary className="min-h-[44px] cursor-pointer py-2 font-semibold">Earlier in this conversation</summary>{history.map((turn, i) => <div key={i} className="mt-4 border-t border-ink/15 pt-4"><p className="whitespace-pre-wrap break-words font-semibold">{turn.question}</p><p className="mt-2 whitespace-pre-wrap break-words text-sm">{turn.answer}</p></div>)}</details>}
           {standalone && composer}
-          {standalone && generated && <button type="button" className="min-h-[44px] self-start py-2 font-semibold text-forest underline underline-offset-4" onClick={() => { if (!window.confirm('Start a new conversation? The unsaved conversation will be cleared. Your saved action stays.')) return; setGenerated(null); setResult(null); setAnsweredQuestion(''); setEditedPlan(''); setHistory([]); setConversationKey(key => key + 1); requestAnimationFrame(editQuestion); }}>Start a new conversation</button>}
+          {standalone && generated && <button type="button" className="min-h-[44px] self-start py-2 font-semibold text-forest underline underline-offset-4" onClick={() => { if (!window.confirm('Start a new conversation? The unsaved conversation will be cleared. Your saved action stays.')) return; setGenerated(null); setResult(null); setAnsweredQuestion(''); setEditedPlan(''); setHistory([]); setBackground(''); setConversationKey(key => key + 1); requestAnimationFrame(editQuestion); }}>Start a new conversation</button>}
         </div>
         <p id="action-storage-status" role="status" className="mt-5 text-sm">{notice}</p>
         {undoAction && <button type="button" className="min-h-[44px] py-2 font-semibold text-forest underline underline-offset-4" onClick={() => {

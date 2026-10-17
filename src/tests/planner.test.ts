@@ -77,7 +77,7 @@ it('uses AICredits directly when Gemini is unconfigured or AICredits mode is sel
   }
 });
 it('does not spend backup credits after a successful Gemini answer, including clarification', async () => {
-  const upstream = vi.fn().mockResolvedValue(Response.json(completed({ ...plan, status: 'clarify', steps: [], questions: ['Which model is it?'] })));
+  const upstream = vi.fn().mockResolvedValue(Response.json(completed({ ...plan, status: 'clarify', alternative: '', steps: [], questions: ['Which model is it?'] })));
   expect((await generatePlan(input, backupEnv, upstream)).plan.status).toBe('clarify');
   expect(upstream).toHaveBeenCalledTimes(1);
 });
@@ -121,7 +121,7 @@ it('enforces method, origin, media type, malformed and oversized body constraint
   expect((await invoke(input, { origin: 'https://other.test' })).status).toBe(403);
   expect((await invoke(input, { 'content-type': 'text/plain' })).status).toBe(415);
   expect((await invoke('not-json')).status).toBe(400);
-  expect((await invoke({ ...input, description: 'a'.repeat(33000) })).status).toBe(413);
+  expect((await invoke({ ...input, description: 'a'.repeat(41000) })).status).toBe(413);
 });
 it('returns validated AI output through the actual API handler without exposing configuration', async () => {
   vi.stubEnv('GEMINI_API_KEY', 'test-api-key'); vi.stubEnv('GEMINI_MODEL', 'gemini-3.8-flash');
@@ -224,7 +224,7 @@ it('forwards bounded previous turns and rejects extra steps for an explicit one-
   const body = JSON.parse(upstream.mock.calls[0][1].body);
   expect(body.response_format.schema.properties.steps.maxItems).toBe(1);
   expect(JSON.parse(body.input).previousTurns).toEqual(requestInput.context);
-  const one = { ...plan, steps: [plan.steps[0]] };
+  const one = { ...plan, alternative: '', steps: [plan.steps[0]] };
   expect((await generatePlan(requestInput, env, vi.fn().mockResolvedValue(Response.json(completed(one))))).plan.steps).toHaveLength(1);
 });
 it('retains essential deterministic safety guidance even when one action is requested', async () => {

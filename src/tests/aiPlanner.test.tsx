@@ -50,7 +50,7 @@ it('shows honest basic guidance when the AI service is not configured', async ()
   expect(host.textContent).not.toContain('AI-GENERATED DRAFT');
 });
 it('asks for clarification and does not allow saving an unready AI draft', async () => {
-  vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json({ ...generated, plan: { ...generated.plan, status: 'clarify', steps: [], questions: ['Is the fabric torn or just the stitching?'] } })));
+  vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json({ ...generated, plan: { ...generated.plan, status: 'clarify', alternative: '', steps: [], questions: ['Is the fabric torn or just the stitching?'] } })));
   await input('ai-description', 'There is something wrong with my favourite coat near the shoulder.'); await click('Get AI guidance');
   expect(host.textContent).toContain('Is the fabric torn');
   expect([...host.querySelectorAll('button')].some(b => b.textContent?.includes('Save this action'))).toBe(false);
@@ -153,7 +153,7 @@ it('preserves reviewed draft edits when the question changes and a retry fails',
   expect(readAction().action?.customPlan?.text).toBe('Keep my carefully edited plan.');
 });
 it('takes clarification directly back to the original question', async () => {
-  vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json({ ...generated, plan: { ...generated.plan, status: 'clarify', steps: [], questions: ['What fabric is it?'] } })));
+  vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json({ ...generated, plan: { ...generated.plan, status: 'clarify', alternative: '', steps: [], questions: ['What fabric is it?'] } })));
   await input('ai-description', 'There is a tear near the shoulder of my coat.'); await click('Get AI guidance');
   await click('Add details to my question');
   expect(document.activeElement?.id).toBe('ai-description');
@@ -222,4 +222,35 @@ it('shows food safety guidance for food-related answers', async () => {
   vi.stubGlobal('fetch', vi.fn().mockImplementation(async () => Response.json(generated)));
   await input('ai-description', 'How can I prevent vegetable food waste in my flat?'); await click('Get AI guidance');
   expect(host.querySelector('[aria-label="Food safety"]')?.textContent).toContain('cannot determine whether food is safe');
+});
+it('keeps editable original details after recent turns expire and clears them on reset', async () => {
+  await act(async () => root.render(<DecisionHelper standalone onExploreObject={() => {}} />));
+  const request = vi.fn().mockImplementation(async () => Response.json(generated)); vi.stubGlobal('fetch', request);
+  const original = 'I live in Pune with no garden and cannot spend any money.';
+  await input('ai-description', original); await click('Get AI guidance');
+  for (const question of ['What else should I consider here?', 'Can you explain the reason a little more?', 'How should I choose between those options?']) {
+    await input('ai-description', question); await click('Get AI guidance');
+  }
+  const latest = JSON.parse(request.mock.calls[3][1].body);
+  expect(latest.context).toHaveLength(2);
+  expect(latest.context.some((turn: { question: string }) => turn.question === original)).toBe(false);
+  expect(latest.background).toBe(original);
+  await input('conversation-background', 'I now live in Mumbai and have access to a shared garden.');
+  await input('ai-description', 'Please adapt the next step to my updated situation.'); await click('Get AI guidance');
+  expect(JSON.parse(request.mock.calls[4][1].body).background).toContain('Mumbai');
+  await input('conversation-background', '');
+  await input('ai-description', 'Please give me general guidance without that background.'); await click('Get AI guidance');
+  expect(JSON.parse(request.mock.calls[5][1].body).background).toBeUndefined();
+  vi.spyOn(window,'confirm').mockReturnValue(true); await click('Start a new conversation');
+  await input('ai-description', 'How can I use less packaging at home?'); await click('Get AI guidance');
+  expect(JSON.parse(request.mock.calls[6][1].body).background).toBeUndefined();
+});
+it('renders explanation and refusal responses without a save button or empty action sections', async () => {
+  for (const status of ['explanation','refused'] as const) {
+    vi.stubGlobal('fetch',vi.fn().mockImplementation(async () => Response.json({...generated,plan:{...generated.plan,status,steps:[],alternative:''}})));
+    await input('ai-description', 'Explain which options fit the lower-waste theme.'); await click('Get AI guidance');
+    expect(host.textContent).not.toContain('Another option:');
+    expect(host.querySelector('#reviewed-plan')).toBeNull();
+    expect([...host.querySelectorAll('button')].some(b=>b.textContent?.includes('Save this action'))).toBe(false);
+  }
 });

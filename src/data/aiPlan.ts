@@ -13,7 +13,7 @@ export const PLAN_RESOURCES = {
 } as const;
 export type ResourceId = keyof typeof PLAN_RESOURCES;
 export interface AIPlan {
-  status: 'ready' | 'clarify' | 'unsupported';
+  status: 'ready' | 'clarify' | 'unsupported' | 'refused' | 'explanation';
   summary: string;
   action: string;
   reason: string;
@@ -24,7 +24,7 @@ export interface AIPlan {
 }
 export interface GeneratedPlan { plan: AIPlan; source: 'ai' | 'safety'; model: string; provider?: 'gemini' | 'aicredits' }
 export interface PlannerContext { question: string; answer: string }
-export interface PlannerRequest extends Decision { description: string; location?: string; context?: PlannerContext[] }
+export interface PlannerRequest extends Decision { description: string; location?: string; context?: PlannerContext[]; background?: string }
 
 const record = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null && !Array.isArray(v);
 const shortText = (v: unknown, max: number): v is string => typeof v === 'string' && v.trim().length > 0 && v.length <= max && !/https?:\/\/|www\./i.test(v);
@@ -38,17 +38,17 @@ function normalizePlanText(value: string): string {
 }
 const unsupportedFormatting = (value: string) => /```|<\/?[a-z][^>]*>|^\s*\|.+\|/im.test(value);
 export function parsePlan(v: unknown): AIPlan | null {
-  if (!record(v) || (v.status !== 'ready' && v.status !== 'clarify' && v.status !== 'unsupported') ||
+  if (!record(v) || (v.status !== 'ready' && v.status !== 'clarify' && v.status !== 'unsupported' && v.status !== 'refused' && v.status !== 'explanation') ||
     !shortText(v.summary, 600) || !shortText(v.action, 200) || !shortText(v.reason, 600) ||
-    !shortText(v.alternative, 600) || !texts(v.steps, 3) || !texts(v.questions, 2) ||
+    !(v.alternative === '' || shortText(v.alternative, 600)) || !texts(v.steps, 3) || !texts(v.questions, 2) ||
     !Array.isArray(v.resourceIds) || v.resourceIds.length > 3 ||
     !v.resourceIds.every(id => typeof id === 'string' && Object.hasOwn(PLAN_RESOURCES, id)) ||
     (v.status === 'ready' && v.steps.length === 0) ||
-    (v.status !== 'ready' && v.steps.length !== 0) || (v.status === 'clarify' && v.questions.length === 0)) return null;
+    (v.status !== 'ready' && (v.steps.length !== 0 || v.alternative !== '')) || (v.status !== 'ready' && v.status !== 'clarify' && v.questions.length !== 0) || (v.status === 'clarify' && v.questions.length === 0)) return null;
   const rawFields = [v.action, v.summary, v.reason, v.alternative, ...v.steps, ...v.questions] as string[];
   if (rawFields.some(unsupportedFormatting)) return null;
   const normalized = rawFields.map(normalizePlanText);
-  if (normalized.some(text => !text)) return null;
+  if (normalized.some((text, index) => !text && index !== 3)) return null;
   return { status: v.status as AIPlan['status'], action: normalized[0], summary: normalized[1], reason: normalized[2],
     alternative: normalized[3], steps: normalized.slice(4, 4 + v.steps.length), questions: normalized.slice(4 + v.steps.length),
     resourceIds: [...new Set(v.resourceIds)] } as AIPlan;
@@ -71,13 +71,14 @@ export function parsePlannerRequest(v: unknown): PlannerRequest | null {
     typeof v.description !== 'string' || v.description.trim().length < 10 || v.description.length > 1500 ||
     ((v.item === 'anything') !== (v.intent === 'explore')) ||
     (v.issue !== undefined && !issues[v.item].some(i => i.id === v.issue))) return null;
+  if (v.background !== undefined && (typeof v.background !== 'string' || v.background.length > 1700)) return null;
   if (v.context !== undefined && (!Array.isArray(v.context) || v.context.length > 2 || !v.context.every(turn => record(turn) && typeof turn.question === 'string' && turn.question.length <= 1700 && typeof turn.answer === 'string' && turn.answer.length <= 1000))) return null;
-  return { ...(Array.isArray(v.context) ? { context: v.context.map(turn => ({ question: turn.question, answer: turn.answer })) } : {}), item: v.item, intent: v.intent, support: v.support, budget: v.budget,
+  return { ...(typeof v.background === 'string' && v.background.trim() ? { background: v.background.trim() } : {}), ...(Array.isArray(v.context) ? { context: v.context.map(turn => ({ question: turn.question, answer: turn.answer })) } : {}), item: v.item, intent: v.intent, support: v.support, budget: v.budget,
     issue: v.issue as PlannerRequest['issue'], description: v.description.trim(), ...(typeof v.location === 'string' && v.location.trim() ? { location: v.location.trim() } : {}) };
 }
 export const PLAN_LABELS = { reason: 'Why this fits', steps: 'Suggested steps', alternative: 'Another option', questions: 'Details to clarify', resources: 'Resources to check' } as const;
 export function planText(plan: AIPlan): string {
   return [plan.action, plan.summary, `${PLAN_LABELS.reason}: ${plan.reason}`, ...(plan.steps.length ? [PLAN_LABELS.steps] : []), ...plan.steps.map((s, i) => `${i + 1}. ${s}`),
-    `${PLAN_LABELS.alternative}: ${plan.alternative}`, ...(plan.questions.length ? [PLAN_LABELS.questions, ...plan.questions] : []),
+    ...(plan.alternative ? [`${PLAN_LABELS.alternative}: ${plan.alternative}`] : []), ...(plan.questions.length ? [PLAN_LABELS.questions, ...plan.questions] : []),
     ...(plan.resourceIds.length ? [PLAN_LABELS.resources] : []), ...plan.resourceIds.map(id => `${PLAN_RESOURCES[id].label}: ${PLAN_RESOURCES[id].url}`)].join('\n\n');
 }
