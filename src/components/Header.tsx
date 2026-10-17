@@ -40,9 +40,8 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSources }) => {
 
   const navLinks = [
     { label: 'Follow One Thing', href: '/#follow-one-thing' },
-    { label: 'The Pattern', href: '/#bigger-pattern' },
+    { label: 'Learn more', href: '/#learn' },
     { label: 'Ask Before Waste', href: '/ask' },
-    { label: 'One Planet', href: '/#one-planet' },
     { label: 'The 7-Day Pause', href: '/#pause' },
   ];
 

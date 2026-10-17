@@ -97,3 +97,51 @@ it('connects the final story stage to an editable question without calling AI', 
   expect(takeQuestionDraft()).toContain('T-shirt');
   expect(request).not.toHaveBeenCalled();
 });
+it('keeps learning optional and reveals old deep links on load and hash changes', async () => {
+  window.history.replaceState({}, '', '/#one-planet');
+  await act(async () => root.render(<App />));
+  expect(host.querySelector('#one-planet')?.closest('details')?.open).toBe(true);
+  expect(host.querySelector('#systems')?.closest('details')?.open).toBe(false);
+  expect(document.activeElement?.id).toBe('one-planet');
+  await act(async () => {
+    window.history.replaceState({}, '', '/#systems'); window.dispatchEvent(new HashChangeEvent('hashchange'));
+  });
+  expect(host.querySelector('#systems')?.closest('details')?.open).toBe(true);
+  expect(document.activeElement?.id).toBe('systems');
+  expect(host.querySelector('#pause')?.closest('details')?.open).toBe(false);
+});
+it('resumes a selected story and stage after visiting the assistant', async () => {
+  await act(async () => root.render(<App />));
+  await act(async () => host.querySelector<HTMLButtonElement>('#object-tab-smartphone')!.click());
+  await act(async () => host.querySelector<HTMLButtonElement>('button[aria-label^="Stage 3:"]')!.click());
+  await act(async () => root.unmount()); root = createRoot(host);
+  window.history.replaceState({}, '', '/ask');
+  await act(async () => root.render(<App />));
+  expect([...host.querySelectorAll('a')].find(a=>a.textContent==='Back to the stories')?.getAttribute('href')).toBe('/#follow-one-thing');
+  await act(async () => root.unmount()); root = createRoot(host);
+  window.history.replaceState({}, '', '/#follow-one-thing');
+  await act(async () => root.render(<App />));
+  expect(host.querySelector('#object-tab-smartphone')?.getAttribute('aria-pressed')).toBe('true');
+  expect(host.querySelector('[aria-current="step"]')?.getAttribute('aria-label')).toContain('Stage 3:');
+  await act(async () => [...host.querySelectorAll<HTMLAnchorElement>('a')].find(a=>a.textContent==='Explore an object’s story')!.click());
+  expect(host.querySelector('[aria-current="step"]')?.getAttribute('aria-label')).toContain('Stage 3:');
+});
+it('places a saved-action return path in the welcome and focuses saved actions on direct entry', async () => {
+  localStorage.setItem(ACTION_KEY,JSON.stringify({item:'clothes',intent:'buy',support:'myself',budget:'free',note:'Keep this note',outcome:'planned'}));
+  await act(async () => root.render(<App />));
+  expect(host.querySelector('#hero a[href="/ask#saved-action"]')).not.toBeNull();
+  await act(async () => root.unmount()); root=createRoot(host);
+  window.history.replaceState({}, '', '/ask#saved-action');
+  await act(async () => root.render(<App />));
+  expect(document.activeElement?.id).toBe('saved-action');
+});
+it('carries the chosen scenario into an editable question without sending it to AI', async () => {
+  const request=vi.fn(); vi.stubGlobal('fetch',request);
+  await act(async () => root.render(<App />));
+  const link=[...host.querySelectorAll<HTMLAnchorElement>('a')].find(a=>a.textContent==='Ask about this choice')!;
+  link.addEventListener('click',event=>event.preventDefault());
+  await act(async () => link.click());
+  const question=takeQuestionDraft();
+  expect(question).toContain('headphones'); expect(question).toContain('repaired');
+  expect(request).not.toHaveBeenCalled();
+});

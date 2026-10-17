@@ -1,3 +1,5 @@
+import { readStoryProgress, writeStoryProgress } from './utils/storyProgress';
+import { useSectionNavigation } from './utils/useSectionNavigation';
 import { SiteFooter } from './components/SiteFooter';
 import { useState, useRef, useEffect } from 'react';
 import { Header } from './components/Header';
@@ -32,8 +34,16 @@ export default function App() {
         : 'BEFORE WASTE — Think Before It Becomes Waste';
   }, [isAssistant, isNotFound]);
   // Single source of truth for selected object and stage
-  const [selectedObjectId, setSelectedObjectId] = useState<string>(() => { const id = new URLSearchParams(window.location.search).get('story'); return id && ['tshirt', 'smartphone', 'food', 'package'].includes(id) ? id : 'tshirt'; });
-  const [selectedStageIndex, setSelectedStageIndex] = useState<number>(0);
+  const [initialStory] = useState(() => {
+    const saved = readStoryProgress();
+    const requested = new URLSearchParams(window.location.search).get('story');
+    return requested && ['tshirt', 'smartphone', 'food', 'package'].includes(requested)
+      ? { id: requested, stage: requested === saved.id ? saved.stage : 0 } : saved;
+  });
+  const [selectedObjectId, setSelectedObjectId] = useState(initialStory.id);
+  const [selectedStageIndex, setSelectedStageIndex] = useState(initialStory.stage);
+  useEffect(() => { if (!isAssistant && !isNotFound) writeStoryProgress(selectedObjectId, selectedStageIndex); }, [selectedObjectId, selectedStageIndex, isAssistant, isNotFound]);
+  useSectionNavigation();
 
   // Sources dialog state and trigger ref
   const [sourcesModalOpen, setSourcesModalOpen] = useState<boolean>(false);
@@ -106,16 +116,12 @@ export default function App() {
       {/* Main Narrative Flow */}
       <main id="main-content" tabIndex={-1} className="flex-1">
         {isNotFound ? <NotFound /> : isAssistant ? <>
-          <div className="mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:px-8"><a href="/" className="inline-flex min-h-[44px] items-center font-semibold text-forest underline underline-offset-4">Back to the stories</a></div>
+          <div className="mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:px-8"><a href="/#follow-one-thing" className="inline-flex min-h-[44px] items-center font-semibold text-forest underline underline-offset-4">Back to the stories</a></div>
           <DecisionHelper standalone initialQuestion={initialQuestion} onExploreObject={id => window.location.assign(`/?story=${encodeURIComponent(id)}#follow-one-thing`)} />
           <TrustAndMethod onOpenSources={handleOpenSources} />
         </> : <>
         {/* 2. Opening Experience: Spark curiosity immediately */}
         <Welcome onExploreObjects={handleExploreObject} />
-
-        <AssistantEntry />
-
-        <HeroOpening onExploreObjects={handleExploreObject} />
 
         {/* 3. Signature Experience: Follow One Thing (Single Source of Truth) */}
         <FollowOneThing
@@ -128,21 +134,28 @@ export default function App() {
           onRestartStory={handleRestartStory}
         />
 
-        {/* 4. Reveal the Bigger Pattern */}
-        <BiggerPattern />
-
-        {/* 5. A Playful Moment: What would you do? */}
+        <div className="mx-auto max-w-7xl px-4 pb-8 sm:px-6 lg:px-8">
+          <details className="rounded-xl border border-ink/20 bg-surface p-4"><summary className="min-h-[44px] cursor-pointer py-2 font-semibold">Optional: a closer look at T-shirt materials</summary><HeroOpening onExploreObjects={handleExploreObject} /></details>
+        </div>
         <WhatWouldYouDo />
-
-        {/* 6. A Moment of Wonder: One planet, different demands */}
-        <OnePlanetDemands />
-
-        {/* 7. The Pause: A small action that matters */}
-        <SevenDayPause />
-
-        {/* 8. Individual Choices and Bigger Systems */}
-        <SystemsSection />
-        <TrustAndMethod onOpenSources={handleOpenSources} />
+        <AssistantEntry />
+        <section id="learn" tabIndex={-1} aria-labelledby="learn-title" className="scroll-mt-20 border-y border-ink/10 bg-paper px-4 py-10 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-7xl">
+            <p className="section-kicker text-forest">THE BIGGER PICTURE · OPTIONAL</p>
+            <h2 id="learn-title" className="mt-3 font-editorial text-2xl sm:text-3xl">Good choices need supportive systems.</h2>
+            <p className="mt-3 max-w-3xl leading-relaxed">Keeping useful things in use can avoid unnecessary replacements. What is possible also depends on product design, affordable repair and local services. Individuals cannot solve these challenges alone.</p>
+            <p className="mt-3 text-sm text-ink/80">Explore any topic below, or continue to an optional reflection. Your action does not depend on completing these sections.</p>
+            <div className="mt-5 space-y-3">
+              <details className="rounded-xl border border-ink/20"><summary className="min-h-[44px] cursor-pointer px-4 py-3 font-semibold">The Pattern: how earlier choices can prevent waste</summary><BiggerPattern /></details>
+              <details className="rounded-xl border border-ink/20"><summary className="min-h-[44px] cursor-pointer px-4 py-3 font-semibold">One Planet: explore resource demand</summary><OnePlanetDemands /></details>
+              <details className="rounded-xl border border-ink/20"><summary className="min-h-[44px] cursor-pointer px-4 py-3 font-semibold">Systems: design, access and collective change</summary><SystemsSection /></details>
+            </div>
+          </div>
+        </section>
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+          <details className="rounded-xl border border-ink/20 bg-surface"><summary className="min-h-[44px] cursor-pointer px-4 py-4 font-semibold">Optional reflection: try the 7-Day Pause</summary><p className="px-4 pb-4 text-sm text-ink/80">A separate buying-reflection exercise. It does not track your saved action or measure waste avoided.</p><SevenDayPause /></details>
+          <details className="mt-4 rounded-xl border border-ink/20"><summary className="min-h-[44px] cursor-pointer px-4 py-4 font-semibold">How it works, sources and your data</summary><TrustAndMethod onOpenSources={handleOpenSources} /></details>
+        </div>
         </>}
       </main>
 

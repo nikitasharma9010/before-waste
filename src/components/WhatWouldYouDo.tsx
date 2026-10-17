@@ -1,3 +1,4 @@
+import { QuestionLink } from './QuestionLink';
 import { handleRadioKeyDown } from '../utils/selectionKeyboard';
 import React, { useState } from 'react';
 import { SCENARIOS_DATA, Scenario, ScenarioOption } from '../data/scenariosData';
@@ -179,6 +180,10 @@ export const WhatWouldYouDo: React.FC = () => {
                   {selectedOption.nextStepSuggestion}
                 </p>
               </div>
+            </div>
+            <div className="mt-5 border-t border-ink/15 pt-4">
+              <p className="text-sm">Want help applying this choice? Add your real situation before sending the question.</p>
+              <QuestionLink key={`${activeScenarioId}-${selectedOptionId}`} label="Ask about this choice" question={`I explored this scenario: ${currentScenario.prompt} I am considering: ${selectedOption.label}. What should I check to decide whether this fits my own situation?`} />
             </div>
           </div>
         </div>

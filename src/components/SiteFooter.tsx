@@ -45,7 +45,7 @@ export function SiteFooter({ assistant = false, onRestart, onOpenSources }: {
           <h2 className="text-sm font-semibold text-white">Explore</h2>
           <ul className="mt-2">
             <li><a href={`${home}#follow-one-thing`} className={link}>Follow One Thing</a></li>
-            <li><a href={`${home}#bigger-pattern`} className={link}>The Pattern</a></li>
+            <li><a href={`${home}#learn`} className={link}>Learn more</a></li>
             <li><a href="/ask" aria-current={assistant ? 'page' : undefined} className={link}>Ask Before Waste</a></li>
             <li><a href={`${home}#pause`} className={link}>The 7-Day Pause</a></li>
           </ul>
