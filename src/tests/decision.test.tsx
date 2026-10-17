@@ -128,11 +128,11 @@ it('uses relevant reuse resources and validates older saved records', () => {
   expect(readAction().action).toMatchObject({ note: 'Old note', issue: 'unsure', barrier: undefined });
 });
 
-it('puts the decision flow before the interactive preview and aligns header calls to action', async () => {
+it('puts the compact assistant entry before the interactive preview and aligns header calls to action', async () => {
   await act(async () => root.render(<App />));
   const children = [...host.querySelector('main')!.children];
-  expect(children.indexOf(host.querySelector('#decision-helper')!)).toBeLessThan(children.indexOf(host.querySelector('#object-preview')!));
+  expect(children.indexOf(host.querySelector('#assistant-entry')!)).toBeLessThan(children.indexOf(host.querySelector('#object-preview')!));
   const cta = [...host.querySelectorAll('header a')].find(a => a.textContent?.includes('Ask Before Waste'));
-  expect(cta?.getAttribute('href')).toBe('#decision-helper');
+  expect(cta?.getAttribute('href')).toBe('/ask');
   expect(host.querySelectorAll('h1')).toHaveLength(1);
 });

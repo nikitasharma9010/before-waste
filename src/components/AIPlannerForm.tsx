@@ -4,13 +4,14 @@ import type { Decision } from '../data/decisionData';
 import { parseGeneratedPlan, type GeneratedPlan } from '../data/aiPlan';
 
 const starters = ['How can I waste less food?', 'What can I do with a broken chair?', 'What does a circular economy mean?'];
-export function AIPlannerForm({ decision, hasDraft, onResult, onFallback }: {
+export function AIPlannerForm({ decision, hasDraft, initialQuestion = '', onResult, onFallback }: {
   decision: Decision;
+  initialQuestion?: string;
   hasDraft: boolean;
   onResult: (decision: Decision, plan: GeneratedPlan, question: string) => void;
   onFallback: (decision: Decision) => void;
 }) {
-  const [description, setDescription] = useState('');
+  const [description, setDescription] = useState(initialQuestion);
   const [location, setLocation] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');

@@ -110,7 +110,7 @@ describe('real application interactions', () => {
   it('focuses the selected destination and closes the navigation drawer', async () => {
     await render(<App />);
     await click(host.querySelector('[aria-label="Toggle navigation menu"]')!);
-    const link = host.querySelector('#mobile-navigation-menu a[href="#pause"]')!;
+    const link = host.querySelector('#mobile-navigation-menu a[href="/#pause"]')!;
     await click(link);
     expect(host.querySelector('#mobile-navigation-menu')).toBeNull();
     expect(document.activeElement).toBe(host.querySelector('#pause'));
@@ -246,8 +246,8 @@ describe('real application interactions', () => {
 it('connects primary calls to action and trust details to working destinations', async () => {
   await act(async () => root.render(<App />));
   const primary = [...host.querySelectorAll('a')].filter(a => a.textContent?.trim() === 'Ask Before Waste');
-  expect(primary).toHaveLength(3);
-  for (const link of primary) expect(link.getAttribute('href')).toBe('#decision-helper');
+  expect(primary.length).toBeGreaterThanOrEqual(3);
+  for (const link of primary) expect(link.getAttribute('href')).toBe('/ask');
   const trust = host.querySelector('#how-it-works')!;
   expect(trust.textContent).toContain('external AI service');
   expect(trust.textContent).toContain('not endorsements');

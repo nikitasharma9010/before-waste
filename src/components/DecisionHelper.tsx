@@ -7,7 +7,8 @@ import { AIPlanContent } from './AIPlanContent';
 
 const control = 'w-full min-h-[44px] rounded-xl border border-ink/25 bg-surface p-3 text-ink';
 const primary = 'min-h-[44px] rounded-xl bg-forest px-5 py-3 font-semibold text-white hover:bg-forest-strong';
-export function DecisionHelper({ onExploreObject }: { onExploreObject: (id: string) => void }) {
+export function DecisionHelper({ onExploreObject, standalone = false, initialQuestion = '' }: { onExploreObject: (id: string) => void; standalone?: boolean; initialQuestion?: string }) {
+  const Heading = standalone ? 'h1' : 'h2';
   const [initial] = useState(readAction);
   const [saved, setSaved] = useState<SavedAction | null>(initial.action);
   const [notice, setNotice] = useState(initial.unavailable ? 'Saved actions could not be read. You can still use this flow.' : '');
@@ -56,11 +57,11 @@ export function DecisionHelper({ onExploreObject }: { onExploreObject: (id: stri
     requestAnimationFrame(() => savedRef.current?.focus());
   };
   return (
-    <section id="decision-helper" tabIndex={-1} aria-labelledby="decision-title" className="scroll-mt-20 border-y border-ink/10 bg-sage py-16 lg:py-24">
+    <section id="decision-helper" tabIndex={-1} aria-labelledby="decision-title" className={`scroll-mt-20 border-y border-ink/10 bg-sage ${standalone ? 'py-8 lg:py-12' : 'py-16 lg:py-24'}`}>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl mb-8">
           <p className="section-kicker text-forest mb-3">ONE OBJECT. ONE NEXT STEP.</p>
-          <h2 ref={titleRef} tabIndex={-1} id="decision-title" className="scroll-mt-20 font-editorial text-3xl sm:text-4xl lg:text-5xl">What should I do with this?</h2>
+          <Heading ref={titleRef} tabIndex={-1} id="decision-title" className="scroll-mt-20 font-editorial text-3xl sm:text-4xl lg:text-5xl">{standalone ? 'Ask Before Waste' : 'What should I do with this?'}</Heading>
           <p className="mt-4 text-lg">Before you buy, replace or let something go, find a starting point that fits your life.</p>
           <p className="mt-2 text-sm text-ink/80">Ask about any item, reducing waste or sustainable living. No account needed.</p>
           {saved && <a href="#saved-action" onClick={() => savedRef.current?.focus({ preventScroll: true })} className="mt-4 inline-flex min-h-[44px] items-center font-semibold text-forest underline underline-offset-4">Return to my saved action</a>}
@@ -100,7 +101,7 @@ export function DecisionHelper({ onExploreObject }: { onExploreObject: (id: stri
               </select>
             </label>}
             </>}
-            <AIPlannerForm decision={decision} hasDraft={!!generated} onResult={(snapshot, plan, question) => {
+            <AIPlannerForm initialQuestion={initialQuestion} decision={decision} hasDraft={!!generated} onResult={(snapshot, plan, question) => {
               setAnsweredQuestion(question);
               setResult(snapshot); setGenerated(plan); setEditedPlan(planText(plan.plan));
               requestAnimationFrame(() => resultRef.current?.focus());

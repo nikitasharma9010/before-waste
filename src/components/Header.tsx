@@ -36,16 +36,16 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSources }) => {
   }, [mobileMenuOpen]);
 
   const navLinks = [
-    { label: 'Follow One Thing', href: '#follow-one-thing' },
-    { label: 'The Pattern', href: '#bigger-pattern' },
-    { label: 'Find a Next Step', href: '#decision-helper' },
-    { label: 'One Planet', href: '#one-planet' },
-    { label: 'The 7-Day Pause', href: '#pause' },
+    { label: 'Follow One Thing', href: '/#follow-one-thing' },
+    { label: 'The Pattern', href: '/#bigger-pattern' },
+    { label: 'Ask Before Waste', href: '/ask' },
+    { label: 'One Planet', href: '/#one-planet' },
+    { label: 'The 7-Day Pause', href: '/#pause' },
   ];
 
   const handleLinkClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
     setMobileMenuOpen(false);
-    const target = document.getElementById(event.currentTarget.hash.slice(1));
+    const target = event.currentTarget.hash ? document.getElementById(event.currentTarget.hash.slice(1)) : null;
     if (target) {
       target.tabIndex = -1;
       target.focus({ preventScroll: true });
@@ -65,7 +65,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSources }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4 lg:gap-8">
         {/* Zone 1: Brand Wordmark */}
         <a
-          href="#hero"
+          href="/#hero"
           onClick={handleLinkClick}
           aria-label="Before Waste home"
           className="inline-flex items-center min-h-[44px] min-w-0 text-ink hover:text-clay rounded transition-colors"
@@ -81,6 +81,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSources }) => {
           {navLinks.map((link) => (
             <a
               key={link.href}
+              aria-current={link.href === '/ask' && /^\/ask\/?$/.test(window.location.pathname) ? 'page' : undefined}
               href={link.href}
               onClick={handleLinkClick}
               className="inline-flex items-center min-h-[44px] py-2 hover:text-ink hover:underline underline-offset-4 decoration-clay decoration-2 focus-visible:ring-2 focus-visible:ring-ink rounded transition-colors whitespace-nowrap shrink-0"
@@ -101,7 +102,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSources }) => {
         {/* Zone 3: 1 Primary Action & Mobile Toggle */}
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           <a
-            href="#decision-helper"
+            href="/ask"
             onClick={handleLinkClick}
             className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 min-h-[44px] text-sm font-semibold text-white bg-forest hover:bg-forest-strong focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ink rounded-xl transition-colors whitespace-nowrap shrink-0 shadow-xs"
           >
@@ -134,7 +135,8 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSources }) => {
             {navLinks.map((link) => (
               <a
                 key={link.href}
-                href={link.href}
+                aria-current={link.href === '/ask' && /^\/ask\/?$/.test(window.location.pathname) ? 'page' : undefined}
+              href={link.href}
                 onClick={handleLinkClick}
                 className="py-3 px-4 min-h-[44px] flex items-center rounded-xl text-base font-medium text-ink hover:bg-ink/5 focus-visible:ring-2 focus-visible:ring-ink transition-colors"
               >
@@ -153,7 +155,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSources }) => {
             </button>
             <div className="pt-2">
               <a
-                href="#decision-helper"
+                href="/ask"
                 onClick={handleLinkClick}
                 className="flex items-center justify-center gap-2 w-full py-3 px-4 min-h-[44px] text-center font-semibold text-white bg-forest hover:bg-forest-strong focus-visible:ring-2 focus-visible:ring-ink rounded-xl transition-colors shadow-xs"
               >
