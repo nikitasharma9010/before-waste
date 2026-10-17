@@ -110,9 +110,10 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
             }} onFallback={snapshot => {
               setResult(snapshot); setGenerated(null); setEditedPlan('');
             }} />
-            {standalone && <div className="flex items-center gap-3 pt-1" aria-hidden="true"><div className="h-px flex-1 bg-ink/10" /><span className="text-xs font-semibold uppercase tracking-wide text-ink/50">Or</span><div className="h-px flex-1 bg-ink/10" /></div>}
-            <button className={standalone ? 'min-h-[44px] w-full rounded-xl border border-ink/25 px-4 py-3 text-sm font-semibold hover:bg-ink/5' : 'min-h-[44px] py-2 text-sm font-semibold text-forest underline underline-offset-4'} type="button" onClick={showBasic}>{decision.item === 'anything' ? 'Browse general guidance (no AI)' : 'Find my next step (basic guidance)'}</button>
+            {!standalone && <>
+            <button className="min-h-[44px] py-2 text-sm font-semibold text-forest underline underline-offset-4" type="button" onClick={showBasic}>{decision.item === 'anything' ? 'Browse general guidance (no AI)' : 'Find my next step (basic guidance)'}</button>
             <p className="text-sm text-ink/80">General starting points. Your object’s condition, model and local services can change what is possible.</p>
+            </>}
           </div>
           {standalone && asking ? <div aria-hidden="true" className="mr-auto w-full max-w-full animate-pulse rounded-2xl rounded-bl-sm border border-ink/15 bg-paper p-5 sm:p-8">
             <div className="flex items-center gap-2 text-sm font-semibold text-ink/60"><LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" /><span>Preparing your answer…</span></div>
@@ -142,6 +143,11 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
                     void navigator.clipboard.writeText(editedPlan).then(() => setNotice('Draft copied.'), () => setNotice('Copy was unavailable. Select the draft text to copy it manually.'));
                   }}>Copy draft</button>
                 </div>}
+              </> : standalone ? <>
+              <p className="section-kicker text-clay mb-3">AI UNAVAILABLE</p>
+              <h3 className="text-2xl sm:text-3xl font-editorial">AI guidance isn’t available right now</h3>
+              <p className="mt-4 leading-relaxed">Your question is still in the form above — try again in a moment. In the meantime, here’s a general starting point:</p>
+              <p className="mt-3 text-sm">Related guidance: <a className="underline text-forest underline-offset-4" href={advice.resource.url}>{advice.resource.label}</a>.</p>
               </> : <>
               <p className="section-kicker text-clay mb-3">BASIC GUIDANCE · NOT AI GENERATED</p>
               <p className="text-sm mb-3">{itemLabels[result.item]} · {intentLabels[result.intent]}</p>
@@ -159,8 +165,10 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
               <p className="mt-3 text-xs text-ink/80">Editorial starting points, not a diagnosis or a measured environmental saving. Check collection and donation acceptance locally.</p>
               </>}
               {generated?.plan.status === 'ready' && !editedPlan.trim() && <p role="status" className="mt-4 text-sm text-clay">Add some text to the draft before saving it.</p>}
+              {!(standalone && !generated) && <>
               {saved && !isSameSaved && <p className="mt-5 text-sm">Replacing your action starts a new note and outcome. Undo is available until the next replacement, removal or page reload.</p>}
               {(!generated || generated.plan.status === 'ready') && <button type="button" disabled={!!generated && !editedPlan.trim()} className={`${primary} mt-6 disabled:opacity-60`} onClick={saveResult}>{saved ? (isSameSaved ? 'View my saved action' : 'Replace my saved action with this') : 'Save this action for the week'}</button>}
+              </>}
             </> : <><h3 className="text-2xl font-editorial">Your answer will appear here.</h3><p className="mt-4 leading-relaxed">Ask a question to understand an idea or find a practical next step. Your answer will appear here, ready to review, edit and save.</p><p className="mt-4 text-sm">Include the details that matter to you. You can refine your question after reading the answer.</p></>}
           </div>
           </>}

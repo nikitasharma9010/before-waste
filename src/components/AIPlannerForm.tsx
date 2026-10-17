@@ -102,6 +102,6 @@ export function AIPlannerForm({ decision, hasDraft, initialQuestion = '', standa
       }}>Cancel request</button>}
     </div>
     <p role="status" aria-live="polite" aria-atomic="true" className="text-sm">{status}</p>
-    {error && <div className="rounded-xl border border-clay/30 bg-paper p-4 text-sm"><p id="ai-error" role="alert">{error}</p>{!invalid && <p className="mt-2">Your question is kept. Try again or use basic guidance.{hasDraft ? ' Your previous draft is still available.' : ''}</p>}</div>}
+    {error && <div className="rounded-xl border border-clay/30 bg-paper p-4 text-sm"><p id="ai-error" role="alert">{error}</p>{!invalid && <p className="mt-2">{standalone ? 'Your question is kept. Try again in a moment.' : 'Your question is kept. Try again or use basic guidance.'}{hasDraft ? ' Your previous draft is still available.' : ''}</p>}</div>}
   </form>;
 }

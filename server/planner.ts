@@ -59,10 +59,10 @@ export async function generatePlan(input: PlannerRequest, env: NodeJS.ProcessEnv
     } };
   }
   const mode = env.AI_PROVIDER?.trim() || 'auto';
-  if (!['auto', 'gemini', 'aicredits'].includes(mode)) throw new PlannerError(503, 'AI provider configuration is unavailable. Use basic guidance.');
+  if (!['auto', 'gemini', 'aicredits'].includes(mode)) throw new PlannerError(503, 'AI provider configuration is unavailable.');
   const providers: ('gemini' | 'aicredits')[] = mode === 'auto' ? ['gemini', 'aicredits'] : [mode as 'gemini' | 'aicredits'];
   const configured = providers.filter(provider => !!(provider === 'gemini' ? env.GEMINI_API_KEY?.trim() : env.AICREDITS_API_KEY?.trim()));
-  if (!configured.length) throw new PlannerError(503, 'AI planning is not configured yet. You can use the basic guidance below.');
+  if (!configured.length) throw new PlannerError(503, 'AI planning is not configured yet.');
   // One total budget keeps sequential failover inside the client and function deadlines.
   const deadline = Date.now() + 20000;
   let lastError: unknown;
@@ -74,14 +74,14 @@ export async function generatePlan(input: PlannerRequest, env: NodeJS.ProcessEnv
     catch (error) { lastError = error; }
   }
   if (lastError instanceof PlannerError) throw lastError;
-  throw new PlannerError(503, 'AI planning took too long. Try later or use basic guidance.');
+  throw new PlannerError(503, 'AI planning took too long. Please try again.');
 }
 
 async function callProvider(input: PlannerRequest, provider: 'gemini' | 'aicredits', env: NodeJS.ProcessEnv, request: typeof fetch, timeout: number): Promise<GeneratedPlan> {
   const isGemini = provider === 'gemini';
   const key = (isGemini ? env.GEMINI_API_KEY : env.AICREDITS_API_KEY)!.trim();
   const model = (isGemini ? env.GEMINI_MODEL?.trim() : env.AICREDITS_MODEL?.trim()) || (isGemini ? 'gemini-3.8-flash' : 'openai/gpt-4o-mini');
-  if (isGemini ? !/^gemini-[a-z0-9.-]{1,70}$/.test(model) : !/^[a-zA-Z0-9][a-zA-Z0-9._:/-]{0,95}$/.test(model)) throw new PlannerError(503, 'AI planning is temporarily unavailable. Use the basic guidance below.');
+  if (isGemini ? !/^gemini-[a-z0-9.-]{1,70}$/.test(model) : !/^[a-zA-Z0-9][a-zA-Z0-9._:/-]{0,95}$/.test(model)) throw new PlannerError(503, 'AI planning is temporarily unavailable.');
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeout);
   const context = JSON.stringify({ userSituation: input.item === 'anything' ? { description: input.description, ...(input.location ? { location: input.location } : {}) } : input, editorialStartingPoint: recommend(input), resources: PLAN_RESOURCES });
@@ -103,7 +103,7 @@ async function callProvider(input: PlannerRequest, provider: 'gemini' | 'aicredi
       signal: controller.signal, body: JSON.stringify(body),
     });
     if (!response.ok) throw new PlannerError(response.status === 429 ? 429 : 503,
-      response.status === 429 ? 'AI is busy or its quota has been reached. Try later or use basic guidance.' : 'AI planning is temporarily unavailable. Use the basic guidance below.');
+      response.status === 429 ? 'AI is busy or its quota has been reached. Please try again later.' : 'AI planning is temporarily unavailable.');
     const data = await response.json() as { status?: string; steps?: { type?: string; content?: { type?: string; text?: string }[] }[]; choices?: { finish_reason?: string; message?: { content?: string } }[] };
     let text: string;
     if (isGemini) {

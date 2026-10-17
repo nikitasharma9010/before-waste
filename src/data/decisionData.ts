@@ -46,7 +46,7 @@ export function recommend(d: Decision) {
     effort: 'One observation and one small change', cost: 'Start with what you already have',
     alternative: 'For a specific item or local disposal rule, check its instructions and your municipality or a qualified service.',
     chapter: 'Explore how everyday objects move through use, reuse and recovery.',
-    resource: { label: 'US EPA: reducing and reusing (US guidance)', url: 'https://www.epa.gov/recycle/what-you-can-do' },
+    resource: { label: 'Ellen MacArthur Foundation: what is a circular economy', url: 'https://ellenmacarthurfoundation.org/topics/circular-economy-introduction/overview' },
   };
 
   const clothing = d.item === 'clothes';

@@ -1,14 +1,15 @@
 import { issues, type Decision } from './decisionData.js';
 
 export const PLAN_RESOURCES = {
-  compost: { label: 'US EPA: composting at home (US guidance)', url: 'https://www.epa.gov/recycle/composting-home', note: 'Home composting differs from commercial collection; check accepted materials for your system.' },
-  recycling: { label: 'US EPA: recycling questions (US guidance)', url: 'https://www.epa.gov/recycle/frequent-questions-recycling', note: 'Acceptance varies by local program. Check your collector directly; a recycling symbol is not a guarantee.' },
-  food: { label: 'US EPA: sustainable management of food (US guidance)', url: 'https://www.epa.gov/sustainable-management-food', note: 'Prioritize preventing wasted food. Do not assess food safety from a description.' },
-  clothing: { label: 'iFixit clothing guides', url: 'https://www.ifixit.com/Device/Clothing', note: 'Match fabric, fault, tools and difficulty before repair.' },
-  headphones: { label: 'iFixit headphone guides', url: 'https://www.ifixit.com/Device/Headphone', note: 'Model-specific guides; not every model is repairable by its owner.' },
-  reuse: { label: 'US EPA: reuse and donation (US guidance)', url: 'https://www.epa.gov/recycle/what-you-can-do', note: 'Background guidance. Check local acceptance and fees directly.' },
-  electronics: { label: 'US EPA: electronics collection (US guidance)', url: 'https://www.epa.gov/recycle/electronics-donation-and-recycling', note: 'Confirm electronics and battery collection options directly with your municipality or manufacturer.' },
-  community: { label: 'Repair Café directory', url: 'https://www.repaircafe.org/en/visit/', note: 'Coverage, times, charges and accepted repairs vary. Contact the group first.' },
+  compost: { label: 'US EPA: composting at home (US example)', url: 'https://www.epa.gov/recycle/composting-home', note: 'One country’s guidance, not a global standard. Search for your own city or country’s composting rules; home composting also differs from commercial collection.' },
+  recycling: { label: 'US EPA: recycling questions (US example)', url: 'https://www.epa.gov/recycle/frequent-questions-recycling', note: 'Recycling rules vary by country and even by city. Check your local collector directly; a recycling symbol is not a guarantee.' },
+  food: { label: 'US EPA: sustainable management of food (US example)', url: 'https://www.epa.gov/sustainable-management-food', note: 'One country’s guidance, not a global standard. Prioritize preventing wasted food. Do not assess food safety from a description.' },
+  clothing: { label: 'iFixit clothing guides', url: 'https://www.ifixit.com/Device/Clothing', note: 'Free, international repair guides. Match fabric, fault, tools and difficulty before repair.' },
+  headphones: { label: 'iFixit headphone guides', url: 'https://www.ifixit.com/Device/Headphone', note: 'Free, international repair guides. Model-specific; not every model is repairable by its owner.' },
+  reuse: { label: 'US EPA: reuse and donation (US example)', url: 'https://www.epa.gov/recycle/what-you-can-do', note: 'One country’s guidance, not a global standard. Check local acceptance and fees directly wherever you are.' },
+  electronics: { label: 'US EPA: electronics collection (US example)', url: 'https://www.epa.gov/recycle/electronics-donation-and-recycling', note: 'One country’s guidance, not a global standard. Confirm electronics and battery collection options with your own municipality or the manufacturer.' },
+  community: { label: 'Repair Café directory', url: 'https://www.repaircafe.org/en/visit/', note: 'An international volunteer network. Coverage, times, charges and accepted repairs vary — contact the group first.' },
+  circular: { label: 'Ellen MacArthur Foundation: what is a circular economy', url: 'https://ellenmacarthurfoundation.org/topics/circular-economy-introduction/overview', note: 'A general, country-neutral explainer of reduce/reuse/recycle thinking — a reasonable starting point wherever you are.' },
 } as const;
 export type ResourceId = keyof typeof PLAN_RESOURCES;
 export interface AIPlan {
