@@ -146,8 +146,7 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
               </> : standalone ? <>
               <p className="section-kicker text-clay mb-3">AI UNAVAILABLE</p>
               <h3 className="text-2xl sm:text-3xl font-editorial">AI guidance isn’t available right now</h3>
-              <p className="mt-4 leading-relaxed">Your question is still in the form above — try again in a moment. In the meantime, here’s a general starting point:</p>
-              <p className="mt-3 text-sm">Related guidance: <a className="underline text-forest underline-offset-4" href={advice.resource.url}>{advice.resource.label}</a>.</p>
+              <p className="mt-4 leading-relaxed">Your question is kept in the form above — try again in a moment.</p>
               </> : <>
               <p className="section-kicker text-clay mb-3">BASIC GUIDANCE · NOT AI GENERATED</p>
               <p className="text-sm mb-3">{itemLabels[result.item]} · {intentLabels[result.intent]}</p>
