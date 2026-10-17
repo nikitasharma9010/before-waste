@@ -4,13 +4,21 @@
   --font-serif: "Fraunces", Georgia, serif;
   --font-sans: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   
-  --color-warm-ivory: #FFF9F0;
-  --color-deep-ink: #202A35;
-  --color-vibrant-coral: #C53B27;
-  --color-electric-cobalt: #2840DE;
-  --color-sunny-marigold: #FFC857;
-  --color-fresh-teal: #086E64;
-  --color-soft-lavender: #EAE3FF;
+  --color-paper: #F7F3EA;
+  --color-surface: #FFFCF5;
+  --color-ink: #243A32;
+  --color-forest: #20594B;
+  --color-forest-strong: #153F35;
+  --color-sage: #E7EEE5;
+  --color-sage-strong: #A6BCA9;
+  --color-sage-border: #BFCEBF;
+  --color-clay: #A44932;
+  --color-clay-strong: #843825;
+  --color-clay-tint: #F5E6DC;
+  --color-clay-border: #DFC1AD;
+  --color-oat: #E8D9BE;
+  --color-oat-strong: #D9C6A4;
+  --color-oat-border: #D7C9B0;
 }
 
 :root {
@@ -19,8 +27,8 @@
 
 body {
   font-family: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background-color: #FFF9F0;
-  color: #202A35;
+  background-color: var(--color-paper);
+  color: var(--color-ink);
   overflow-wrap: break-word;
 }
 
@@ -56,8 +64,8 @@ body {
   z-index: 100;
   padding: 0.75rem 1rem;
   border-radius: 0.75rem;
-  background: #202A35;
-  color: #FFF9F0;
+  background: var(--color-forest);
+  color: var(--color-paper);
   transform: translateY(-150%);
 }
 .skip-link:focus { transform: translateY(0); }

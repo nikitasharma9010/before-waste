@@ -42,19 +42,19 @@ const SYSTEM_PILLARS: SystemPillar[] = [
 
 export const SystemsSection: React.FC = () => {
   return (
-    <section id="systems" className="scroll-mt-20 py-16 lg:py-24 bg-[#FFF9F0] border-b border-[#202A35]/8">
+    <section id="systems" className="scroll-mt-20 py-16 lg:py-24 bg-paper border-b border-ink/8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="max-w-3xl mb-12">
-          <div className="section-kicker text-[#086E64] mb-2">
+          <div className="section-kicker text-forest mb-2">
             <span>COLLECTIVE CONVERSATION</span>
             <span aria-hidden="true">·</span>
             <span>INDIVIDUALS & SYSTEMS</span>
           </div>
-          <h2 className="font-editorial text-3xl sm:text-4xl lg:text-5xl text-[#202A35] font-normal leading-tight text-balance">
+          <h2 className="font-editorial text-3xl sm:text-4xl lg:text-5xl text-ink font-normal leading-tight text-balance">
             Better choices need better systems, too.
           </h2>
-          <p className="mt-3 text-lg text-[#202A35]/80 font-normal leading-relaxed">
+          <p className="mt-3 text-lg text-ink/80 font-normal leading-relaxed">
             Personal habits matter, but individuals cannot carry the weight of broken supply chains alone. Real change happens when thoughtful citizenship meets bold systemic design.
           </p>
         </div>
@@ -66,36 +66,36 @@ export const SystemsSection: React.FC = () => {
             return (
               <div
                 key={pillar.title}
-                className="bg-white rounded-2xl border border-[#202A35]/10 p-5 sm:p-7 shadow-xs hover:border-[#0D9F91]/40 transition-colors flex flex-col justify-between"
+                className="bg-surface rounded-2xl border border-ink/10 p-5 sm:p-7 shadow-xs hover:border-forest/40 transition-colors flex flex-col justify-between"
               >
                 <div>
                   <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-                    <div className="w-10 h-10 shrink-0 rounded-xl bg-[#E6F8F6] text-[#0D9F91] flex items-center justify-center">
+                    <div className="w-10 h-10 shrink-0 rounded-xl bg-sage text-forest flex items-center justify-center">
                       <Icon className="w-5 h-5" />
                     </div>
-                    <span className="text-xs font-medium text-[#202A35]/75 bg-[#FFF9F0] px-2.5 py-1 rounded-md border border-[#202A35]/8">
+                    <span className="text-xs font-medium text-ink/75 bg-paper px-2.5 py-1 rounded-md border border-ink/8">
                       {pillar.focus}
                     </span>
                   </div>
 
-                  <h3 className="font-editorial text-xl sm:text-2xl font-semibold text-[#202A35] mb-2">
+                  <h3 className="font-editorial text-xl sm:text-2xl font-semibold text-ink mb-2">
                     {pillar.title}
                   </h3>
 
-                  <p className="text-sm text-[#202A35]/75 leading-relaxed mb-5">
+                  <p className="text-sm text-ink/75 leading-relaxed mb-5">
                     {pillar.explanation}
                   </p>
                 </div>
 
-                <div className="pt-4 border-t border-[#202A35]/8">
-                  <span className="text-[11px] font-semibold text-[#202A35]/75 uppercase tracking-wider block mb-2">
+                <div className="pt-4 border-t border-ink/8">
+                  <span className="text-[11px] font-semibold text-ink/75 uppercase tracking-wider block mb-2">
                     What this looks like:
                   </span>
                   <div className="flex flex-wrap gap-1.5">
                     {pillar.examples.map((ex) => (
                       <span
                         key={ex}
-                        className="text-xs font-medium px-2.5 py-1 rounded-md bg-[#FFF9F0] text-[#202A35]/80 border border-[#202A35]/8"
+                        className="text-xs font-medium px-2.5 py-1 rounded-md bg-paper text-ink/80 border border-ink/8"
                       >
                         {ex}
                       </span>
@@ -108,11 +108,11 @@ export const SystemsSection: React.FC = () => {
         </div>
 
         {/* Compassionate takeaway box */}
-        <div className="p-6 sm:p-8 rounded-2xl bg-[#EAE3FF]/50 border border-[#CCD4FF] max-w-4xl mx-auto text-center space-y-3">
-          <h3 className="font-editorial text-2xl font-semibold text-[#202A35]">
+        <div className="p-6 sm:p-8 rounded-2xl bg-sage/50 border border-sage-border max-w-4xl mx-auto text-center space-y-3">
+          <h3 className="font-editorial text-2xl font-semibold text-ink">
             You are a citizen, not just a consumer.
           </h3>
-          <p className="text-sm sm:text-base text-[#202A35]/80 leading-relaxed max-w-2xl mx-auto">
+          <p className="text-sm sm:text-base text-ink/80 leading-relaxed max-w-2xl mx-auto">
             When you support right-to-repair bills, patronize neighborhood shoe cobblers, request compost bins in your apartment complex, or borrow from a tool library, you help build the system that makes good choices easy for everyone.
           </p>
         </div>

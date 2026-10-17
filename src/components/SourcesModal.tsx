@@ -74,7 +74,7 @@ export const SourcesModal: React.FC<SourcesModalProps> = ({ isOpen, onClose, tri
       maxWidthClass="max-w-2xl"
     >
       <div className="space-y-4">
-        <p className="text-xs sm:text-sm text-[#202A35]/80 leading-relaxed">
+        <p className="text-xs sm:text-sm text-ink/80 leading-relaxed">
           BEFORE WASTE synthesizes peer-reviewed environmental accounting, industrial lifecycle assessments (LCA), and published reports from international scientific bodies. We distinguish between systemic infrastructure (such as national energy grids and industrial supply chains) and individual household choices.
         </p>
 
@@ -82,27 +82,27 @@ export const SourcesModal: React.FC<SourcesModalProps> = ({ isOpen, onClose, tri
           {SOURCES.map((source) => (
             <div
               key={source.reportName}
-              className="p-4 rounded-xl bg-white border border-[#202A35]/10 hover:border-[#2840DE]/40 transition-colors"
+              className="p-4 rounded-xl bg-surface border border-ink/10 hover:border-forest/40 transition-colors"
             >
               <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 mb-1">
-                <span className="text-xs font-bold text-[#2840DE]">
+                <span className="text-xs font-bold text-forest">
                   {source.institution}
                 </span>
-                <span className="text-[11px] text-[#202A35]/75 font-mono">
+                <span className="text-[11px] text-ink/75 font-mono">
                   {source.yearOrEdition}
                 </span>
               </div>
-              <h3 className="font-editorial text-base font-semibold text-[#202A35] mb-1">
+              <h3 className="font-editorial text-base font-semibold text-ink mb-1">
                 {source.reportName}
               </h3>
-              <p className="text-xs text-[#202A35]/75 leading-relaxed mb-3">
+              <p className="text-xs text-ink/75 leading-relaxed mb-3">
                 {source.scopeSummary}
               </p>
               <a
                 href={source.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-xs font-medium text-[#202A35] hover:text-[#2840DE] focus-visible:ring-2 focus-visible:ring-[#2840DE] rounded transition-colors"
+                className="inline-flex items-center gap-1.5 text-xs font-medium text-ink hover:text-forest focus-visible:ring-2 focus-visible:ring-forest rounded transition-colors"
               >
                 <span>Visit official documentation</span>
                 <ExternalLink className="w-3.5 h-3.5" aria-hidden="true" />
@@ -111,14 +111,14 @@ export const SourcesModal: React.FC<SourcesModalProps> = ({ isOpen, onClose, tri
           ))}
         </div>
 
-        <div className="pt-4 border-t border-[#202A35]/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <span className="text-xs text-[#202A35]/75">
+        <div className="pt-4 border-t border-ink/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <span className="text-xs text-ink/75">
             These references provide background. Estimates vary by study, product, location, and data year.
           </span>
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2.5 min-h-[44px] text-xs font-medium rounded-xl text-white bg-[#202A35] hover:bg-[#C53B27] focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#202A35] transition-colors cursor-pointer self-end sm:self-auto"
+            className="px-4 py-2.5 min-h-[44px] text-xs font-medium rounded-xl text-white bg-forest hover:bg-forest-strong focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ink transition-colors cursor-pointer self-end sm:self-auto"
           >
             Close Dialog
           </button>
