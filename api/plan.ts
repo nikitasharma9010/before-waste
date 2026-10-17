@@ -45,7 +45,7 @@ export default async function handler(req: Request, res: ServerResponse) {
       res.setHeader('Retry-After', '60'); send(429, { error: 'Too many requests. Wait a minute or use basic guidance.' }); return;
     }
     const input = parsePlannerRequest(await readBody(req));
-    if (!input) { send(400, { error: 'Choose a supported item and describe your situation in 20–1500 characters.' }); return; }
+    if (!input) { send(400, { error: 'Ask a question or describe your situation in 10-1500 characters.' }); return; }
     send(200, await generatePlan(input));
   } catch (error) {
     if (error instanceof PlannerError) send(error.status, { error: error.message });

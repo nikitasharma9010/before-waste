@@ -85,21 +85,14 @@ export const ClosingSection: React.FC<ClosingSectionProps> = ({ onRestart, onOpe
           {/* Primary Action Button Bar */}
           <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center justify-center gap-3 pt-4">
             <a
-              href="#pause"
+              href="#decision-helper"
+              onClick={() => document.getElementById('decision-helper')?.focus({ preventScroll: true })}
               className="inline-flex items-center justify-center gap-2 px-6 py-3.5 min-h-[44px] rounded-xl font-bold text-sm text-ink bg-oat hover:bg-oat-strong focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white transition-all shadow-md cursor-pointer text-center"
             >
-              <span>Pause before the next thing</span>
+              <span>Ask Before Waste</span>
             </a>
 
-            <button
-              type="button"
-              onClick={onRestart}
-              className="inline-flex items-center justify-center gap-2 px-5 py-3.5 min-h-[44px] rounded-xl font-semibold text-sm text-white/95 hover:text-white bg-surface/10 hover:bg-surface/20 focus-visible:ring-2 focus-visible:ring-white transition-colors cursor-pointer border border-white/15 text-center"
-              aria-label="Restart journey and return to Cotton T-Shirt stage one"
-            >
-              <RotateCcw className="w-4 h-4" aria-hidden="true" />
-              <span>Explore from the beginning</span>
-            </button>
+            <a href="#pause" onClick={() => document.getElementById('pause')?.focus({ preventScroll: true })} className="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-white/30 px-5 py-3.5 text-sm font-semibold text-white hover:bg-white/10">Try the 7-day pause</a>
 
             <button
               type="button"
@@ -112,7 +105,7 @@ export const ClosingSection: React.FC<ClosingSectionProps> = ({ onRestart, onOpe
               ) : (
                 <Share2 className="w-4 h-4" aria-hidden="true" />
               )}
-              <span>{shareFeedback || 'Share Perspective'}</span>
+              <span>{shareFeedback || 'Share Before Waste'}</span>
             </button>
           </div>
         </div>
@@ -129,6 +122,8 @@ export const ClosingSection: React.FC<ClosingSectionProps> = ({ onRestart, onOpe
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-6 text-xs text-white/80">
+            <button type="button" onClick={onRestart} aria-label="Restart journey and return to Cotton T-Shirt stage one" className="inline-flex min-h-[44px] items-center gap-2 py-2 hover:text-white"><RotateCcw aria-hidden="true" className="h-4 w-4" />Restart the story</button>
+            <a href="#how-it-works" onClick={() => document.getElementById('how-it-works')?.focus({ preventScroll: true })} className="inline-flex min-h-[44px] items-center py-2 underline underline-offset-4">How it works &amp; your data</a>
             <a href="#hero" className="hover:text-white focus-visible:ring-2 focus-visible:ring-white px-1 py-2 min-h-[44px] inline-flex items-center rounded transition-colors">
               Top
             </a>

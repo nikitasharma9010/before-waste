@@ -70,14 +70,15 @@ export const SourcesModal: React.FC<SourcesModalProps> = ({ isOpen, onClose, tri
       titleId="sources-dialog-title"
       title="Sources & Environmental Methodology"
       descriptionId="sources-dialog-description"
-      description="Peer-reviewed research, multilateral lifecycle assessments, and accounting models underlying this project."
+      description="Published reports and environmental accounting references used in the educational stories. References do not imply endorsement."
       maxWidthClass="max-w-2xl"
     >
       <div className="space-y-4">
         <p className="text-xs sm:text-sm text-ink/80 leading-relaxed">
-          BEFORE WASTE synthesizes peer-reviewed environmental accounting, industrial lifecycle assessments (LCA), and published reports from international scientific bodies. We distinguish between systemic infrastructure (such as national energy grids and industrial supply chains) and individual household choices.
+          BEFORE WASTE uses published environmental reports and accounting references for its educational stories. These sources do not endorse this project or verify individual AI answers. We distinguish between systemic infrastructure (such as national energy grids and industrial supply chains) and individual household choices.
         </p>
 
+        <div className="rounded-xl border border-ink/15 bg-sage p-4 text-sm leading-relaxed"><h3 className="font-semibold">Stories, AI drafts and local advice</h3><p className="mt-2">The references below support educational context. AI answers may draw on a separate resource catalogue and can contain mistakes. No live service search or personal environmental-savings calculation is performed. Confirm safety instructions and local collection rules before acting.</p></div>
         <div className="space-y-3 pt-2">
           {SOURCES.map((source) => (
             <div

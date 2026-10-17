@@ -15,7 +15,7 @@ beforeEach(() => {
   vi.stubGlobal('requestAnimationFrame', (fn: FrameRequestCallback) => { fn(0); return 0; });
 });
 afterEach(async () => { await act(async () => root.unmount()); host.remove(); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
-async function render() { await act(async () => root.render(<DecisionHelper onExploreObject={() => {}} />)); }
+async function render() { await act(async () => root.render(<DecisionHelper onExploreObject={() => {}} />)); await click("Use guided examples"); }
 async function click(text: string) {
   const el = [...host.querySelectorAll('button')].find(b => b.textContent?.includes(text));
   if (!el) throw new Error(`Missing ${text}`);
@@ -132,7 +132,7 @@ it('puts the decision flow before the interactive preview and aligns header call
   await act(async () => root.render(<App />));
   const children = [...host.querySelector('main')!.children];
   expect(children.indexOf(host.querySelector('#decision-helper')!)).toBeLessThan(children.indexOf(host.querySelector('#object-preview')!));
-  const cta = [...host.querySelectorAll('header a')].find(a => a.textContent?.includes('Find my next step'));
+  const cta = [...host.querySelectorAll('header a')].find(a => a.textContent?.includes('Ask Before Waste'));
   expect(cta?.getAttribute('href')).toBe('#decision-helper');
   expect(host.querySelectorAll('h1')).toHaveLength(1);
 });

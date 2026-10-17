@@ -136,3 +136,41 @@ future changes, including reflow, text resize, visible focus, keyboard access, a
 target size. This work is not a formal accessibility certification. Safari/Firefox,
 physical-device testing, text-only zoom, and a full screen-reader audit remain
 release checks. Browser viewport checks do not replace those checks.
+
+## Open sustainability questions — 17 October 2026
+
+- 79 automated tests pass; TypeScript check and production build pass.
+- Free questions are the default. Guided clothing/headphone flows and old saved actions remain supported.
+- Tested description-only API input, conceptual answers, absent catalogue matches, open-plan save/reload, honest fallback and device battery safeguarding. Provider responses in automated tests are simulated.
+- Browser checked at widths 280, 320, 375, 768, 1280 and 1440: no document horizontal overflow. Desktop and 375px layouts visually inspected. Missing-key behavior confirmed through the local API.
+- Live Gemini/AICredits output quality and production deployment still require configured Vercel credentials and the deployment demo checks.
+
+## AI assistance usability — 17 October 2026
+
+The question input is now a separate labelled form: Enter adds a newline and Ctrl/Cmd+Enter submits AI guidance. The basic-guidance button has a separate explicit action. Optional starter questions fill the field without sending a request. Short-input errors are linked to the field, identify the minimum, and focus it; service errors retain the question and expose retry. Loading has a polite live status, reduced-motion-aware spinner and cancellation that restores focus. No invented progress percentage is displayed.
+
+AI answers identify their original question and provide a direct edit/clarification control. Editing or retry failure preserves the current reviewed draft; only a successful new answer replaces it. Copying a draft does not require saving. Privacy details use a native disclosure with a visible short summary. Existing visible focus styles and 44px control minimums are retained; input text is 16px.
+
+Validation: 84 tests pass, TypeScript and production build pass. Browser verified inline validation, Ctrl+Enter, missing-key recovery, original-question context and edit focus. No horizontal overflow at 280, 320, 375, 768, 1280 and 1440px; desktop and 375px layouts visually inspected. The preview uses deterministic safety guidance, explicitly labelled as not AI-generated. Real provider quality, physical-device keyboard behavior and screen-reader testing remain deployment checks; this is not a complete WCAG conformance audit or usability study.
+
+References: [W3C form notifications](https://www.w3.org/WAI/tutorials/forms/notifications/), [WCAG status messages](https://www.w3.org/WAI/WCAG21/Understanding/status-messages), [NN/g machine-learning usability](https://www.nngroup.com/articles/machine-learning-ux/).
+
+## Location context and neutral presentation - 17 October 2026
+
+Optional city/region and country is validated (120-character maximum), sent only with an explicit AI request, and shown alongside the answered question. Instructions use details in the location field or description, adapt to stated constraints, ask when necessary and avoid treating US guidance as local evidence elsewhere. No geolocation or live service lookup was added. Provider/model branding was removed from privacy details, answers and saved-plan labels while retaining internal metadata compatibility. Shared section labels drive answer display and copy/save text.
+
+88 automated tests pass, TypeScript and production build pass. New tests cover location validation, both provider contexts/instructions, location UI submission, absence of branding and shared formatting. Browser verified location context and section headings using deterministic safety output; narrow/desktop layouts inspected, with no horizontal overflow at 280-1440px. Live geographic relevance still requires configured credentials; automated tests do not establish model factual accuracy.
+
+## Calls to action and trust signals - 17 October 2026
+
+The header, hero and closing section now use the same primary Ask Before Waste action. Closing alternatives explicitly offer the 7-day pause and sharing; restart is a secondary footer action. The hero and footer link to a focusable How it works & your data section. Three cards explain external AI processing, human review and browser-only saves, with an actionable source/methodology dialog link. The sources dialog distinguishes educational references from AI verification and disclaims endorsement. No fabricated testimonials, usage figures, partner logos, certification or guaranteed impact claims were added.
+
+89 tests pass; TypeScript and production build pass. Tests verify primary destinations, trust disclosures, the source dialog and existing restart behavior. Browser verified the source dialog, focus restoration and desktop/mobile trust cards; no horizontal overflow at 280, 320, 375, 768, 1280 and 1440px. Existing real-model and screen-reader deployment checks remain.
+
+Design reference: [NN/g on credibility through clear disclosure and checkable information](https://www.nngroup.com/articles/trustworthy-design/).
+
+## Consistent provider output - 17 October 2026
+
+Both AI adapters pass through the same answer parser. It now trims whitespace and normalizes heading prefixes, list prefixes, bold wrappers and inline code wrappers into plain-text fields before display or copying. HTML, Markdown tables, fenced answers and empty normalized fields are rejected through the existing provider fallback path rather than displayed as broken formatting. The application still owns headings, spacing and step numbering. Clarification responses keep the same layout but omit action steps until enough information is available. User-edited saved text is preserved as written.
+
+91 tests pass, including identical normalized answer/copy text from both provider adapters and rejection of unsupported presentation. TypeScript and production build pass. No visual layout change; existing responsive checks remain applicable. Live response content still depends on configured model quality.

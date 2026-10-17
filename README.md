@@ -2,7 +2,7 @@
 
 An everyday-object decision tool and interactive educational site built with React,
 TypeScript, Vite and Tailwind CSS. An optional AI planner turns a visitor's
-description and constraints into an editable action plan for clothes or headphones.
+question or description into an editable answer or action plan about waste prevention and sustainable living. Any item can be discussed; clothes and headphones remain optional guided examples.
 
 ## Enable AI planning on Vercel
 
@@ -18,8 +18,7 @@ description and constraints into an editable action plan for clothes or headphon
    from your AICredits dashboard; the documented example is not a quality ranking.
 4. Redeploy after setting variables. Vercel environment changes do not update an
    existing deployment. Keep default Vite settings: `npm run build`, output `dist`.
-5. Open the deployed site without signing in. Describe a fictional clothes or
-   headphones situation, generate a plan, edit it, save it and reload. The accepted
+5. Open the deployed site without signing in. Ask a fictional question about food waste, reuse, repair or sustainable living, generate a plan, edit it, save it and reload. The accepted
    text should remain unchanged, with no second provider call.
 
 No browser key entry is needed. Without a key, the server returns a clear setup
@@ -47,14 +46,13 @@ AICredits gets the remaining shared 20-second budget. Provider-only modes allow
 non-AI guidance is shown. One visitor request can therefore incur charges from
 both services. This is bounded failover, not repeated automatic retries.
 
-The page discloses potential transfer to both services, and saved plans retain the
-gateway/model provenance. AICredits requests disable semantic caching via
+The page uses provider-neutral AI disclosures, including possible backup processing. Internal provider/model metadata is retained for compatibility but is not displayed in answer or saved-plan labels. AICredits requests disable semantic caching via
 `no_cache: true`; processing/retention by AICredits and its upstream model provider
 remain subject to their policies. This is not a zero-retention guarantee.
 
 ## AI boundaries and deployment checks
 
-- Descriptions and selected answers are sent only when Generate is clicked. Saved
+- Descriptions, optional location and selected answers are sent only when AI guidance is requested. Saved
   reflection notes and saved-action notes are not sent. Original descriptions are
   not automatically persisted by this app; the reviewed plan is stored locally
   only when the visitor saves it.
@@ -111,3 +109,9 @@ Environmental estimates depend on product, geography, and study assumptions. The
 Sources dialog provides background references; the garment-care story also links
 directly to WRAP's 2017 UK clothing-sector report. This is educational content, not
 a product-specific footprint calculator or a comprehensive independent fact audit.
+
+### Open questions
+The default Ask freely mode requires no item selection. It accepts 10–1500 characters, including conceptual questions. The model receives only the description in this mode, without hidden budget or repair preferences. Guided examples still send selected constraints. Resource links come from a curated catalogue; if none is relevant, no link is fabricated. Answers are not live research or local collection verification. Unrelated requests should be redirected to the waste-prevention theme. When AI fails, clearly labelled general guidance is shown rather than a fabricated answer. Existing saved actions remain compatible.
+
+### Location and answer presentation
+Visitors can optionally provide city/region and country, or mention their location and other details in the question. No geolocation is requested or inferred. Both configured services receive the supplied context. Instructions require respecting stated budget, currency, housing, tools and access; ambiguous locations require clarification. Local rules and service availability are not live-verified. US references remain background outside the US. Answer display and copy/save formatting share section labels; provider/model names are not rendered on the page.

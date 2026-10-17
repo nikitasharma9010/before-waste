@@ -17,8 +17,7 @@ The API is `POST /api/plan`; the Vite local dev server serves the same handler.
 
 ## Fictional examples
 
-Choose the matching item/intention/help/budget options before generating. The
-description can include what was tried, exact budget limits and urgency.
+Start in Ask freely for any theme-related question. For examples 1–4, select Use guided examples and choose the matching item/intention/help/budget options. The description can include what was tried, exact budget limits and urgency.
 
 1. Clothes / needs attention / missing button / myself / no spending:
    "My coat button is loose. I have the spare button and thread but no needle.
@@ -32,9 +31,7 @@ description can include what was tried, exact budget limits and urgency.
    hand them over nearby but cannot pay for a courier. What can I try first?"
 4. Clarification: "My headphones make an odd sound. I do not know the model or
    whether the problem is with my phone. What information should I check?"
-5. Unsupported scope: describe a refrigerator while headphones is selected. The
-   result should stay within supported scope or ask a clarification, without
-   generating appliance-repair instructions.
+5. Open questions: try "How can I waste less food?", "Can I reuse takeaway containers?", "What can I do with a broken chair?", and "What is a circular economy?". No item selection should be required. Check that conceptual answers explain the idea directly and no hidden budget constraint is assumed. Try an unrelated request, which should be redirected to the theme. For safety-critical or local questions, check that the model asks for needed details and avoids inventing rules.
 6. Safety: "My headphones have a swollen battery and no longer work." This
    triggers explicitly labelled deterministic safety guidance, not an AI result.
 
@@ -42,7 +39,7 @@ description can include what was tried, exact budget limits and urgency.
 
 - Open the public URL without signing in and on a physical phone.
 - Generate a real AI plan using fictional inputs; check the AI-generated label and
-  gateway/model name. Verify AICredits is shown when that service handles the call.
+  AI-assistance disclosure without provider/model branding. Verify both configured services use the same answer layout.
   No static/safety fallback should be represented as AI.
 - Confirm it respects budget, help and urgency and does not repeat a failed check.
 - Confirm links come from the resource catalogue, with local/US scope disclosed.
@@ -67,3 +64,22 @@ The prompt and resource restrictions reduce some risks; they are not a guarantee
 of factual or repair safety. Judge outputs on actual scenarios. Do not claim a
 diagnosis, verified local service, measured environmental savings or an evaluated
 model-quality advantage without evidence.
+
+## AI assistance interaction checks
+
+- Choose a starter question: it should fill and focus the input without sending anything.
+- Submit fewer than 10 characters: the error should be linked to the focused field.
+- Enter should add a newline. Ctrl/Cmd+Enter should request AI guidance, never trigger basic guidance.
+- During a request, cancel it; the question must remain and late results must be ignored.
+- Edit a reviewed draft, then change the question and force a failed request: the edited draft must remain.
+- Check the original question above each answer. Edit my question or Add details to my question should return focus to the input without erasing it.
+- Copy a draft before saving; confirm it copies the edited version.
+- Check the live status announcements using a screen reader and try the flow on a physical phone, including with the keyboard open.
+
+## Location and consistent answers
+
+- Try Pune, India with INR 200, a small flat and no tools; then another city/country and currency. Confirm suggestions respect the supplied details without inventing prices, businesses or local collection rules.
+- Also put location only in the question. Do not require the separate field or ask again for already-supplied details.
+- Try conflicting locations and a local collection question without location: ask for clarification when needed. General educational questions should work without location.
+- Check current answers, expanded privacy details and older saved plans: no provider/model branding should appear. AI assistance and external processing remain disclosed.
+- Display and copied drafts should use the same reason, steps, alternative and resource labels. User-edited saved text remains as edited.
