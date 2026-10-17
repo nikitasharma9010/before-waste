@@ -25,7 +25,7 @@ const TSHIRT_HOTSPOTS: Hotspot[] = [
     y: 20,
     icon: MapPin,
     label: 'Global Transit',
-    metric: '4 Continents',
+    metric: 'Across borders',
     description: 'Cotton grown in one hemisphere, spun in another, dyed in a third, and shipped across oceans before resting on your hanger.',
     accent: '#C53B27'
   },
@@ -36,8 +36,8 @@ const TSHIRT_HOTSPOTS: Hotspot[] = [
     y: 44,
     icon: Droplets,
     label: 'Embedded Water',
-    metric: '~2,700 Liters',
-    description: 'Approximately 30 bathtubs of water were absorbed by cotton bolls in the field to produce the fabric for just one cotton shirt (Water Footprint Network).',
+    metric: 'Water & soil',
+    description: 'Cotton cultivation uses rainwater and, in some regions, irrigation. Water demand varies with growing conditions, farming practices, and garment weight.',
     accent: '#2840DE'
   },
   {
@@ -47,8 +47,8 @@ const TSHIRT_HOTSPOTS: Hotspot[] = [
     y: 35,
     icon: Users,
     label: 'Human Labor',
-    metric: '~80 Seams',
-    description: 'Garment workers in cut-and-sew workshops carefully stitch around eighty distinct seams on industrial overlock machines.',
+    metric: 'Skilled work',
+    description: 'Garment workers cut, stitch, and finish the fabric. Construction and the number of seams depend on the garment.',
     accent: '#086E64'
   },
   {
@@ -58,8 +58,8 @@ const TSHIRT_HOTSPOTS: Hotspot[] = [
     y: 80,
     icon: Clock,
     label: 'Wear Frequency',
-    metric: '7 to 10 Wears',
-    description: 'In fast-fashion segments, garments are often discarded after fewer than ten wears—long before fibers actually degrade.',
+    metric: 'Wear & care',
+    description: 'How often a garment is worn and cared for shapes its useful life. Repairing small signs of wear can help keep it in use.',
     accent: '#B88000'
   }
 ];
@@ -95,7 +95,7 @@ export const HeroOpening: React.FC<HeroOpeningProps> = ({ onExploreObjects }) =>
 
         {/* 2-Column Desktop Grid / Responsive Mobile Stack (Interactive T-shirt placed early on mobile) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-start">
-          
+
           {/* Interactive T-Shirt Visual (Appears first on mobile right below headline!) */}
           <div className="lg:col-span-5 order-1 lg:order-2 w-full">
             <div className="bg-white rounded-3xl p-4 sm:p-6 lg:p-7 border border-[#202A35]/15 shadow-sm relative">

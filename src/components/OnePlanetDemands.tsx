@@ -38,13 +38,13 @@ export const OnePlanetDemands: React.FC = () => {
 
         {/* Main Content Grid */}
         <div className="bg-white rounded-3xl border border-[#202A35]/10 p-4 sm:p-7 lg:p-10 shadow-sm">
-          {/* Country Selection Chips (role=tablist) */}
+          {/* Country selection buttons */}
           <div className="mb-8">
             <span id="country-tabs-label" className="text-xs font-semibold text-[#202A35]/70 uppercase tracking-wider block mb-3">
               Explore national per-capita demands (Global Footprint Network, 2024 Edition):
             </span>
             <div
-              role="tablist"
+              role="group"
               aria-labelledby="country-tabs-label"
               className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none"
             >
@@ -54,9 +54,8 @@ export const OnePlanetDemands: React.FC = () => {
                   <button
                     key={item.id}
                     type="button"
-                    role="tab"
                     id={`country-tab-${item.id}`}
-                    aria-selected={isSelected}
+                    aria-pressed={isSelected}
                     aria-controls="country-demand-panel"
                     onClick={() => setSelectedCountryId(item.id)}
                     className={`flex items-center gap-2 px-3.5 py-2.5 min-h-[44px] rounded-xl text-xs sm:text-sm font-semibold transition-all whitespace-nowrap shrink-0 cursor-pointer focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#202A35] focus:outline-none ${
@@ -82,7 +81,7 @@ export const OnePlanetDemands: React.FC = () => {
           {/* Interactive Comparison Display */}
           <div
             id="country-demand-panel"
-            role="tabpanel"
+            role="region"
             aria-labelledby={`country-tab-${selectedCountry.id}`}
             className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center mb-8"
           >

@@ -6,6 +6,7 @@ export interface StoryStage {
   detail: string;
   materialFlow: string;
   curiousFact: string;
+  source?: { title: string; url: string };
 }
 
 export interface StoryObject {
@@ -35,17 +36,17 @@ export const OBJECTS_DATA: StoryObject[] = [
         stageNumber: 1,
         stageName: 'Before me',
         stageTitle: 'Before it was a T-shirt, it was a field',
-        body: 'Months before reaching a clothing rack, it began as cotton seeds in fertile soil—requiring sunlight, soil nutrients, and roughly 2,700 liters of freshwater for a single garment.',
+        body: 'Months before reaching a clothing rack, it began as cotton seeds in fertile soil—requiring sunlight, soil nutrients, and water from rain or irrigation. Water demand varies by growing conditions and garment weight.',
         detail: 'Bolls of cotton are harvested, cleaned of seeds, and baled before embarking on an international shipping network spanning thousands of kilometers.',
         materialFlow: 'Raw cotton bolls → Ginning mill → Export cargo containers',
-        curiousFact: 'A typical cotton T-shirt has already traveled to up to four countries before you try it on.'
+        curiousFact: 'Cotton can pass through several countries as it is grown, spun, dyed, sewn, and shipped.'
       },
       {
         stageNumber: 2,
         stageName: 'Becoming',
         stageTitle: 'People, looms, dye vats, and machines',
         body: 'Raw fibers were carded into slivers, spun into yarn, knitted into jersey fabric, and submerged in pressurized dye baths with stabilizing agents.',
-        detail: 'Garment workers in cut-and-sew workshops carefully stitch around 80 seams, sewing the collar ribbing, sleeves, and hems on high-speed industrial overlockers.',
+        detail: 'Garment workers in cut-and-sew workshops assemble the garment, sewing the collar ribbing, sleeves, and hems on high-speed industrial overlockers.',
         materialFlow: 'Carded fiber → Spun yarn → Knitted fabric → Dye baths → Sewing line',
         curiousFact: 'More human hands touched your shirt during its assembly than will ever touch it while you own it.'
       },
@@ -54,9 +55,10 @@ export const OBJECTS_DATA: StoryObject[] = [
         stageName: 'With me',
         stageTitle: 'The quiet chapter in your wardrobe',
         body: 'Now it rests in your drawer. Every wash cycle, cold rinse, line dry, or tumble hot influences how long its cotton fibers retain their structural strength.',
-        detail: 'Washing in cold water and air-drying preserves yarn elasticity, reduces energy use by over 75%, and prevents micro-fiber breakage.',
+        detail: 'Washing in cold water and air-drying can reduce drying energy and wear on the fabric; follow the garment care label.',
         materialFlow: 'Gentle wash cycles · Hanging to dry · Folding · Repeated wear',
-        curiousFact: 'Extending the active life of clothing by just 9 months reduces its carbon, water, and waste footprint by an estimated 20–30% (WRAP UK, Valuing Our Clothes).'
+        curiousFact: 'WRAP identifies longer active use and clothing-care practices as opportunities to reduce the environmental impacts of UK clothing. Savings depend on the garment and how it is used.',
+        source: { title: 'WRAP: Valuing Our Clothes (2017, UK clothing sector)', url: 'https://www.wrap.ngo/resources/report/valuing-our-clothes-cost-uk-fashion' }
       },
       {
         stageNumber: 4,

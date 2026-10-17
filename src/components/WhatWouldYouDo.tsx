@@ -1,3 +1,4 @@
+import { handleRadioKeyDown } from '../utils/selectionKeyboard';
 import React, { useState } from 'react';
 import { SCENARIOS_DATA, Scenario, ScenarioOption } from '../data/scenariosData';
 import { Headphones, Shirt, CheckCircle, Lightbulb } from 'lucide-react';
@@ -42,13 +43,12 @@ export const WhatWouldYouDo: React.FC = () => {
           </p>
         </div>
 
-        {/* Scenario Switcher Tabs */}
-        <div role="tablist" aria-label="Select a scenario" className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 mb-8">
+        {/* Scenario selection buttons */}
+        <div role="group" aria-label="Select a scenario" className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 mb-8">
           <button
             type="button"
-            role="tab"
             id="tab-scenario-headphones"
-            aria-selected={activeScenarioId === 'headphones'}
+            aria-pressed={activeScenarioId === 'headphones'}
             aria-controls="scenario-content-panel"
             onClick={() => handleScenarioChange('headphones')}
             className={`flex items-center justify-center sm:justify-start gap-2 px-4 py-2.5 min-h-[44px] rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#202A35] focus:outline-none ${
@@ -62,9 +62,8 @@ export const WhatWouldYouDo: React.FC = () => {
           </button>
           <button
             type="button"
-            role="tab"
             id="tab-scenario-jacket"
-            aria-selected={activeScenarioId === 'jacket'}
+            aria-pressed={activeScenarioId === 'jacket'}
             aria-controls="scenario-content-panel"
             onClick={() => handleScenarioChange('jacket')}
             className={`flex items-center justify-center sm:justify-start gap-2 px-4 py-2.5 min-h-[44px] rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#202A35] focus:outline-none ${
@@ -81,7 +80,7 @@ export const WhatWouldYouDo: React.FC = () => {
         {/* Scenario Box */}
         <div
           id="scenario-content-panel"
-          role="tabpanel"
+          role="region"
           aria-labelledby={activeScenarioId === 'headphones' ? 'tab-scenario-headphones' : 'tab-scenario-jacket'}
           className="bg-[#FFF9F0] rounded-3xl border border-[#202A35]/10 p-4 sm:p-7 lg:p-10 shadow-sm"
         >
@@ -101,6 +100,7 @@ export const WhatWouldYouDo: React.FC = () => {
           {/* Three Choice Cards (role=radiogroup) */}
           <div
             role="radiogroup"
+            onKeyDown={handleRadioKeyDown}
             aria-labelledby="scenario-prompt-title"
             className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8"
           >

@@ -46,7 +46,7 @@ const COMPARISON_STAGES: StageComparison[] = [
     linearImpact: 'Average product lifespan drops year after year.',
     circularName: 'CARE & EXTEND',
     circularDesc: 'Washing cold, gentle maintenance, patching torn pockets, sharpening knives, and replacing worn ear pads.',
-    circularBenefit: 'Extending useful life by just one year reduces an object\'s footprint by up to 30%.'
+    circularBenefit: 'Keeping a useful object in service can reduce demand for a replacement. The benefit depends on the product, maintenance, and how it is used.'
   },
   {
     step: '05',
@@ -97,15 +97,14 @@ export const BiggerPattern: React.FC = () => {
 
             {/* Segmented Controller (Full width responsive grid on mobile, inline-flex on sm+) */}
             <div
-              role="tablist"
+              role="group"
               aria-label="Economic model comparison"
               className="w-full sm:w-auto grid grid-cols-2 sm:inline-flex p-1 bg-[#FFF9F0] border border-[#202A35]/15 rounded-xl"
             >
               <button
                 type="button"
-                role="tab"
                 id="tab-linear"
-                aria-selected={activeModel === 'linear'}
+                aria-pressed={activeModel === 'linear'}
                 aria-controls="model-panel"
                 onClick={() => setActiveModel('linear')}
                 className={`px-3 sm:px-4 py-2 sm:py-2.5 min-h-[44px] text-xs sm:text-sm font-medium rounded-lg transition-all cursor-pointer text-center whitespace-nowrap focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#202A35] focus:outline-none ${
@@ -118,9 +117,8 @@ export const BiggerPattern: React.FC = () => {
               </button>
               <button
                 type="button"
-                role="tab"
                 id="tab-circular"
-                aria-selected={activeModel === 'circular'}
+                aria-pressed={activeModel === 'circular'}
                 aria-controls="model-panel"
                 onClick={() => setActiveModel('circular')}
                 className={`px-3 sm:px-4 py-2 sm:py-2.5 min-h-[44px] text-xs sm:text-sm font-medium rounded-lg transition-all cursor-pointer text-center whitespace-nowrap focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#202A35] focus:outline-none ${
@@ -135,8 +133,8 @@ export const BiggerPattern: React.FC = () => {
           </div>
 
           {/* Visual Diagram Strip */}
-          <div className="mb-10" id="model-panel" role="tabpanel" aria-labelledby={activeModel === 'linear' ? 'tab-linear' : 'tab-circular'}>
-            <div role="tablist" aria-label="Lifecycle stages" className="grid grid-cols-1 md:grid-cols-5 gap-2.5 lg:gap-3">
+          <div className="mb-10" id="model-panel" role="region" aria-labelledby={activeModel === 'linear' ? 'tab-linear' : 'tab-circular'}>
+            <div role="group" aria-label="Lifecycle stages" className="grid grid-cols-1 md:grid-cols-5 gap-2.5 lg:gap-3">
               {COMPARISON_STAGES.map((item, idx) => {
                 const isSelected = selectedStepIndex === idx;
                 const isLinear = activeModel === 'linear';
@@ -144,9 +142,8 @@ export const BiggerPattern: React.FC = () => {
                   <button
                     key={item.step}
                     type="button"
-                    role="tab"
                     id={`step-tab-${item.step}`}
-                    aria-selected={isSelected}
+                    aria-pressed={isSelected}
                     aria-controls="step-detail-panel"
                     aria-label={`Step ${item.step}: ${isLinear ? item.linearName : item.circularName}`}
                     onClick={() => setSelectedStepIndex(idx)}
@@ -191,7 +188,7 @@ export const BiggerPattern: React.FC = () => {
           </div>
 
           {/* Deep Dive Card for Selected Step */}
-          <div id="step-detail-panel" role="tabpanel" aria-labelledby={`step-tab-${activeStep.step}`} className="p-4 sm:p-6 lg:p-8 rounded-2xl bg-[#FFF9F0] border border-[#202A35]/10">
+          <div id="step-detail-panel" role="region" aria-labelledby={`step-tab-${activeStep.step}`} className="p-4 sm:p-6 lg:p-8 rounded-2xl bg-[#FFF9F0] border border-[#202A35]/10">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
               {/* Left Column: What Happens Here */}
               <div className="lg:col-span-7 space-y-4">

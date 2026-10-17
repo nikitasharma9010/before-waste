@@ -25,6 +25,7 @@ export const SevenDayPause: React.FC = () => {
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [storageUnavailableNotice, setStorageUnavailableNotice] = useState<string | null>(null);
 
+  const progressRef = useRef<HTMLDivElement>(null);
   const resetTriggerRef = useRef<HTMLButtonElement>(null);
 
   // Load from localStorage on mount with schema validation
@@ -79,9 +80,16 @@ export const SevenDayPause: React.FC = () => {
 
   // Safe reset
   const handleReset = () => {
+    if (!clearPauseData()) {
+      setStorageUnavailableNotice(
+        "Unable to clear saved reflections. Your progress is still shown; please try resetting again. Previously saved notes may return after reloading."
+      );
+      setShowResetConfirm(false);
+      return;
+    }
     setCompletedDays([]);
     setNotes({});
-    clearPauseData();
+    setStorageUnavailableNotice(null);
     setShowResetConfirm(false);
   };
 
@@ -115,7 +123,7 @@ export const SevenDayPause: React.FC = () => {
         )}
 
         {/* Progress Strip & Reset Bar */}
-        <div className="bg-[#FFF9F0] rounded-2xl border border-[#202A35]/10 p-4 sm:p-5 mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div ref={progressRef} tabIndex={-1} aria-label="7-Day Pause progress" className="bg-[#FFF9F0] rounded-2xl border border-[#202A35]/10 p-4 sm:p-5 mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div
               className="w-12 h-12 rounded-xl bg-white border border-[#202A35]/15 flex items-center justify-center text-[#C53B27] font-bold font-mono text-base"
@@ -132,7 +140,7 @@ export const SevenDayPause: React.FC = () => {
                   : `${completedDays.length} of 7 questions explored`}
               </p>
               <p className="text-xs text-[#202A35]/65">
-                Saved privately on this browser only.
+                {storageUnavailableNotice ? 'Device storage could not be confirmed. See the notice above.' : 'Saved privately on this browser only.'}
               </p>
             </div>
           </div>
@@ -158,6 +166,7 @@ export const SevenDayPause: React.FC = () => {
           isOpen={showResetConfirm}
           onClose={() => setShowResetConfirm(false)}
           triggerRef={resetTriggerRef}
+          fallbackFocusRef={progressRef}
           titleId="reset-dialog-title"
           title="Reset your 7-Day Pause?"
           descriptionId="reset-dialog-description"
@@ -303,7 +312,7 @@ export const SevenDayPause: React.FC = () => {
                     {/* Personal scratchpad note with label association */}
                     <div className="pt-2">
                       <label htmlFor={inputId} className="text-xs font-medium text-[#202A35]/80 block mb-1.5">
-                        Your quiet reflection or what you noticed (saved locally):
+                        Your quiet reflection or what you noticed ({storageUnavailableNotice ? 'saving unavailable' : 'saved locally'}):
                       </label>
                       <input
                         type="text"

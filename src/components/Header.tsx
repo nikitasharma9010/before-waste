@@ -7,6 +7,7 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ onOpenSources }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
   const sourcesButtonRef = useRef<HTMLButtonElement>(null);
 
   const navLinks = [
@@ -70,6 +71,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSources }) => {
           {/* Mobile Menu Button (Accessible min 44x44 target) */}
           <button
             type="button"
+            ref={menuButtonRef}
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="xl:hidden p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-[#202A35] hover:bg-[#202A35]/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#202A35] transition-colors"
             aria-label="Toggle navigation menu"
@@ -100,9 +102,9 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSources }) => {
             ))}
             <button
               type="button"
-              onClick={(e) => {
+              onClick={() => {
                 setMobileMenuOpen(false);
-                onOpenSources(e.currentTarget);
+                onOpenSources(menuButtonRef.current);
               }}
               className="text-left py-3 px-4 min-h-[44px] flex items-center rounded-xl text-base font-medium text-[#202A35]/80 hover:bg-[#202A35]/5 focus-visible:ring-2 focus-visible:ring-[#202A35] transition-colors cursor-pointer"
             >

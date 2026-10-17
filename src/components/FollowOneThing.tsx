@@ -90,9 +90,9 @@ export const FollowOneThing: React.FC<FollowOneThingProps> = ({
           </p>
         </div>
 
-        {/* 4 Object Tabs (role=tablist) */}
+        {/* Object selection buttons */}
         <div
-          role="tablist"
+          role="group"
           aria-label="Select an object to follow"
           className="flex items-center gap-2 overflow-x-auto pb-3 mb-8 scrollbar-none"
         >
@@ -103,9 +103,8 @@ export const FollowOneThing: React.FC<FollowOneThingProps> = ({
               <button
                 key={obj.id}
                 type="button"
-                role="tab"
                 id={`object-tab-${obj.id}`}
-                aria-selected={isActive}
+                aria-pressed={isActive}
                 aria-controls="story-content-panel"
                 onClick={() => onSelectObject(obj.id)}
                 className={`flex items-center gap-2.5 px-4 py-2.5 min-h-[44px] rounded-xl font-medium text-sm transition-all whitespace-nowrap shrink-0 cursor-pointer focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#202A35] focus:outline-none ${
@@ -131,10 +130,10 @@ export const FollowOneThing: React.FC<FollowOneThingProps> = ({
           })}
         </div>
 
-        {/* Story Box Main Card (role=tabpanel) */}
+        {/* Story content region */}
         <div
           id="story-content-panel"
-          role="tabpanel"
+          role="region"
           aria-labelledby={`object-tab-${currentObject.id}`}
           className="bg-[#FFF9F0] rounded-3xl border border-[#202A35]/10 p-4 sm:p-7 lg:p-10 shadow-sm"
         >
@@ -271,6 +270,12 @@ export const FollowOneThing: React.FC<FollowOneThingProps> = ({
                 <p className="text-xs text-[#202A35]/90 leading-relaxed">
                   <strong className="font-semibold text-[#202A35]">Insight: </strong>
                   {currentStage.curiousFact}
+                  {currentStage.source && (
+                    <a href={currentStage.source.url} target="_blank" rel="noopener noreferrer"
+                      className="block mt-2 underline underline-offset-2 focus-visible:ring-2 focus-visible:ring-[#202A35] rounded">
+                      Source: {currentStage.source.title}
+                    </a>
+                  )}
                 </p>
               </div>
 

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
+import { createPortal } from 'react-dom';
 
 interface AccessibleDialogProps {
   isOpen: boolean;
@@ -11,6 +12,7 @@ interface AccessibleDialogProps {
   children: React.ReactNode;
   triggerRef?: React.RefObject<HTMLElement | null>;
   maxWidthClass?: string;
+  fallbackFocusRef?: React.RefObject<HTMLElement | null>;
 }
 
 export const AccessibleDialog: React.FC<AccessibleDialogProps> = ({
@@ -22,87 +24,69 @@ export const AccessibleDialog: React.FC<AccessibleDialogProps> = ({
   description,
   children,
   triggerRef,
+  fallbackFocusRef,
   maxWidthClass = 'max-w-2xl'
 }) => {
   const dialogRef = useRef<HTMLDivElement>(null);
-  const previouslyFocusedElement = useRef<HTMLElement | null>(null);
+  const overlayRef = useRef<HTMLDivElement>(null);
+  const closeRef = useRef(onClose);
+  useEffect(() => { closeRef.current = onClose; }, [onClose]);
 
   useEffect(() => {
     if (!isOpen) return;
-
-    // Remember the element that had focus before the dialog opened
-    previouslyFocusedElement.current = (document.activeElement as HTMLElement) || triggerRef?.current || null;
-
-    // Prevent background scrolling
-    const originalOverflow = document.body.style.overflow;
+    const previous = document.activeElement as HTMLElement | null;
+    const overflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
-
-    // Move focus into the dialog
-    const focusTimer = setTimeout(() => {
-      if (dialogRef.current) {
-        const focusableElements = dialogRef.current.querySelectorAll<HTMLElement>(
-          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-        );
-        if (focusableElements.length > 0) {
-          focusableElements[0].focus();
-        } else {
-          dialogRef.current.focus();
-        }
-      }
-    }, 50);
-
-    // Trap focus and handle escape key
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        onClose();
-        return;
-      }
-
-      if (e.key === 'Tab' && dialogRef.current) {
-        const focusableElements = dialogRef.current.querySelectorAll<HTMLElement>(
-          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
-        );
-        if (focusableElements.length === 0) return;
-
-        const firstElement = focusableElements[0];
-        const lastElement = focusableElements[focusableElements.length - 1];
-
-        if (e.shiftKey) {
-          if (document.activeElement === firstElement) {
-            e.preventDefault();
-            lastElement.focus();
-          }
-        } else {
-          if (document.activeElement === lastElement) {
-            e.preventDefault();
-            firstElement.focus();
-          }
+    // The portal is a body child, so no ancestor of the dialog is made inert.
+    const backgrounds = Array.from(document.body.children).filter(
+      (element): element is HTMLElement => element instanceof HTMLElement && element !== overlayRef.current
+    );
+    const inertStates = backgrounds.map(element => [element, element.inert] as const);
+    backgrounds.forEach(element => { element.inert = true; });
+    const focusable = () => Array.from(dialogRef.current?.querySelectorAll<HTMLElement>(
+      'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    ) || []).filter(element => !element.closest('[hidden], [inert]'));
+    const moveInside = () => (focusable()[0] || dialogRef.current)?.focus();
+    moveInside();
+    const handleFocus = (event: FocusEvent) => {
+      if (!dialogRef.current?.contains(event.target as Node)) moveInside();
+    };
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        closeRef.current();
+      } else if (event.key === 'Tab') {
+        const elements = focusable();
+        const first = elements[0];
+        const last = elements[elements.length - 1];
+        if (!first) { event.preventDefault(); dialogRef.current?.focus(); return; }
+        if (!dialogRef.current?.contains(document.activeElement) ||
+            (event.shiftKey && document.activeElement === first) ||
+            (!event.shiftKey && document.activeElement === last)) {
+          event.preventDefault();
+          (event.shiftKey ? last : first).focus();
         }
       }
     };
-
+    document.addEventListener('focusin', handleFocus);
     window.addEventListener('keydown', handleKeyDown);
-
     return () => {
-      clearTimeout(focusTimer);
-      document.body.style.overflow = originalOverflow;
+      document.removeEventListener('focusin', handleFocus);
       window.removeEventListener('keydown', handleKeyDown);
-
-      // Restore focus to previous element or triggerRef
-      const returnTarget = triggerRef?.current || previouslyFocusedElement.current;
-      if (returnTarget && typeof returnTarget.focus === 'function') {
-        setTimeout(() => {
-          returnTarget.focus();
-        }, 10);
-      }
+      document.body.style.overflow = overflow;
+      inertStates.forEach(([element, inert]) => { element.inert = inert; });
+      const target = [triggerRef?.current, previous, fallbackFocusRef?.current].find(
+        element => element?.isConnected && element !== document.body && !element.closest('[inert]')
+      );
+      target?.focus();
     };
-  }, [isOpen, onClose, triggerRef]);
+  }, [isOpen, triggerRef, fallbackFocusRef]);
 
   if (!isOpen) return null;
 
-  return (
+  return createPortal(
     <div
+      ref={overlayRef}
       className="fixed inset-0 z-50 bg-[#202A35]/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 overflow-y-auto"
       role="presentation"
       onClick={(e) => {
@@ -147,6 +131,7 @@ export const AccessibleDialog: React.FC<AccessibleDialogProps> = ({
           {children}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
