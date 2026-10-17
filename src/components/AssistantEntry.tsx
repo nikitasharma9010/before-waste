@@ -10,7 +10,7 @@ export function AssistantEntry() {
   return <section id="assistant-entry" aria-labelledby="entry-title" className="border-y border-ink/10 bg-sage py-8 sm:py-10">
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 grid gap-6 lg:grid-cols-2 lg:items-center">
       <div><p className="section-kicker text-forest">A PRACTICAL NEXT STEP</p><h2 id="entry-title" className="mt-3 font-editorial text-2xl sm:text-3xl">Choose a next step for your situation.</h2><p className="mt-3 max-w-xl text-ink/80">Ask about any item, repair, reuse or sustainable living. Continue to a dedicated space to add context, review guidance and save useful guidance.</p></div>
-      <div>{saved && <a href="/ask#saved" className="mb-4 inline-flex min-h-[44px] items-center font-semibold text-forest underline underline-offset-4">View saved answers</a>}
+      <div>{saved > 0 && <a href="/ask#saved" className="mb-4 inline-flex min-h-[44px] items-center font-semibold text-forest underline underline-offset-4">View saved answers</a>}
       <form action="/ask" method="get" className="space-y-3" onSubmit={event => {
         if (!handoffQuestion(question)) { event.preventDefault(); setError('This browser could not carry your draft. Copy your question, then open the assistant using the link below.'); }
       }}>

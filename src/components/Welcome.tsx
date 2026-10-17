@@ -11,7 +11,7 @@ export function Welcome() {
         <a href="/ask"  className="inline-flex justify-center items-center min-h-[44px] px-5 py-3 rounded-xl bg-forest text-white font-semibold hover:bg-forest-strong">Ask Before Waste</a>
         <a href="#follow-one-thing" className="inline-flex justify-center items-center min-h-[44px] px-5 py-3 rounded-xl border border-ink/25 font-semibold hover:bg-sage">Explore an object’s story</a>
       </div>
-      {saved && <a href="/ask#saved" className="mt-4 inline-flex min-h-[44px] items-center font-semibold text-forest underline underline-offset-4">View saved answers</a>}
+      {saved > 0 && <a href="/ask#saved" className="mt-4 inline-flex min-h-[44px] items-center font-semibold text-forest underline underline-offset-4">View saved answers</a>}
       <p className="mt-4 max-w-2xl text-sm text-ink/80">Ask directly for guidance, or explore first: follow an object → try a choice → choose your next step.</p>
       <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-ink/80" aria-label="Before you start">
         <span>No account needed</span><span>Review before saving</span>
