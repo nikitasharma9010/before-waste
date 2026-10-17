@@ -66,14 +66,14 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
           <p className="mt-2 text-sm text-ink/80">{standalone ? 'No account needed. You choose what to save.' : 'Ask about any item, reducing waste or sustainable living. No account needed.'}</p>
           {saved && <a href="#saved-action" onClick={() => savedRef.current?.focus({ preventScroll: true })} className="mt-4 inline-flex min-h-[44px] items-center font-semibold text-forest underline underline-offset-4">Return to my saved action</a>}
         </div>
-        <div className="grid gap-6 lg:grid-cols-2 items-start">
+        <div className={standalone ? 'mx-auto flex max-w-3xl flex-col gap-6' : 'grid gap-6 lg:grid-cols-2 items-start'}>
           <div className="min-w-0 rounded-2xl border border-ink/15 bg-surface p-5 sm:p-8 space-y-5">
-            <div role="group" className="flex flex-wrap gap-2" aria-label="Question mode">
+            {!standalone && <div role="group" className="flex flex-wrap gap-2" aria-label="Question mode">
               {[['anything', 'Ask freely'], ['clothes', 'Use guided examples']].map(([item, label]) => <button key={item} type="button" aria-pressed={item === 'anything' ? decision.item === 'anything' : decision.item !== 'anything'} className="min-h-[44px] rounded-xl border border-forest px-4 py-2 font-semibold aria-pressed:bg-forest aria-pressed:text-white" onClick={() => {
                 setDecision({ item: item as Decision['item'], intent: item === 'anything' ? 'explore' : 'buy', support: 'myself', budget: 'free' });
                 setResult(null); setGenerated(null); setEditedPlan('');
               }}>{label}</button>)}
-            </div>
+            </div>}
             {decision.item !== 'anything' && <>
             <label className="block font-semibold">What is the object?
               <select className={`${control} mt-2`} value={decision.item} onChange={e => change('item', e.target.value as Decision['item'])}>
@@ -111,13 +111,19 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
             <button className="min-h-[44px] py-2 text-sm font-semibold text-forest underline underline-offset-4" type="button" onClick={showBasic}>{decision.item === 'anything' ? 'Browse general guidance (no AI)' : 'Find my next step (basic guidance)'}</button>
             <p className="text-sm text-ink/80">General starting points. Your object’s condition, model and local services can change what is possible.</p>
           </div>
-          <div ref={resultRef} tabIndex={-1} aria-label="Your suggested next step" className="scroll-mt-20 min-w-0 break-words rounded-2xl border border-ink/15 bg-paper p-5 sm:p-8">
+          {(!standalone || result) && <>
+          {standalone && generated && <div className="ml-auto max-w-[88%] rounded-2xl rounded-br-sm bg-forest px-4 py-3 text-white sm:px-5 sm:py-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-white/70">You asked</p>
+            <p className="mt-1 whitespace-pre-wrap break-words text-sm">{answeredQuestion}</p>
+          </div>}
+          <div ref={resultRef} tabIndex={-1} aria-label="Your suggested next step" className={`min-w-0 break-words rounded-2xl border border-ink/15 bg-paper p-5 sm:p-8 ${standalone ? 'scroll-mt-20 mr-auto w-full rounded-bl-sm' : 'scroll-mt-20'}`}>
             {advice && result ? <>
               {generated ? <>
-                <div className="mb-5 rounded-xl border border-ink/15 bg-surface p-4">
+                {!standalone && <div className="mb-5 rounded-xl border border-ink/15 bg-surface p-4">
                   <p className="text-xs font-semibold uppercase tracking-wide">Answering your question</p><p className="mt-2 whitespace-pre-wrap break-words text-sm">{answeredQuestion}</p>
                   <button type="button" onClick={editQuestion} className="mt-2 min-h-[44px] py-2 text-sm font-semibold text-forest underline underline-offset-4">{generated.plan.status === 'clarify' ? 'Add details to my question' : 'Edit my question'}</button>
-                </div>
+                </div>}
+                {standalone && <button type="button" onClick={editQuestion} className="mb-4 min-h-[44px] py-2 text-sm font-semibold text-forest underline underline-offset-4">{generated.plan.status === 'clarify' ? 'Add details to my question' : 'Edit my question'}</button>}
                 <AIPlanContent generated={generated} />
                 {generated.plan.status === 'ready' && <div className="mt-6">
                   <details className="rounded-xl border border-ink/15 bg-surface p-4"><summary className="min-h-[44px] cursor-pointer py-2 font-semibold">Edit the draft before saving</summary>
@@ -151,6 +157,7 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
               {(!generated || generated.plan.status === 'ready') && <button type="button" disabled={!!generated && !editedPlan.trim()} className={`${primary} mt-6 disabled:opacity-60`} onClick={saveResult}>{saved ? (isSameSaved ? 'View my saved action' : 'Replace my saved action with this') : 'Save this action for the week'}</button>}
             </> : <><h3 className="text-2xl font-editorial">Your answer will appear here.</h3><p className="mt-4 leading-relaxed">Ask a question to understand an idea or find a practical next step. Your answer will appear here, ready to review, edit and save.</p><p className="mt-4 text-sm">Include the details that matter to you. You can refine your question after reading the answer.</p></>}
           </div>
+          </>}
         </div>
         <p id="action-storage-status" role="status" className="mt-5 text-sm">{notice}</p>
         {undoAction && <button type="button" className="min-h-[44px] py-2 font-semibold text-forest underline underline-offset-4" onClick={() => {
