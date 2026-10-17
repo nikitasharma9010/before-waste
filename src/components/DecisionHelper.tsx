@@ -1,3 +1,4 @@
+import { CopyTextButton } from './CopyTextButton';
 import { useRef, useState } from 'react';
 import { LoaderCircle } from 'lucide-react';
 import { barrierLabels, intentLabels, issues, itemLabels, recommend, recoveryAdvice, sameDecision, type Barrier, type Decision } from '../data/decisionData';
@@ -11,6 +12,7 @@ const primary = 'min-h-[44px] rounded-xl bg-forest px-5 py-3 font-semibold text-
 export function DecisionHelper({ onExploreObject, standalone = false, initialQuestion = '' }: { onExploreObject: (id: string) => void; standalone?: boolean; initialQuestion?: string }) {
   const Heading = standalone ? 'h1' : 'h2';
   const [initial] = useState(readAction);
+  const [storageAvailable, setStorageAvailable] = useState(!initial.unavailable);
   const [saved, setSaved] = useState<SavedAction | null>(initial.action);
   const [notice, setNotice] = useState(initial.unavailable ? 'Saved actions could not be read. You can still use this flow.' : '');
   const [decision, setDecision] = useState<Decision>({ item: 'anything', intent: 'explore', support: 'myself', budget: 'free' });
@@ -36,6 +38,7 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
   const advice = result ? recommend(result) : null;
   const isSameSaved = !!(saved && result && sameDecision(saved, result) &&
     (generated ? saved.question === answeredQuestion && saved.customPlan?.text === editedPlan && saved.customPlan.source === generated.source : !saved.customPlan));
+  const updatingSaved = !!(saved && result && generated && saved.customPlan && sameDecision(saved, result) && saved.question === answeredQuestion);
   const change = <K extends keyof Decision>(key: K, value: Decision[K]) => {
     setDecision({ ...decision, [key]: value, ...(key === 'item' ? { issue: 'unsure' as const } : {}) });
     setResult(null);
@@ -43,6 +46,7 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
   };
   const persist = (next: SavedAction | null) => {
     const success = writeAction(next);
+    setStorageAvailable(success);
     if (!success && !next) {
       setNotice('Your saved action could not be removed. Please try again; it may return after reloading.');
       return false;
@@ -53,15 +57,25 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
   };
   const saveResult = () => {
     if (!result) return;
-    if (saved && isSameSaved) {
+    if (saved && isSameSaved && storageAvailable) {
       setNotice('This action is already saved. Your note and outcome have been kept.');
       requestAnimationFrame(() => savedRef.current?.focus());
       return;
     }
+    if (saved && isSameSaved) { persist(saved); return; }
     setUndoAction(saved);
-    persist({ ...result, note: '', outcome: 'planned', ...(generated ? { question: answeredQuestion, customPlan: { ...generated, text: editedPlan } } : {}) });
-    requestAnimationFrame(() => savedRef.current?.focus());
+    persist({ ...(updatingSaved ? saved! : { ...result, note: '', outcome: 'planned' as const }), ...(generated ? { question: answeredQuestion, customPlan: { ...generated, text: editedPlan } } : {}) });
   };
+  const feedback = <div>
+        <p id="action-storage-status" role="status" className="mt-5 text-sm">{notice}</p>
+        {undoAction && <button type="button" className="min-h-[44px] py-2 font-semibold text-forest underline underline-offset-4" onClick={() => {
+          persist(undoAction); setUndoAction(null);
+          requestAnimationFrame(() => savedRef.current?.focus());
+        }}>Undo last change</button>}
+  </div>;
+  const savedFirstLine = saved?.customPlan?.text.trim().split('\n')[0] ?? '';
+  const savedHeading = savedFirstLine.length <= 200 ? savedFirstLine : 'Your saved plan';
+  const savedBody = savedFirstLine.length <= 200 ? saved?.customPlan?.text.trim().split('\n').slice(1).join('\n').trim() : saved?.customPlan?.text;
   const composer = (
     <div className="min-w-0 rounded-2xl border border-ink/15 bg-surface p-5 sm:p-8 space-y-5">
             {!standalone && <div role="group" className="flex flex-wrap gap-2" aria-label="Question mode">
@@ -101,6 +115,7 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
             <AIPlannerForm background={background} key={conversationKey} context={context} followUp={!!generated} standalone={standalone} initialQuestion={conversationKey === 0 ? initialQuestion : ''} decision={decision} hasDraft={!!generated} onBusyChange={setAsking} onResult={(snapshot, plan, question) => {
               if (generated) setHistory(context);
               else if (!background) setBackground(question);
+              setNotice('');
               setAnsweredQuestion(question);
               setResult(snapshot); setGenerated(plan); setEditedPlan(planText(plan.plan));
               requestAnimationFrame(() => resultRef.current?.focus());
@@ -120,7 +135,7 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
         <div className={`max-w-3xl ${standalone ? 'mb-5' : 'mb-8'}`}>
           {!standalone && <p className="section-kicker text-forest mb-3">ONE OBJECT. ONE NEXT STEP.</p>}
           <Heading ref={titleRef} tabIndex={-1} id="decision-title" className="scroll-mt-20 font-editorial text-3xl sm:text-4xl lg:text-5xl">{standalone ? 'Ask Before Waste' : 'What should I do with this?'}</Heading>
-          {standalone && generated && <button type="button" className="min-h-[44px] self-start py-2 font-semibold text-forest underline underline-offset-4" onClick={() => { if (!window.confirm('Start a new conversation? The unsaved conversation will be cleared. Your saved action stays.')) return; setGenerated(null); setResult(null); setAnsweredQuestion(''); setEditedPlan(''); setHistory([]); setBackground(''); setConversationKey(key => key + 1); requestAnimationFrame(editQuestion); }}>Start a new conversation</button>}
+          {standalone && generated && <button type="button" className="min-h-[44px] self-start py-2 font-semibold text-forest underline underline-offset-4" onClick={() => { if (!window.confirm('Start a new conversation? The unsaved conversation will be cleared. Your saved action stays.')) return; setGenerated(null); setResult(null); setAnsweredQuestion(''); setEditedPlan(''); setHistory([]); setNotice(''); setBackground(''); setConversationKey(key => key + 1); requestAnimationFrame(editQuestion); }}>Start a new conversation</button>}
           {(!standalone || !generated) && <p className={standalone ? 'mt-2 text-base' : 'mt-4 text-lg'}>{standalone ? 'Find a practical next step for your items and lower-waste living.' : 'Before you buy, replace or let something go, find a starting point that fits your life.'}</p>}
           {(!standalone || !generated) && <p className="mt-2 text-sm text-ink/80">{standalone ? 'No account needed. Save an action when you’re ready.' : 'Ask about any item, reducing waste or sustainable living. No account needed.'}</p>}
           {saved && <a href="#saved-action" onClick={() => savedRef.current?.focus({ preventScroll: true })} className="mt-4 inline-flex min-h-[44px] items-center font-semibold text-forest underline underline-offset-4">Return to my saved action</a>}
@@ -147,17 +162,7 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
                 <AIPlanContent generated={generated} question={answeredQuestion} />
                 {standalone && history.length === 0 && <details className="mt-4 border-t border-ink/15 pt-2"><summary className="min-h-[44px] cursor-pointer py-2 text-sm font-semibold text-forest">View your question</summary><p className="whitespace-pre-wrap break-words text-sm">{answeredQuestion}</p></details>}
                 {standalone && <button type="button" onClick={editQuestion} className="mt-2 min-h-[44px] py-2 text-sm font-semibold text-forest underline underline-offset-4">{generated.plan.status === 'clarify' ? 'Answer these questions below' : 'Ask a follow-up below'}</button>}
-                {generated.plan.status === 'ready' && <div className="mt-6">
-                  <details className="rounded-xl border border-ink/15 bg-surface p-4"><summary className="min-h-[44px] cursor-pointer py-2 font-semibold">Edit the draft before saving</summary>
-                  <label htmlFor="reviewed-plan" className="block font-semibold">Review or edit the plan you want to save</label>
-                  <p className="mt-2 text-sm">Adjust the wording to the action you want to keep.</p>
-                  <textarea id="reviewed-plan" className={`${control} mt-3 min-h-48`} maxLength={6000} value={editedPlan} onChange={e => setEditedPlan(e.target.value)} />
-                  </details>
-                  <button type="button" className="mt-2 min-h-[44px] py-2 text-sm font-semibold text-forest underline underline-offset-4" onClick={() => {
-                    if (!navigator.clipboard) { setNotice('Select the draft text to copy it manually.'); return; }
-                    void navigator.clipboard.writeText(editedPlan).then(() => setNotice('Draft copied.'), () => setNotice('Copy was unavailable. Select the draft text to copy it manually.'));
-                  }}>Copy draft</button>
-                </div>}
+
               </> : standalone ? <>
               <p className="section-kicker text-clay mb-3">AI UNAVAILABLE</p>
               <h3 className="text-2xl sm:text-3xl font-editorial">AI guidance isn’t available right now</h3>
@@ -180,10 +185,19 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
               </>}
               {generated?.plan.status === 'ready' && !editedPlan.trim() && <p role="status" className="mt-4 text-sm text-clay">Add some text to the draft before saving it.</p>}
               {!(standalone && !generated) && <>
-              {saved && !isSameSaved && (!generated || generated.plan.status === 'ready') && <p className="mt-5 text-sm">Replacing your action starts a new note and outcome. Undo is available until the next replacement, removal or page reload.</p>}
+              {saved && !isSameSaved && !updatingSaved && (!generated || generated.plan.status === 'ready') && <p className="mt-5 text-sm">One action is kept at a time. Replacing it starts fresh notes and progress; you can undo until the next change or reload.</p>}
               {generated?.plan.status === 'ready' && <p className="mt-4 text-sm text-ink/80">Saving keeps this draft and your question, including any supplied location, in this browser.</p>}
-              {(!generated || generated.plan.status === 'ready') && <button type="button" disabled={!!generated && !editedPlan.trim()} className={`${primary} mt-6 disabled:opacity-60`} onClick={saveResult}>{saved ? (isSameSaved ? 'View my saved action' : 'Replace my saved action with this') : 'Save this action for the week'}</button>}
+              <div className="mt-3 flex flex-wrap items-start gap-3">
+              {(!generated || generated.plan.status === 'ready') && <button type="button" disabled={!!generated && !editedPlan.trim()} className={`${primary} disabled:opacity-60`} onClick={saveResult}>{saved ? (isSameSaved ? (storageAvailable ? 'View my saved action' : 'Try saving again') : (updatingSaved ? 'Update my saved action' : 'Replace my saved action')) : 'Save this action'}</button>}
+              {generated && <CopyTextButton key={answeredQuestion} text={generated.plan.status === 'ready' ? editedPlan : planText(generated.plan)} />}
+              </div>
+              {generated?.plan.status === 'ready' && <div className="mt-4"><details className="rounded-xl border border-ink/15 bg-surface p-4"><summary className="min-h-[44px] cursor-pointer py-2 font-semibold">Edit answer (optional)</summary>
+                  <label htmlFor="reviewed-plan" className="block font-semibold">Edit the text to copy or save</label>
+                  <p className="mt-2 text-sm">Adjust the wording to the action you want to keep.</p>
+                  <textarea id="reviewed-plan" className={`${control} mt-3 min-h-48`} maxLength={6000} value={editedPlan} onChange={e => { setEditedPlan(e.target.value); setNotice('Edits are not saved yet. Copy uses this edited text.'); }} />
+                  </details></div>}
               </>}
+              {feedback}
             </> : <><h3 className="text-2xl font-editorial">Your answer will appear here.</h3><p className="mt-4 leading-relaxed">Ask a question to understand an idea or find a practical next step. Your answer will appear here, ready to review, edit and save.</p><p className="mt-4 text-sm">Include the details that matter to you. You can refine your question after reading the answer.</p></>}
           </div>
           </>}
@@ -191,23 +205,16 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
           {standalone && composer}
 
         </div>
-        <p id="action-storage-status" role="status" className="mt-5 text-sm">{notice}</p>
-        {undoAction && <button type="button" className="min-h-[44px] py-2 font-semibold text-forest underline underline-offset-4" onClick={() => {
-          persist(undoAction); setUndoAction(null);
-          requestAnimationFrame(() => savedRef.current?.focus());
-        }}>Undo last replacement or removal</button>}
+        {!result && feedback}
         {saved && <div id="saved-action" className="scroll-mt-20 mt-8 rounded-2xl border border-forest/30 bg-surface p-5 sm:p-8 max-w-3xl" aria-labelledby="saved-action-title">
-          <p className="section-kicker text-forest mb-3">ONE THING THIS WEEK</p>
+          <p className="section-kicker text-forest mb-3">MY SAVED ACTION</p>
           {!saved.customPlan && <p className="text-sm mb-2">{itemLabels[saved.item]} · {intentLabels[saved.intent]}</p>}
-          <h3 ref={savedRef} tabIndex={-1} id="saved-action-title" className="scroll-mt-20 text-2xl font-editorial">{saved.customPlan ? saved.customPlan.plan.action : recommend(saved).title}</h3>
+          <h3 ref={savedRef} tabIndex={-1} id="saved-action-title" className="scroll-mt-20 text-2xl font-editorial">{saved.customPlan ? savedHeading : recommend(saved).title}</h3>
           {saved.question && <details className="mt-4 rounded-xl border border-ink/15 p-4"><summary className="min-h-[44px] cursor-pointer py-2 font-semibold">Your original question and context</summary><p className="whitespace-pre-wrap break-words text-sm">{saved.question}</p></details>}
           {saved.customPlan ? <>
-            <p className="mt-3 text-sm">{saved.customPlan.source === 'ai' ? 'AI-assisted plan · reviewed by you' : 'Safety guidance · reviewed by you'}</p>
-            <p className="mt-4 whitespace-pre-wrap leading-relaxed">{saved.customPlan.text}</p>
-            <button type="button" className="min-h-[44px] mt-3 text-forest underline underline-offset-4" onClick={() => {
-              void navigator.clipboard?.writeText(saved.customPlan!.text).then(() => setNotice('Plan copied.'), () => setNotice('Copy was unavailable. Select the plan text to copy it manually.'));
-              if (!navigator.clipboard) setNotice('Select the plan text to copy it manually.');
-            }}>Copy my plan</button>
+            <p className="mt-3 text-sm">{saved.customPlan.source === 'ai' ? 'AI-assisted plan' : 'Safety guidance'}</p>
+            {savedBody && <p className="mt-4 whitespace-pre-wrap leading-relaxed">{savedBody}</p>}
+            <CopyTextButton text={saved.customPlan.text} label="Copy saved plan" />
           </> : <>
           <p className="mt-3">{recommend(saved).step}</p>
           <a className="inline-flex min-h-[44px] items-center mt-2 text-forest underline underline-offset-4" href={recommend(saved).resource.url}>{recommend(saved).resource.label}</a>

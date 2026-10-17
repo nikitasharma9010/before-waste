@@ -80,7 +80,7 @@ it('keeps notes and outcomes when viewing the same saved recommendation', async 
 it('undoes a replacement including the original note, outcome and barrier', async () => {
   localStorage.setItem(ACTION_KEY, JSON.stringify({ item: 'clothes', intent: 'buy', support: 'myself', budget: 'free', note: 'Keep this history', outcome: 'blocked', barrier: 'time' }));
   await render(); await select(0, 'headphones'); await click('Find my next step');
-  expect(host.textContent).toContain('starts a new note and outcome');
+  expect(host.textContent).toContain('starts fresh notes and progress');
   await click('Replace my saved action'); expect(readAction().action?.item).toBe('headphones');
   await click('Undo last');
   expect(readAction().action).toMatchObject({ item: 'clothes', note: 'Keep this history', outcome: 'blocked', barrier: 'time' });
