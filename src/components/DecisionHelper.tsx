@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { LoaderCircle } from 'lucide-react';
 import { barrierLabels, intentLabels, issues, itemLabels, recommend, recoveryAdvice, sameDecision, type Barrier, type Decision } from '../data/decisionData';
 import { readAction, writeAction, type SavedAction, type Outcome } from '../utils/actionStorage';
 import { planText, type GeneratedPlan } from '../data/aiPlan';
@@ -18,6 +19,7 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
   const [generated, setGenerated] = useState<GeneratedPlan | null>(null);
   const [editedPlan, setEditedPlan] = useState('');
   const [answeredQuestion, setAnsweredQuestion] = useState('');
+  const [asking, setAsking] = useState(false);
   const showBasic = () => {
     setDecision({ ...decision }); setGenerated(null); setEditedPlan(''); setAnsweredQuestion('');
     setResult({ ...decision });
@@ -101,19 +103,23 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
               </select>
             </label>}
             </>}
-            <AIPlannerForm initialQuestion={initialQuestion} decision={decision} hasDraft={!!generated} onResult={(snapshot, plan, question) => {
+            <AIPlannerForm standalone={standalone} initialQuestion={initialQuestion} decision={decision} hasDraft={!!generated} onBusyChange={setAsking} onResult={(snapshot, plan, question) => {
               setAnsweredQuestion(question);
               setResult(snapshot); setGenerated(plan); setEditedPlan(planText(plan.plan));
               requestAnimationFrame(() => resultRef.current?.focus());
             }} onFallback={snapshot => {
               setResult(snapshot); setGenerated(null); setEditedPlan('');
             }} />
-            <button className="min-h-[44px] py-2 text-sm font-semibold text-forest underline underline-offset-4" type="button" onClick={showBasic}>{decision.item === 'anything' ? 'Browse general guidance (no AI)' : 'Find my next step (basic guidance)'}</button>
+            {standalone && <div className="flex items-center gap-3 pt-1" aria-hidden="true"><div className="h-px flex-1 bg-ink/10" /><span className="text-xs font-semibold uppercase tracking-wide text-ink/50">Or</span><div className="h-px flex-1 bg-ink/10" /></div>}
+            <button className={standalone ? 'min-h-[44px] w-full rounded-xl border border-ink/25 px-4 py-3 text-sm font-semibold hover:bg-ink/5' : 'min-h-[44px] py-2 text-sm font-semibold text-forest underline underline-offset-4'} type="button" onClick={showBasic}>{decision.item === 'anything' ? 'Browse general guidance (no AI)' : 'Find my next step (basic guidance)'}</button>
             <p className="text-sm text-ink/80">General starting points. Your object’s condition, model and local services can change what is possible.</p>
           </div>
-          {(!standalone || result) && <>
+          {standalone && asking ? <div aria-hidden="true" className="mr-auto w-full max-w-full animate-pulse rounded-2xl rounded-bl-sm border border-ink/15 bg-paper p-5 sm:p-8">
+            <div className="flex items-center gap-2 text-sm font-semibold text-ink/60"><LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" /><span>Preparing your answer…</span></div>
+            <div className="mt-4 space-y-2"><div className="h-3 w-3/4 rounded-full bg-ink/10" /><div className="h-3 w-1/2 rounded-full bg-ink/10" /><div className="h-3 w-2/3 rounded-full bg-ink/10" /></div>
+          </div> : (!standalone || result) && <>
           {standalone && generated && <div className="ml-auto max-w-[88%] rounded-2xl rounded-br-sm bg-forest px-4 py-3 text-white sm:px-5 sm:py-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-white/70">You asked</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-white/85">You asked</p>
             <p className="mt-1 whitespace-pre-wrap break-words text-sm">{answeredQuestion}</p>
           </div>}
           <div ref={resultRef} tabIndex={-1} aria-label="Your suggested next step" className={`min-w-0 break-words rounded-2xl border border-ink/15 bg-paper p-5 sm:p-8 ${standalone ? 'scroll-mt-20 mr-auto w-full rounded-bl-sm' : 'scroll-mt-20'}`}>
