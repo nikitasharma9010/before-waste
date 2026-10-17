@@ -1,10 +1,11 @@
+import { AccessibleDialog } from './AccessibleDialog';
 import { useEffect, useRef, useState } from 'react';
 import { LoaderCircle, Sparkles } from 'lucide-react';
 import type { Decision } from '../data/decisionData';
 import { parseGeneratedPlan, type GeneratedPlan, type PlannerContext } from '../data/aiPlan';
 
 const starters = ['How can I waste less food?', 'What can I do with a broken chair?', 'What does a circular economy mean?'];
-export function AIPlannerForm({ decision, hasDraft, initialQuestion = '', standalone = false, onResult, onFallback, onBusyChange, context = [], followUp = false, replyToClarification = false, background = '' }: {
+export function AIPlannerForm({ decision, hasDraft, initialQuestion = '', standalone = false, onResult, onFallback, onBusyChange, context = [], followUp = false, replyToClarification = false, background = '', confirmEditedDraft = false }: {
   decision: Decision;
   context?: PlannerContext[];
   background?: string;
@@ -16,6 +17,7 @@ export function AIPlannerForm({ decision, hasDraft, initialQuestion = '', standa
   onResult: (decision: Decision, plan: GeneratedPlan, question: string) => void;
   onFallback: (decision: Decision) => void;
   onBusyChange?: (busy: boolean) => void;
+  confirmEditedDraft?: boolean;
 }) {
   const [description, setDescription] = useState(initialQuestion);
   const [location, setLocation] = useState('');
@@ -24,6 +26,7 @@ export function AIPlannerForm({ decision, hasDraft, initialQuestion = '', standa
   const [error, setError] = useState('');
   const [invalid, setInvalid] = useState(false);
   const [status, setStatus] = useState('');
+  const [confirmReplacement, setConfirmReplacement] = useState(false);
   const field = useRef<HTMLTextAreaElement>(null);
   const locationField = useRef<HTMLInputElement>(null);
   const controller = useRef<AbortController | null>(null);
@@ -36,11 +39,12 @@ export function AIPlannerForm({ decision, hasDraft, initialQuestion = '', standa
     controller.current?.abort(); setBusy(false); setDescription(value); setError(''); setInvalid(false);
     setStatus(busy ? 'Request cancelled because the question changed.' : '');
   }
-  async function generate() {
+  async function generate(allowReplacement = false) {
     if (busy) return;
     if (description.trim().length < 10) {
       setInvalid(true); setError('Add a little more detail: use at least 10 characters.'); field.current?.focus(); return;
     }
+    if (confirmEditedDraft && !allowReplacement) { setConfirmReplacement(true); return; }
     controller.current?.abort();
     const pending = new AbortController(); controller.current = pending;
     const snapshot = { ...decision };
@@ -106,6 +110,12 @@ export function AIPlannerForm({ decision, hasDraft, initialQuestion = '', standa
       {starters.map(question => <button key={question} type="button" className="min-h-[44px] rounded-xl border border-ink/20 px-3 py-2 text-left text-sm hover:bg-sage" onClick={() => { update(question); field.current?.focus(); }}>{question}</button>)}
     </div>}
     <p role="status" aria-live="polite" aria-atomic="true" className={status === 'Your answer is ready to review.' ? 'sr-only' : 'text-sm'}>{status}</p>
+    <AccessibleDialog isOpen={confirmReplacement} onClose={() => setConfirmReplacement(false)} triggerRef={field} titleId="replace-draft-title" title="Replace your edited draft?" descriptionId="replace-draft-description" description="You have unsaved edits. A successful new answer will replace them. Keep your draft to save it first, or continue without saving." maxWidthClass="max-w-lg">
+      <div className="flex flex-col gap-3 sm:flex-row">
+        <button type="button" className="min-h-[44px] rounded-xl border border-forest/30 px-4 py-3 font-semibold text-forest" onClick={() => setConfirmReplacement(false)}>Keep my draft</button>
+        <button type="button" className="min-h-[44px] rounded-xl bg-forest px-4 py-3 font-semibold text-white" onClick={() => { setConfirmReplacement(false); void generate(true); }}>Continue without saving</button>
+      </div>
+    </AccessibleDialog>
     {error && <div className="rounded-xl border border-clay/30 bg-paper p-4 text-sm"><p id="ai-error" role="alert">{error}</p>{!invalid && <p className="mt-2">{standalone ? 'Your question is kept. Try again in a moment.' : 'Your question is kept. Try again or use basic guidance.'}{hasDraft ? ' Your previous draft is still available.' : ''}</p>}</div>}
   </form>;
 }
