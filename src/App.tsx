@@ -1,3 +1,4 @@
+import { SiteFooter } from './components/SiteFooter';
 import { useState, useRef, useEffect } from 'react';
 import { Header } from './components/Header';
 import { HeroOpening } from './components/HeroOpening';
@@ -146,10 +147,10 @@ export default function App() {
       </main>
 
       {/* 9. Closing Experience */}
-      {isNotFound ? null : isAssistant ? <footer className="border-t border-ink/15 px-4 py-6 text-sm"><div className="mx-auto flex max-w-7xl flex-wrap gap-x-6 gap-y-2"><a href="/#follow-one-thing" className="inline-flex min-h-[44px] items-center text-forest underline">Explore the object stories</a><a href="/#pause" className="inline-flex min-h-[44px] items-center text-forest underline">Try the 7-day pause</a><button type="button" className="min-h-[44px] text-forest underline" onClick={event => handleOpenSources(event.currentTarget)}>Sources &amp; methodology</button></div></footer> : <ClosingSection
-        onRestart={handleRestart}
-        onOpenSources={handleOpenSources}
-      />}
+      {!isNotFound && <>
+        {!isAssistant && <ClosingSection />}
+        <SiteFooter assistant={isAssistant} onRestart={handleRestart} onOpenSources={handleOpenSources} />
+      </>}
 
       {/* Accessible Sources Modal */}
       <SourcesModal
