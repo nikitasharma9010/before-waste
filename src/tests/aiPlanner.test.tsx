@@ -24,7 +24,7 @@ async function input(id: string, value: string) {
   });
 }
 async function click(text: string) {
-  const button = [...host.querySelectorAll('button')].find(b => b.textContent?.includes(text));
+  const button = [...document.querySelectorAll('button')].find(b => b.textContent?.includes(text));
   if (!button) throw new Error(`Missing ${text}`);
   for (let parent = button.parentElement; parent; parent = parent.parentElement) if (parent instanceof HTMLDetailsElement) parent.open = true;
   await act(async () => button.click());
@@ -148,7 +148,7 @@ it('preserves reviewed draft edits when the question changes and a retry fails',
   await input('ai-description', 'Can I find a matching spare without buying?');
   expect(host.querySelector<HTMLTextAreaElement>('#reviewed-plan')?.value).toBe('Keep my carefully edited plan.');
   expect(host.textContent).toContain('My coat button is loose. What should I do?');
-  await click('Get AI guidance');
+  await click('Get AI guidance'); await click('Continue without saving');
   expect(host.querySelector<HTMLTextAreaElement>('#reviewed-plan')?.value).toBe('Keep my carefully edited plan.');
   expect(host.textContent).toContain('Your previous draft is still available.');
   await click('Save action on this device');
@@ -269,7 +269,7 @@ it('prioritizes the first answer and keeps the submitted question in a closed di
   await act(async()=>summary.click()); expect(details.open).toBe(true);
   await input('ai-description','What if I cannot find a replacement button?'); await click('Get AI guidance');
   expect(host.textContent).not.toContain('You asked');
-  expect(host.textContent).toContain('Earlier in this conversation');
+  expect(host.textContent).toContain('Recent exchanges');
   expect([...host.querySelectorAll('summary')].some(s=>s.textContent==='View your question')).toBe(true);
 });
 it('shows one actionable error on standalone without adding a duplicate unavailable answer', async () => {
@@ -359,4 +359,47 @@ it('keeps settings after the reply form and uses a proper answer heading', async
   const settings = host.querySelector('#conversation-background')!.closest('details')!;
   expect(composer.compareDocumentPosition(settings) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   expect(settings.open).toBe(false);
+});
+
+it('does not send a follow-up or discard edited text when replacement is cancelled', async () => {
+  await act(async () => root.render(<DecisionHelper standalone onExploreObject={() => {}} />));
+  const request = vi.fn().mockResolvedValue(Response.json(generated)); vi.stubGlobal('fetch', request);
+  await input('ai-description', 'A button fell off my jacket. What should I check?'); await click('Get AI guidance');
+  await input('reviewed-plan', 'Keep this manually edited action.');
+  await input('ai-description', 'What could I do without sewing supplies?');
+  await click('Get AI guidance');
+  expect(document.querySelector('[role="dialog"]')?.textContent).toContain('Replace your edited draft?');
+  await click('Keep my draft');
+  expect(request).toHaveBeenCalledTimes(1);
+  expect(host.querySelector<HTMLTextAreaElement>('#reviewed-plan')?.value).toBe('Keep this manually edited action.');
+  expect(host.querySelector<HTMLTextAreaElement>('#ai-description')?.value).toContain('without sewing supplies');
+  await click('Get AI guidance'); await click('Continue without saving');
+  expect(request).toHaveBeenCalledTimes(2);
+});
+it('does not interrupt an ordinary follow-up with an edit warning', async () => {
+  await act(async () => root.render(<DecisionHelper standalone onExploreObject={() => {}} />));
+  const request = vi.fn().mockResolvedValue(Response.json(generated)); vi.stubGlobal('fetch', request);
+  await input('ai-description', 'A button fell off my jacket. What should I check?'); await click('Get AI guidance');
+  await input('ai-description', 'What could I do without sewing supplies?'); await click('Get AI guidance');
+  expect(document.querySelector('[role="dialog"]')).toBeNull(); expect(request).toHaveBeenCalledTimes(2);
+});
+it('reports unreadable storage honestly and retries loading without replacing saved data', async () => {
+  localStorage.setItem('beforewaste_action_v1', JSON.stringify({item:'clothes',intent:'buy',support:'myself',budget:'free',note:'Keep my original note',outcome:'planned'}));
+  const read = vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => { throw new Error('blocked'); });
+  await act(async () => root.render(<DecisionHelper key="unreadable" standalone onExploreObject={() => {}} />));
+  expect(host.querySelector('#saved-action')?.textContent).toContain('Saved action unavailable');
+  expect(host.querySelector('#saved-action')?.textContent).not.toContain('No saved action yet');
+  expect(host.querySelector('[aria-label="Assistant sections"]')?.textContent).toContain('Unavailable');
+  read.mockRestore(); await click('Try loading again');
+  expect(host.querySelector<HTMLTextAreaElement>('#action-note')?.value).toBe('Keep my original note');
+  expect(readAction().action?.note).toBe('Keep my original note');
+});
+it('keeps the save retry inside the affected saved-action section', async () => {
+  vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json(generated)));
+  await input('ai-description', 'My coat needs a button. What should I check?'); await click('Get AI guidance');
+  vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new Error('blocked'); });
+  await click('Save action on this device');
+  const retry = [...host.querySelectorAll('button')].find(button => button.textContent === 'Try saving again')!;
+  expect(retry.closest('#saved-action')).not.toBeNull();
+  expect([...host.querySelectorAll('a')].some(link => link.textContent === 'Session only · View my action')).toBe(true);
 });
