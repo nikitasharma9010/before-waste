@@ -17,7 +17,7 @@ beforeEach(() => {
 afterEach(async () => { await act(async () => root.unmount()); host.remove(); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
 async function render() { await act(async () => root.render(<DecisionHelper onExploreObject={() => {}} />)); await click("Use guided examples"); }
 async function click(text: string) {
-  const el = [...host.querySelectorAll('button')].find(b => b.textContent?.includes(text));
+  const el = [...host.querySelectorAll<HTMLButtonElement | HTMLAnchorElement>('button, a')].find(b => b.textContent?.includes(text));
   if (!el) throw new Error(`Missing ${text}`);
   await act(async () => el.click());
 }
@@ -36,7 +36,7 @@ it('offers all six situations and adapts repair advice to budget and help', () =
   expect(recommend({ ...base, budget: 'flexible' }).cost).toContain('replacement');
 });
 it('saves an action, restores it on return and records an outcome', async () => {
-  await render(); await click('Find my next step'); await click('Save this action');
+  await render(); await click('Find my next step'); await click('Save action on this device');
   expect(readAction().action?.intent).toBe('buy');
   await act(async () => root.unmount()); root = createRoot(host); await render();
   expect(host.querySelector('#saved-action-title')?.textContent).toContain('wardrobe');
@@ -48,7 +48,7 @@ it('saves an action, restores it on return and records an outcome', async () => 
 it('clears stale advice when an answer changes and provides model-specific caution', async () => {
   await render(); await click('Find my next step');
   await select(0, 'headphones');
-  expect(host.textContent).not.toContain('Save this action for the week');
+  expect(host.textContent).not.toContain('Save action on this device for the week');
   await select(1, 'fix'); await click('Find my next step');
   expect(host.textContent).toContain('battery is swollen');
   expect(host.querySelector('a[href="https://www.ifixit.com/Device/Headphone"]')).not.toBeNull();
@@ -56,7 +56,7 @@ it('clears stale advice when an answer changes and provides model-specific cauti
 it('keeps the action usable when storage writes fail and does not pretend removal succeeded', async () => {
   await render(); await click('Find my next step');
   vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new Error('blocked'); });
-  await click('Save this action');
+  await click('Save action on this device');
   expect(host.querySelector('#action-storage-status')?.textContent).toContain('session only');
   vi.spyOn(Storage.prototype, 'removeItem').mockImplementation(() => { throw new Error('blocked'); });
   await click('Remove saved action');
@@ -72,7 +72,7 @@ it('rejects untrusted stored shapes', () => {
 
 it('keeps notes and outcomes when viewing the same saved recommendation', async () => {
   localStorage.setItem(ACTION_KEY, JSON.stringify({ item: 'clothes', intent: 'buy', support: 'myself', budget: 'free', note: 'Keep my plan', outcome: 'done' }));
-  await render(); await click('Find my next step'); await click('View my saved action');
+  await render(); await click('Find my next step'); await click('Saved · View my action');
   expect(readAction().action?.note).toBe('Keep my plan');
   expect(readAction().action?.outcome).toBe('done');
 });
@@ -87,7 +87,7 @@ it('undoes a replacement including the original note, outcome and barrier', asyn
 });
 
 it('focuses a stable heading after removal and allows undo', async () => {
-  await render(); await click('Find my next step'); await click('Save this action');
+  await render(); await click('Find my next step'); await click('Save action on this device');
   await click('Remove saved action');
   expect(document.activeElement).toBe(host.querySelector('#decision-title'));
   expect(host.querySelector('#action-storage-status')?.textContent).toContain('removed');
@@ -95,7 +95,7 @@ it('focuses a stable heading after removal and allows undo', async () => {
 });
 
 it('offers and persists barrier-specific alternatives without changing the original action', async () => {
-  await render(); await click('Find my next step'); await click('Save this action');
+  await render(); await click('Find my next step'); await click('Save action on this device');
   const outcome = host.querySelector<HTMLSelectElement>('#action-outcome')!;
   await act(async () => { outcome.value = 'blocked'; outcome.dispatchEvent(new Event('change', { bubbles: true })); });
   const barrier = host.querySelector<HTMLSelectElement>('#action-barrier')!;
