@@ -414,7 +414,8 @@ it('explains save availability beside non-action answers and shows Save for read
       expect(host.querySelector('#answer-save-hint')).toBeNull();
     } else {
       expect(save).toBeUndefined();
-      expect(host.querySelector('#answer-save-hint')?.textContent?.length).toBeGreaterThan(20);
+      if (status === 'unsupported') expect(host.querySelector('#answer-save-hint')).toBeNull();
+      else expect(host.querySelector('#answer-save-hint')?.textContent?.length).toBeGreaterThan(20);
     }
   }
 });
@@ -439,4 +440,16 @@ it('keeps drafts and answers while switching tabs, saves several answers and sup
   expect(host.querySelector<HTMLElement>('#ask')?.hidden).toBe(false);
   expect(host.querySelector('[aria-label="Your answer"]')?.textContent).toContain(generated.plan.action);
   expect(fetch).toHaveBeenCalledTimes(2);
+});
+
+it('keeps off-topic redirects brief without references or action controls', async () => {
+  await act(async () => root.render(<DecisionHelper standalone onExploreObject={() => {}} />));
+  vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json({...generated,plan:{status:'unsupported',action:'Ask about lower-waste living',summary:'I can help with waste prevention, repair, reuse, recycling and sustainable living.',reason:'Other topics are outside this assistant’s scope.',steps:[],alternative:'',questions:[],resourceIds:[]}})));
+  await input('ai-description', 'What is the capital of France?'); await click('Get AI guidance');
+  const answer = host.querySelector('[aria-label="Your answer"]')!;
+  expect(answer.textContent).toContain('Ask about lower-waste living');
+  expect(answer.textContent).not.toContain('Why this fits');
+  expect(answer.textContent).not.toContain('Resources to check');
+  expect(answer.querySelector('button')).toBeNull();
+  expect(host.querySelector('#reviewed-plan')).toBeNull();
 });
