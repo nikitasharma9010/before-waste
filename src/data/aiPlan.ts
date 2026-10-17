@@ -22,7 +22,7 @@ export interface AIPlan {
   resourceIds: ResourceId[];
 }
 export interface GeneratedPlan { plan: AIPlan; source: 'ai' | 'safety'; model: string; provider?: 'gemini' | 'aicredits' }
-export interface PlannerRequest extends Decision { description: string }
+export interface PlannerRequest extends Decision { description: string; location?: string }
 
 const record = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null && !Array.isArray(v);
 const shortText = (v: unknown, max: number): v is string => typeof v === 'string' && v.trim().length > 0 && v.length <= max && !/https?:\/\/|www\./i.test(v);
@@ -52,14 +52,16 @@ export function parsePlannerRequest(v: unknown): PlannerRequest | null {
   if (!record(v) || (v.item !== 'clothes' && v.item !== 'headphones' && v.item !== 'anything') ||
     (v.intent !== 'buy' && v.intent !== 'fix' && v.intent !== 'pass' && v.intent !== 'explore') ||
     (v.support !== 'myself' && v.support !== 'help') || (v.budget !== 'free' && v.budget !== 'flexible') ||
+    (v.location !== undefined && (typeof v.location !== 'string' || v.location.length > 120)) ||
     typeof v.description !== 'string' || v.description.trim().length < 10 || v.description.length > 1500 ||
     ((v.item === 'anything') !== (v.intent === 'explore')) ||
     (v.issue !== undefined && !issues[v.item].some(i => i.id === v.issue))) return null;
   return { item: v.item, intent: v.intent, support: v.support, budget: v.budget,
-    issue: v.issue as PlannerRequest['issue'], description: v.description.trim() };
+    issue: v.issue as PlannerRequest['issue'], description: v.description.trim(), ...(typeof v.location === 'string' && v.location.trim() ? { location: v.location.trim() } : {}) };
 }
+export const PLAN_LABELS = { reason: 'Why this fits', steps: 'Suggested steps', alternative: 'Another option', questions: 'Details to clarify', resources: 'Resources to check' } as const;
 export function planText(plan: AIPlan): string {
-  return [plan.action, plan.summary, `Why: ${plan.reason}`, ...plan.steps.map((s, i) => `${i + 1}. ${s}`),
-    `Alternative: ${plan.alternative}`, ...plan.questions.map(q => `Question: ${q}`),
-    ...plan.resourceIds.map(id => `${PLAN_RESOURCES[id].label}: ${PLAN_RESOURCES[id].url}`)].join('\n\n');
+  return [plan.action, plan.summary, `${PLAN_LABELS.reason}: ${plan.reason}`, ...(plan.steps.length ? [PLAN_LABELS.steps] : []), ...plan.steps.map((s, i) => `${i + 1}. ${s}`),
+    `${PLAN_LABELS.alternative}: ${plan.alternative}`, ...(plan.questions.length ? [PLAN_LABELS.questions, ...plan.questions] : []),
+    ...(plan.resourceIds.length ? [PLAN_LABELS.resources] : []), ...plan.resourceIds.map(id => `${PLAN_RESOURCES[id].label}: ${PLAN_RESOURCES[id].url}`)].join('\n\n');
 }

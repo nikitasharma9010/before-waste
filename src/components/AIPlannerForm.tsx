@@ -11,6 +11,7 @@ export function AIPlannerForm({ decision, hasDraft, onResult, onFallback }: {
   onFallback: (decision: Decision) => void;
 }) {
   const [description, setDescription] = useState('');
+  const [location, setLocation] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [invalid, setInvalid] = useState(false);
@@ -38,7 +39,7 @@ export function AIPlannerForm({ decision, hasDraft, onResult, onFallback }: {
     const timer = setTimeout(() => pending.abort('timeout'), 25000);
     try {
       const response = await fetch('/api/plan', { method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...snapshot, description: question }), signal: pending.signal });
+        body: JSON.stringify({ ...snapshot, description: question, ...(location.trim() ? { location: location.trim() } : {}) }), signal: pending.signal });
       const data: unknown = await response.json();
       if (pending.signal.aborted) return;
       if (!response.ok) {
@@ -48,7 +49,7 @@ export function AIPlannerForm({ decision, hasDraft, onResult, onFallback }: {
       const plan = parseGeneratedPlan(data);
       if (!plan) throw new Error('AI returned an incomplete answer.');
       setStatus('Your answer is ready to review.');
-      onResult(snapshot, plan, question);
+      onResult(snapshot, plan, location.trim() ? `${question}\nLocation: ${location.trim()}` : question);
     } catch (failure) {
       if (pending.signal.aborted && pending.signal.reason !== 'timeout') return;
       const message = pending.signal.reason === 'timeout' ? 'The request timed out.' : failure instanceof Error && failure.message.length < 200 ? failure.message : 'AI could not connect.';
@@ -62,7 +63,7 @@ export function AIPlannerForm({ decision, hasDraft, onResult, onFallback }: {
   return <form aria-label="Ask Before Waste" className="border-t border-ink/15 pt-5 space-y-4" onSubmit={event => { event.preventDefault(); void generate(); }}>
     <div>
       <label htmlFor="ai-description" className="block font-semibold">Ask about an item or sustainable living</label>
-      <p id="ai-hint" className="mt-2 text-sm text-ink/80">Ask a question or describe your situation. Add your budget, what you tried or other constraints if relevant.</p>
+      <p id="ai-hint" className="mt-2 text-sm text-ink/80">Ask a question or describe your situation. Add your location, budget, what you tried or other relevant details.</p>
     </div>
     {!description && decision.item === 'anything' && <div role="group" aria-label="Example questions" className="flex flex-wrap gap-2">
       {starters.map(question => <button key={question} type="button" className="min-h-[44px] rounded-xl border border-ink/20 px-3 py-2 text-left text-sm hover:bg-sage" onClick={() => { update(question); field.current?.focus(); }}>{question}</button>)}
@@ -73,9 +74,16 @@ export function AIPlannerForm({ decision, hasDraft, onResult, onFallback }: {
       aria-describedby={`ai-hint ai-privacy-summary ai-length${error ? ' ai-error' : ''}`} className="w-full min-h-32 rounded-xl border border-ink/25 bg-paper p-3 text-base font-normal aria-invalid:border-clay"
       placeholder="What would you like to know?" />
     <p id="ai-length" className="text-xs text-ink/80">{description.length}/1500 characters · Minimum 10. Enter adds a new line; Ctrl or ⌘ + Enter sends.</p>
+    <div>
+      <label htmlFor="ai-location" className="block text-sm font-semibold">City or region and country <span className="font-normal">(optional)</span></label>
+      <input id="ai-location" type="text" maxLength={120} value={location} aria-describedby="ai-location-hint" placeholder="For example: Pune, India" className="mt-2 w-full min-h-[44px] rounded-xl border border-ink/25 bg-paper p-3 text-base" onChange={event => {
+        controller.current?.abort(); setBusy(false); setLocation(event.target.value); setError(''); setInvalid(false); setStatus('');
+      }} />
+      <p id="ai-location-hint" className="mt-2 text-sm text-ink/80">Share only if relevant. No address needed; location is never detected automatically. Local services and rules still need confirmation.</p>
+    </div>
     <p id="ai-privacy-summary" className="text-sm text-ink/80">AI can make mistakes. Leave out private information. You choose what to save.</p>
     <details className="text-sm text-ink/80"><summary className="min-h-[44px] cursor-pointer py-3 underline underline-offset-4">How your question is used</summary>
-      <p id="ai-privacy" className="pb-3">Generate sends this description and selected answers to the configured AI service: Google Gemini or AICredits and its model provider. Automatic fallback may send it to both services. Your saved notes are not sent. Answers do not include a live local-service search.</p>
+      <p id="ai-privacy" className="pb-3">Your question, optional location and selected answers are sent to an external AI service to prepare a response. If the first service is unavailable, a backup service may process the same details. Your saved notes are not sent. Answers do not include a live local-service search.</p>
     </details>
     {hasDraft && <p className="text-sm">Your current draft stays available while you edit or retry. A successful new answer replaces the unsaved draft; your saved action stays.</p>}
     <div className="flex flex-wrap items-center gap-3">

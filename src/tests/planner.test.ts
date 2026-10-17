@@ -2,7 +2,7 @@ import type { IncomingMessage, ServerResponse } from 'node:http';
 import { afterEach, expect, it, vi } from 'vitest';
 import handler from '../../api/plan';
 import { generatePlan } from '../../server/planner';
-import { parsePlan, parsePlannerRequest, type AIPlan, type PlannerRequest } from '../data/aiPlan';
+import { planText, PLAN_LABELS, parsePlan, parsePlannerRequest, type AIPlan, type PlannerRequest } from '../data/aiPlan';
 
 const input: PlannerRequest = { item: 'headphones', intent: 'fix', support: 'myself', budget: 'free', description: 'Only the left side plays. I have no tools and already tried another device.' };
 const plan: AIPlan = { status: 'ready', summary: 'One side of your headphones is silent after a source check.', action: 'Check model support before paying for parts', reason: 'You have no tools and already tried another source.', steps: ['Find the model number and warranty information.', 'Ask support whether an assessment has a fee.'], alternative: 'Borrow a suitable pair if you need audio before support responds.', questions: [], resourceIds: ['headphones'] };
@@ -160,4 +160,33 @@ it('protects open battery questions without mistaking ordinary food waste for a 
   expect(upstream).not.toHaveBeenCalled();
   const food = parsePlannerRequest({ description: 'My potatoes are bulging out of the bag. How can I waste less?' })!;
   expect((await generatePlan(food, env, upstream)).source).toBe('ai');
+});
+
+
+it('validates optional location without breaking location-free requests', () => {
+  expect(parsePlannerRequest({ description: 'Where can I recycle a broken kettle?', location: '  Pune, India  ' })?.location).toBe('Pune, India');
+  expect(parsePlannerRequest({ description: 'Where can I recycle a broken kettle?', location: '' })?.location).toBeUndefined();
+  for (const location of [123, {}, 'x'.repeat(121)]) expect(parsePlannerRequest({ ...input, location })).toBeNull();
+});
+it('passes provided location and constraints to both services with locality and formatting rules', async () => {
+  const question = parsePlannerRequest({ description: 'I live in a small flat in Pune. How can I reduce food waste without spending more than INR 200?', location: 'Pune, India' })!;
+  for (const provider of ['gemini', 'aicredits']) {
+    const upstream = vi.fn().mockResolvedValue(provider === 'gemini' ? Response.json(completed(plan)) : chatResponse());
+    await generatePlan(question, { ...backupEnv, AI_PROVIDER: provider }, upstream);
+    const body = JSON.parse(upstream.mock.calls[0][1].body);
+    const context = JSON.parse(provider === 'gemini' ? body.input : body.messages[1].content);
+    const instructions = provider === 'gemini' ? body.system_instruction : body.messages[0].content;
+    expect(context.userSituation.location).toBe('Pune, India');
+    expect(context.userSituation.description).toContain('INR 200');
+    expect(context.userSituation.budget).toBeUndefined();
+    expect(instructions).toContain('US-labelled resources are background only outside the US');
+    expect(instructions).toContain('If locations conflict or are ambiguous');
+    expect(instructions).toContain('without Markdown headings');
+    expect(instructions).toContain('Do not mention model names');
+  }
+});
+it('uses the same section labels for generated display and copy/save text', () => {
+  const text = planText(plan);
+  for (const label of [PLAN_LABELS.reason, PLAN_LABELS.steps, PLAN_LABELS.alternative, PLAN_LABELS.resources]) expect(text).toContain(label);
+  expect(text).not.toContain('undefined');
 });

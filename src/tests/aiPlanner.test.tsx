@@ -71,14 +71,15 @@ it('keeps basic guidance usable with an unfinished optional AI description', asy
   expect(host.querySelector('#ai-description')?.hasAttribute('minlength')).toBe(false);
 });
 
-it('discloses AICredits and retains provider provenance with a saved plan', async () => {
+it('keeps provider metadata compatible without displaying provider or model names', async () => {
   vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json({ ...generated, model: 'openai/gpt-4o-mini', provider: 'aicredits' })));
-  expect(host.querySelector('#ai-privacy')?.textContent).toContain('both services');
+  expect(host.querySelector('#ai-privacy')?.textContent).toContain('external AI service');
   await input('ai-description', 'My coat button is loose and I have no sewing supplies.'); await click('Get AI guidance');
-  expect(host.textContent).toContain('Generated via AICredits');
+  expect(host.textContent).toContain('AI-assisted guidance');
+  expect(host.textContent).not.toMatch(/Gemini|AICredits|gpt-4o-mini/);
   await click('Save this action');
   expect(readAction().action?.customPlan?.provider).toBe('aicredits');
-  expect(host.querySelector('#saved-action')?.textContent).toContain('AICredits');
+  expect(host.querySelector('#saved-action')?.textContent).not.toMatch(/Gemini|AICredits|gpt-4o-mini/);
 });
 
 it('starts with free questions and preserves a broad answer across saving and reload', async () => {
@@ -157,4 +158,21 @@ it('takes clarification directly back to the original question', async () => {
   await click('Add details to my question');
   expect(document.activeElement?.id).toBe('ai-description');
   expect(host.querySelector<HTMLTextAreaElement>('#ai-description')?.value).toContain('tear near the shoulder');
+});
+
+
+it('sends optional location and shows it with the answered question without provider branding', async () => {
+  const request = vi.fn().mockResolvedValue(Response.json(generated)); vi.stubGlobal('fetch', request);
+  await input('ai-description', 'How can I reduce food waste in my small flat?');
+  const location = host.querySelector<HTMLInputElement>('#ai-location')!;
+  await act(async () => {
+    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')!.set!.call(location, 'Pune, India');
+    location.dispatchEvent(new Event('input', { bubbles: true }));
+  });
+  await click('Get AI guidance');
+  expect(JSON.parse(request.mock.calls[0][1].body).location).toBe('Pune, India');
+  expect(host.textContent).toContain('Location: Pune, India');
+  expect(host.textContent).not.toMatch(/Gemini|AICredits|gemini-3/);
+  expect(host.querySelector('#ai-location-hint')?.textContent).toContain('never detected automatically');
+  expect([...host.querySelectorAll('h4')].map(h => h.textContent)).toContain('Suggested steps');
 });

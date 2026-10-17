@@ -137,7 +137,7 @@ target size. This work is not a formal accessibility certification. Safari/Firef
 physical-device testing, text-only zoom, and a full screen-reader audit remain
 release checks. Browser viewport checks do not replace those checks.
 
-## Open sustainability questions — 17 October 2026
+## Open sustainability questions â€” 17 October 2026
 
 - 79 automated tests pass; TypeScript check and production build pass.
 - Free questions are the default. Guided clothing/headphone flows and old saved actions remain supported.
@@ -154,3 +154,9 @@ AI answers identify their original question and provide a direct edit/clarificat
 Validation: 84 tests pass, TypeScript and production build pass. Browser verified inline validation, Ctrl+Enter, missing-key recovery, original-question context and edit focus. No horizontal overflow at 280, 320, 375, 768, 1280 and 1440px; desktop and 375px layouts visually inspected. The preview uses deterministic safety guidance, explicitly labelled as not AI-generated. Real provider quality, physical-device keyboard behavior and screen-reader testing remain deployment checks; this is not a complete WCAG conformance audit or usability study.
 
 References: [W3C form notifications](https://www.w3.org/WAI/tutorials/forms/notifications/), [WCAG status messages](https://www.w3.org/WAI/WCAG21/Understanding/status-messages), [NN/g machine-learning usability](https://www.nngroup.com/articles/machine-learning-ux/).
+
+## Location context and neutral presentation - 17 October 2026
+
+Optional city/region and country is validated (120-character maximum), sent only with an explicit AI request, and shown alongside the answered question. Instructions use details in the location field or description, adapt to stated constraints, ask when necessary and avoid treating US guidance as local evidence elsewhere. No geolocation or live service lookup was added. Provider/model branding was removed from privacy details, answers and saved-plan labels while retaining internal metadata compatibility. Shared section labels drive answer display and copy/save text.
+
+88 automated tests pass, TypeScript and production build pass. New tests cover location validation, both provider contexts/instructions, location UI submission, absence of branding and shared formatting. Browser verified location context and section headings using deterministic safety output; narrow/desktop layouts inspected, with no horizontal overflow at 280-1440px. Live geographic relevance still requires configured credentials; automated tests do not establish model factual accuracy.
