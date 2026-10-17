@@ -83,3 +83,11 @@ model-quality advantage without evidence.
 - Try conflicting locations and a local collection question without location: ask for clarification when needed. General educational questions should work without location.
 - Check current answers, expanded privacy details and older saved plans: no provider/model branding should appear. AI assistance and external processing remain disclosed.
 - Display and copied drafts should use the same reason, steps, alternative and resource labels. User-edited saved text remains as edited.
+
+## Dedicated assistant navigation
+
+- From the homepage, enter a fictional question and Continue to assistant. Confirm it appears at `/ask` without the question in the URL and without an automatic AI request.
+- Open `/ask` directly and refresh `/ask` and `/ask/` on the deployed Vercel preview. Confirm `/api/plan` still returns API JSON rather than the SPA HTML.
+- Check browser Back/Forward, home/story links, mobile navigation, sources dialog and saved action after changing pages.
+- Use an unrelated-location/repair example, edit with clarification details and regenerate. Context is the visible question/selected details, not an automatic hidden chat history.
+- If tab storage is blocked, the homepage must preserve the question and offer a manual recovery link.

@@ -85,8 +85,8 @@ export const ClosingSection: React.FC<ClosingSectionProps> = ({ onRestart, onOpe
           {/* Primary Action Button Bar */}
           <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center justify-center gap-3 pt-4">
             <a
-              href="#decision-helper"
-              onClick={() => document.getElementById('decision-helper')?.focus({ preventScroll: true })}
+              href="/ask"
+
               className="inline-flex items-center justify-center gap-2 px-6 py-3.5 min-h-[44px] rounded-xl font-bold text-sm text-ink bg-oat hover:bg-oat-strong focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white transition-all shadow-md cursor-pointer text-center"
             >
               <span>Ask Before Waste</span>
