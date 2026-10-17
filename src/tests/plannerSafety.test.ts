@@ -113,3 +113,18 @@ it.each(['gemini','aicredits'])('bounds the most realistic next step to one task
   const tooMany = {...plan,steps:['Ask a friend for help.', 'Search for local classes.']};
   await expect(generatePlan({...input,description:'What is the most realistic next step?'},{...env,AI_PROVIDER:provider},vi.fn().mockResolvedValue(response(tooMany)))).rejects.toThrow('usable plan');
 });
+
+it.each(['gemini','aicredits'])('replaces model-declared off-topic content with a controlled redirect for %s', async provider => {
+  const response = provider === 'gemini' ? gemini : chat;
+  const raw = {...plan,status:'unsupported',action:'The capital is Paris',summary:'Paris is the capital of France.',reason:'This is an unrelated geography answer.',steps:[],alternative:'',resourceIds:['circular']};
+  const upstream = vi.fn().mockResolvedValue(response(raw));
+  const result = await generatePlan({...input,description:'What is the capital of France?'},{...env,AI_PROVIDER:provider},upstream);
+  expect(result.plan).toMatchObject({status:'unsupported',action:'Ask about lower-waste living',steps:[],questions:[],alternative:'',resourceIds:[]});
+  expect(JSON.stringify(result.plan)).not.toContain('Paris');
+  expect(result.plan.summary).toContain('waste prevention');
+  const body = JSON.parse(upstream.mock.calls[0][1].body);
+  const instructions = provider === 'gemini' ? body.system_instruction : body.messages[0].content;
+  expect(instructions).toContain('Topic boundary applies to every turn');
+  expect(instructions).toContain('answer only that portion');
+  expect(instructions).toContain('mentioning recycling');
+});

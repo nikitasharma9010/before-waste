@@ -4,6 +4,7 @@ export function AIPlanContent({ generated, question = '', standalone = false }: 
   const { plan } = generated;
   const Heading = standalone ? 'h2' : 'h3';
   const Subheading = standalone ? 'h3' : 'h4';
+  if (plan.status === 'unsupported') return <div className="space-y-4"><Heading className="text-2xl sm:text-3xl font-editorial">{plan.action}</Heading><p>{plan.summary}</p></div>;
   return <div className="space-y-4">
     <p className="section-kicker text-forest">{generated.source === 'ai' ? 'AI-GENERATED DRAFT · REVIEW BEFORE ACTING' : 'SAFETY GUIDANCE · NOT AI GENERATED'}</p>
     <Heading className="text-2xl sm:text-3xl font-editorial">{plan.action}</Heading>
