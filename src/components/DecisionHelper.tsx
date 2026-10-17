@@ -1,6 +1,9 @@
 import { useRef, useState } from 'react';
 import { barrierLabels, intentLabels, issues, itemLabels, recommend, recoveryAdvice, sameDecision, type Barrier, type Decision } from '../data/decisionData';
 import { readAction, writeAction, type SavedAction, type Outcome } from '../utils/actionStorage';
+import { planText, type GeneratedPlan } from '../data/aiPlan';
+import { AIPlannerForm } from './AIPlannerForm';
+import { AIPlanContent } from './AIPlanContent';
 
 const control = 'w-full min-h-[44px] rounded-xl border border-ink/25 bg-surface p-3 text-ink';
 const primary = 'min-h-[44px] rounded-xl bg-forest px-5 py-3 font-semibold text-white hover:bg-forest-strong';
@@ -11,13 +14,18 @@ export function DecisionHelper({ onExploreObject }: { onExploreObject: (id: stri
   const [decision, setDecision] = useState<Decision>({ item: 'clothes', intent: 'buy', support: 'myself', budget: 'free' });
   const [result, setResult] = useState<Decision | null>(null);
   const [undoAction, setUndoAction] = useState<SavedAction | null>(null);
+  const [generated, setGenerated] = useState<GeneratedPlan | null>(null);
+  const [editedPlan, setEditedPlan] = useState('');
   const resultRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const savedRef = useRef<HTMLHeadingElement>(null);
   const advice = result ? recommend(result) : null;
+  const isSameSaved = !!(saved && result && sameDecision(saved, result) &&
+    (generated ? saved.customPlan?.text === editedPlan && saved.customPlan.source === generated.source : !saved.customPlan));
   const change = <K extends keyof Decision>(key: K, value: Decision[K]) => {
     setDecision({ ...decision, [key]: value, ...(key === 'item' ? { issue: 'unsure' as const } : {}) });
     setResult(null);
+    setGenerated(null); setEditedPlan('');
   };
   const persist = (next: SavedAction | null) => {
     const success = writeAction(next);
@@ -31,13 +39,13 @@ export function DecisionHelper({ onExploreObject }: { onExploreObject: (id: stri
   };
   const saveResult = () => {
     if (!result) return;
-    if (saved && sameDecision(saved, result)) {
+    if (saved && isSameSaved) {
       setNotice('This action is already saved. Your note and outcome have been kept.');
       requestAnimationFrame(() => savedRef.current?.focus());
       return;
     }
     setUndoAction(saved);
-    persist({ ...result, note: '', outcome: 'planned' });
+    persist({ ...result, note: '', outcome: 'planned', ...(generated ? { customPlan: { ...generated, text: editedPlan } } : {}) });
     requestAnimationFrame(() => savedRef.current?.focus());
   };
   return (
@@ -53,6 +61,8 @@ export function DecisionHelper({ onExploreObject }: { onExploreObject: (id: stri
         <div className="grid gap-6 lg:grid-cols-2 items-start">
           <form className="rounded-2xl border border-ink/15 bg-surface p-5 sm:p-8 space-y-5" onSubmit={event => {
             event.preventDefault();
+            setDecision({ ...decision });
+            setGenerated(null); setEditedPlan('');
             setResult({ ...decision });
             requestAnimationFrame(() => resultRef.current?.focus());
           }}>
@@ -81,12 +91,27 @@ export function DecisionHelper({ onExploreObject }: { onExploreObject: (id: stri
                 <option value="free">Start without spending</option><option value="flexible">I can consider a cost</option>
               </select>
             </label>}
-            <button className={primary} type="submit">Find my next step</button>
+            <AIPlannerForm decision={decision} onClear={() => { setResult(null); setGenerated(null); setEditedPlan(''); }} onResult={(snapshot, plan) => {
+              setResult(snapshot); setGenerated(plan); setEditedPlan(planText(plan.plan));
+              requestAnimationFrame(() => resultRef.current?.focus());
+            }} onFallback={snapshot => {
+              setResult(snapshot); setGenerated(null); setEditedPlan('');
+            }} />
+            <button className="min-h-[44px] rounded-xl border border-ink/25 px-5 py-3 font-semibold hover:bg-sage" type="submit">Find my next step (basic guidance)</button>
             <p className="text-sm text-ink/80">General starting points. Your object’s condition, model and local services can change what is possible.</p>
           </form>
           <div ref={resultRef} tabIndex={-1} aria-label="Your suggested next step" className="scroll-mt-20 rounded-2xl border border-ink/15 bg-paper p-5 sm:p-8">
             {advice && result ? <>
-              <p className="section-kicker text-clay mb-3">{itemLabels[result.item]} · {intentLabels[result.intent]}</p>
+              {generated ? <>
+                <AIPlanContent generated={generated} />
+                {generated.plan.status === 'ready' && <div className="mt-6">
+                  <label htmlFor="reviewed-plan" className="block font-semibold">Review or edit the plan you want to save</label>
+                  <p className="mt-2 text-sm">You decide what to do. Saving keeps this version on your browser.</p>
+                  <textarea id="reviewed-plan" className={`${control} mt-3 min-h-48`} maxLength={6000} value={editedPlan} onChange={e => setEditedPlan(e.target.value)} />
+                </div>}
+              </> : <>
+              <p className="section-kicker text-clay mb-3">BASIC GUIDANCE · NOT AI GENERATED</p>
+              <p className="text-sm mb-3">{itemLabels[result.item]} · {intentLabels[result.intent]}</p>
               <h3 className="text-2xl sm:text-3xl font-editorial">{advice.title}</h3>
               <p className="mt-4 leading-relaxed">{advice.step}</p>
               <dl className="mt-5 grid gap-4 sm:grid-cols-2 text-sm"><div><dt className="font-semibold">Time & effort</dt><dd className="mt-1">{advice.effort}</dd></div><div><dt className="font-semibold">Cost to consider</dt><dd className="mt-1">{advice.cost}</dd></div></dl>
@@ -99,12 +124,13 @@ export function DecisionHelper({ onExploreObject }: { onExploreObject: (id: stri
               {result.intent === 'fix' && <p className="mt-2 text-sm">Choose a matching guide and check tools, difficulty and model before starting.</p>}
               {result.intent === 'pass' && <p className="mt-3 text-sm">Before travelling, contact the recipient or collection service. Ask whether they accept this item in its current condition{result.item === 'headphones' ? ', whether batteries need special handling,' : ''} and whether there is a fee. US guidance is background information; use your municipality or manufacturer for local rules.</p>}
               <p className="mt-3 text-xs text-ink/80">Editorial starting points, not a diagnosis or a measured environmental saving. Check collection and donation acceptance locally.</p>
-              {saved && !sameDecision(saved, result) && <p className="mt-5 text-sm">Replacing your action starts a new note and outcome. Undo is available until the next replacement, removal or page reload.</p>}
-              <button type="button" className={`${primary} mt-6`} onClick={saveResult}>{saved ? (sameDecision(saved, result) ? 'View my saved action' : 'Replace my saved action with this') : 'Save this action for the week'}</button>
+              </>}
+              {saved && !isSameSaved && <p className="mt-5 text-sm">Replacing your action starts a new note and outcome. Undo is available until the next replacement, removal or page reload.</p>}
+              {(!generated || generated.plan.status === 'ready') && <button type="button" disabled={!!generated && !editedPlan.trim()} className={`${primary} mt-6 disabled:opacity-60`} onClick={saveResult}>{saved ? (isSameSaved ? 'View my saved action' : 'Replace my saved action with this') : 'Save this action for the week'}</button>}
             </> : <><h3 className="text-2xl font-editorial">A small decision, made easier.</h3><p className="mt-4 leading-relaxed">Tell us what you are considering. You will get a practical first step, an alternative, and a little of the story behind your choice.</p><p className="mt-4 text-sm">Your budget and access to help matter. Choose what is realistic for you.</p></>}
           </div>
         </div>
-        <p role="status" className="mt-5 text-sm">{notice}</p>
+        <p id="action-storage-status" role="status" className="mt-5 text-sm">{notice}</p>
         {undoAction && <button type="button" className="min-h-[44px] py-2 font-semibold text-forest underline underline-offset-4" onClick={() => {
           persist(undoAction); setUndoAction(null);
           requestAnimationFrame(() => savedRef.current?.focus());
@@ -112,9 +138,18 @@ export function DecisionHelper({ onExploreObject }: { onExploreObject: (id: stri
         {saved && <div id="saved-action" className="scroll-mt-20 mt-8 rounded-2xl border border-forest/30 bg-surface p-5 sm:p-8 max-w-3xl" aria-labelledby="saved-action-title">
           <p className="section-kicker text-forest mb-3">ONE THING THIS WEEK</p>
           <p className="text-sm mb-2">{itemLabels[saved.item]} · {intentLabels[saved.intent]}</p>
-          <h3 ref={savedRef} tabIndex={-1} id="saved-action-title" className="scroll-mt-20 text-2xl font-editorial">{recommend(saved).title}</h3>
+          <h3 ref={savedRef} tabIndex={-1} id="saved-action-title" className="scroll-mt-20 text-2xl font-editorial">{saved.customPlan ? 'Your reviewed action plan' : recommend(saved).title}</h3>
+          {saved.customPlan ? <>
+            <p className="mt-3 text-sm">{saved.customPlan.source === 'ai' ? `AI-assisted plan · ${saved.customPlan.model} · reviewed by you` : 'Safety guidance · reviewed by you'}</p>
+            <p className="mt-4 whitespace-pre-wrap leading-relaxed">{saved.customPlan.text}</p>
+            <button type="button" className="min-h-[44px] mt-3 text-forest underline underline-offset-4" onClick={() => {
+              void navigator.clipboard?.writeText(saved.customPlan!.text).then(() => setNotice('Plan copied.'), () => setNotice('Copy was unavailable. Select the plan text to copy it manually.'));
+              if (!navigator.clipboard) setNotice('Select the plan text to copy it manually.');
+            }}>Copy my plan</button>
+          </> : <>
           <p className="mt-3">{recommend(saved).step}</p>
           <a className="inline-flex min-h-[44px] items-center mt-2 text-forest underline underline-offset-4" href={recommend(saved).resource.url}>{recommend(saved).resource.label}</a>
+          </>}
           <p className="mt-3 text-sm text-ink/80">Saved only in this browser when storage is available. Clearing browser data removes it. No automatic reminders.</p>
           <label className="block mt-5 font-semibold" htmlFor="action-outcome">What happened?</label>
           <select id="action-outcome" className={`${control} mt-2`} value={saved.outcome} onChange={e => persist({ ...saved, outcome: e.target.value as Outcome })}>

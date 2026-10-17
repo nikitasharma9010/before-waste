@@ -57,11 +57,11 @@ it('keeps the action usable when storage writes fail and does not pretend remova
   await render(); await click('Find my next step');
   vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new Error('blocked'); });
   await click('Save this action');
-  expect(host.querySelector('[role="status"]')?.textContent).toContain('session only');
+  expect(host.querySelector('#action-storage-status')?.textContent).toContain('session only');
   vi.spyOn(Storage.prototype, 'removeItem').mockImplementation(() => { throw new Error('blocked'); });
   await click('Remove saved action');
   expect(host.querySelector('#saved-action-title')).not.toBeNull();
-  expect(host.querySelector('[role="status"]')?.textContent).toContain('could not be removed');
+  expect(host.querySelector('#action-storage-status')?.textContent).toContain('could not be removed');
 });
 it('rejects untrusted stored shapes', () => {
   localStorage.setItem(ACTION_KEY, JSON.stringify({ item: 'unknown', intent: 'fix' }));
@@ -90,7 +90,7 @@ it('focuses a stable heading after removal and allows undo', async () => {
   await render(); await click('Find my next step'); await click('Save this action');
   await click('Remove saved action');
   expect(document.activeElement).toBe(host.querySelector('#decision-title'));
-  expect(host.querySelector('[role="status"]')?.textContent).toContain('removed');
+  expect(host.querySelector('#action-storage-status')?.textContent).toContain('removed');
   await click('Undo last'); expect(readAction().action?.item).toBe('clothes');
 });
 

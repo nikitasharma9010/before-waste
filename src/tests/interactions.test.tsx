@@ -129,7 +129,7 @@ describe('real application interactions', () => {
     const details = host.querySelector('#hotspot-details')!;
     expect(details.getAttribute('aria-live')).toBe('polite');
     expect(details.textContent).toContain('Wear & care');
-    expect(host.querySelector('textarea')?.getAttribute('rows')).toBe('3');
+    expect(host.querySelector('#reflection-note-day-1')?.getAttribute('rows')).toBe('3');
   });
 
   it('selects scenario radio cards with arrows, wraps, and supports Home/End', async () => {

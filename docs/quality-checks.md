@@ -98,7 +98,23 @@ preservation, replacement Undo, removal focus, barrier persistence, issue reset,
 old-record compatibility, resource selection and the new page order. Browser
 checks covered issue guidance, notes/outcome retention, Undo, focus and reload.
 
-## Remaining accessibility review scope
+## AI planner implementation
+
+The optional description flow calls a server-only Gemini endpoint. Requests and
+plans are schema-validated; resources are resolved from a vetted catalogue. Plans
+are explicitly marked AI-generated, safety guidance or basic non-AI guidance.
+The accepted edited text is saved, not regenerated from the old recommendation
+function on reload. Existing saved actions and reflection notes remain compatible.
+
+66 tests cover provider-response parsing, API request validation and throttling,
+quota/failure/timeout handling, deterministic safety, AI editing and storage,
+clarification, cancellation, basic guidance and prior interactions. Browser checks
+exercised unavailable-provider fallback and a labelled safety plan through the real
+local handler, edited-plan restoration and reflow at six widths (280–1440px).
+Live Gemini output quality requires a configured deployment and is not verified by
+the simulated-provider tests. See `ai-demo-checklist.md` for that final check.
+
+## Remaining manual checks
 
 Use the [WCAG 2.2 reference](https://www.w3.org/WAI/WCAG22/quickref/) when reviewing
 future changes, including reflow, text resize, visible focus, keyboard access, and
