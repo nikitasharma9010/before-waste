@@ -4,25 +4,30 @@ import type { Decision } from '../data/decisionData';
 import { parseGeneratedPlan, type GeneratedPlan } from '../data/aiPlan';
 
 const starters = ['How can I waste less food?', 'What can I do with a broken chair?', 'What does a circular economy mean?'];
-export function AIPlannerForm({ decision, hasDraft, initialQuestion = '', onResult, onFallback }: {
+export function AIPlannerForm({ decision, hasDraft, initialQuestion = '', standalone = false, onResult, onFallback, onBusyChange }: {
   decision: Decision;
   initialQuestion?: string;
   hasDraft: boolean;
+  standalone?: boolean;
   onResult: (decision: Decision, plan: GeneratedPlan, question: string) => void;
   onFallback: (decision: Decision) => void;
+  onBusyChange?: (busy: boolean) => void;
 }) {
   const [description, setDescription] = useState(initialQuestion);
   const [location, setLocation] = useState('');
+  const [showLocation, setShowLocation] = useState(!standalone);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [invalid, setInvalid] = useState(false);
   const [status, setStatus] = useState('');
   const field = useRef<HTMLTextAreaElement>(null);
+  const locationField = useRef<HTMLInputElement>(null);
   const controller = useRef<AbortController | null>(null);
   useEffect(() => {
     setBusy(false); setError(''); setInvalid(false); setStatus('');
     return () => controller.current?.abort();
   }, [decision]);
+  useEffect(() => { onBusyChange?.(busy); }, [busy, onBusyChange]);
   function update(value: string) {
     controller.current?.abort(); setBusy(false); setDescription(value); setError(''); setInvalid(false);
     setStatus(busy ? 'Request cancelled because the question changed.' : '');
@@ -75,16 +80,16 @@ export function AIPlannerForm({ decision, hasDraft, initialQuestion = '', onResu
       {starters.map(question => <button key={question} type="button" className="min-h-[44px] rounded-xl border border-ink/20 px-3 py-2 text-left text-sm hover:bg-sage" onClick={() => { update(question); field.current?.focus(); }}>{question}</button>)}
     </div>}
     <p id="ai-length" className="text-xs text-ink/80">{description.length}/1500 characters · Minimum 10. Enter adds a new line; Ctrl or ⌘ + Enter sends.</p>
-    <div>
+    {showLocation ? <div>
       <label htmlFor="ai-location" className="block text-sm font-semibold">City or region and country <span className="font-normal">(optional)</span></label>
-      <input id="ai-location" type="text" maxLength={120} value={location} aria-describedby="ai-location-hint" placeholder="For example: Pune, India" className="mt-2 w-full min-h-[44px] rounded-xl border border-ink/25 bg-paper p-3 text-base" onChange={event => {
+      <input ref={locationField} id="ai-location" type="text" maxLength={120} value={location} aria-describedby="ai-location-hint" placeholder="For example: Pune, India" className="mt-2 w-full min-h-[44px] rounded-xl border border-ink/25 bg-paper p-3 text-base" onChange={event => {
         controller.current?.abort(); setBusy(false); setLocation(event.target.value); setError(''); setInvalid(false); setStatus('');
       }} />
       <p id="ai-location-hint" className="mt-2 text-sm text-ink/80">Share only if relevant. No address needed; location is never detected automatically. Local services and rules still need confirmation.</p>
-    </div>
-    <p id="ai-privacy-summary" className="text-sm text-ink/80">AI can make mistakes. Leave out private information. You choose what to save.</p>
+    </div> : <button type="button" className="min-h-[44px] py-2 text-sm font-semibold text-forest underline underline-offset-4" onClick={() => { setShowLocation(true); requestAnimationFrame(() => locationField.current?.focus()); }}>+ Add your location (optional)</button>}
+    <p id="ai-privacy-summary" className="text-sm text-ink/80">{standalone ? 'Leave out private information — your question goes to an external AI service.' : 'AI can make mistakes. Leave out private information. You choose what to save.'}</p>
     <details className="text-sm text-ink/80"><summary className="min-h-[44px] cursor-pointer py-3 underline underline-offset-4">How your question is used</summary>
-      <p id="ai-privacy" className="pb-3">Your question, optional location and selected answers are sent to an external AI service to prepare a response. If the first service is unavailable, a backup service may process the same details. Your saved notes are not sent. Answers do not include a live local-service search.</p>
+      <p id="ai-privacy" className="pb-3">Your question, optional location and selected answers are sent to an external AI service to prepare a response. Your saved notes are not sent. Answers do not include a live local-service search.</p>
     </details>
     {hasDraft && <p className="text-sm">Your current draft stays available while you edit or retry. A successful new answer replaces the unsaved draft; your saved action stays.</p>}
     <div className="flex flex-wrap items-center gap-3">
@@ -97,6 +102,6 @@ export function AIPlannerForm({ decision, hasDraft, initialQuestion = '', onResu
       }}>Cancel request</button>}
     </div>
     <p role="status" aria-live="polite" aria-atomic="true" className="text-sm">{status}</p>
-    {error && <div className="rounded-xl border border-clay/30 bg-paper p-4 text-sm"><p id="ai-error" role="alert">{error}</p>{!invalid && <p className="mt-2">Your question is kept. Try again or use basic guidance.{hasDraft ? ' Your previous draft is still available.' : ''}</p>}</div>}
+    {error && <div className="rounded-xl border border-clay/30 bg-paper p-4 text-sm"><p id="ai-error" role="alert">{error}</p>{!invalid && <p className="mt-2">{standalone ? 'Your question is kept. Try again in a moment.' : 'Your question is kept. Try again or use basic guidance.'}{hasDraft ? ' Your previous draft is still available.' : ''}</p>}</div>}
   </form>;
 }

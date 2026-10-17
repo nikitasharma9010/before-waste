@@ -42,7 +42,7 @@ export default async function handler(req: Request, res: ServerResponse) {
     if (req.headers['sec-fetch-site'] === 'cross-site') { send(403, { error: 'Use the planner from this website.' }); return; }
     const ip = String(req.headers['x-vercel-forwarded-for'] ?? req.headers['x-forwarded-for'] ?? req.socket.remoteAddress ?? 'unknown').split(',')[0];
     if (!allowed('global', 30) || !allowed(`ip:${ip}`, 5)) {
-      res.setHeader('Retry-After', '60'); send(429, { error: 'Too many requests. Wait a minute or use basic guidance.' }); return;
+      res.setHeader('Retry-After', '60'); send(429, { error: 'Too many requests. Please wait a minute and try again.' }); return;
     }
     const input = parsePlannerRequest(await readBody(req));
     if (!input) { send(400, { error: 'Ask a question or describe your situation in 10-1500 characters.' }); return; }

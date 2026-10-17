@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { LoaderCircle } from 'lucide-react';
 import { barrierLabels, intentLabels, issues, itemLabels, recommend, recoveryAdvice, sameDecision, type Barrier, type Decision } from '../data/decisionData';
 import { readAction, writeAction, type SavedAction, type Outcome } from '../utils/actionStorage';
 import { planText, type GeneratedPlan } from '../data/aiPlan';
@@ -18,6 +19,7 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
   const [generated, setGenerated] = useState<GeneratedPlan | null>(null);
   const [editedPlan, setEditedPlan] = useState('');
   const [answeredQuestion, setAnsweredQuestion] = useState('');
+  const [asking, setAsking] = useState(false);
   const showBasic = () => {
     setDecision({ ...decision }); setGenerated(null); setEditedPlan(''); setAnsweredQuestion('');
     setResult({ ...decision });
@@ -66,7 +68,7 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
           <p className="mt-2 text-sm text-ink/80">{standalone ? 'No account needed. You choose what to save.' : 'Ask about any item, reducing waste or sustainable living. No account needed.'}</p>
           {saved && <a href="#saved-action" onClick={() => savedRef.current?.focus({ preventScroll: true })} className="mt-4 inline-flex min-h-[44px] items-center font-semibold text-forest underline underline-offset-4">Return to my saved action</a>}
         </div>
-        <div className={standalone ? 'mx-auto flex max-w-3xl flex-col gap-6' : 'grid gap-6 lg:grid-cols-2 items-start'}>
+        <div className={standalone ? 'flex max-w-3xl flex-col gap-6' : 'grid gap-6 lg:grid-cols-2 items-start'}>
           <div className="min-w-0 rounded-2xl border border-ink/15 bg-surface p-5 sm:p-8 space-y-5">
             {!standalone && <div role="group" className="flex flex-wrap gap-2" aria-label="Question mode">
               {[['anything', 'Ask freely'], ['clothes', 'Use guided examples']].map(([item, label]) => <button key={item} type="button" aria-pressed={item === 'anything' ? decision.item === 'anything' : decision.item !== 'anything'} className="min-h-[44px] rounded-xl border border-forest px-4 py-2 font-semibold aria-pressed:bg-forest aria-pressed:text-white" onClick={() => {
@@ -101,19 +103,24 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
               </select>
             </label>}
             </>}
-            <AIPlannerForm initialQuestion={initialQuestion} decision={decision} hasDraft={!!generated} onResult={(snapshot, plan, question) => {
+            <AIPlannerForm standalone={standalone} initialQuestion={initialQuestion} decision={decision} hasDraft={!!generated} onBusyChange={setAsking} onResult={(snapshot, plan, question) => {
               setAnsweredQuestion(question);
               setResult(snapshot); setGenerated(plan); setEditedPlan(planText(plan.plan));
               requestAnimationFrame(() => resultRef.current?.focus());
             }} onFallback={snapshot => {
               setResult(snapshot); setGenerated(null); setEditedPlan('');
             }} />
+            {!standalone && <>
             <button className="min-h-[44px] py-2 text-sm font-semibold text-forest underline underline-offset-4" type="button" onClick={showBasic}>{decision.item === 'anything' ? 'Browse general guidance (no AI)' : 'Find my next step (basic guidance)'}</button>
             <p className="text-sm text-ink/80">General starting points. Your object’s condition, model and local services can change what is possible.</p>
+            </>}
           </div>
-          {(!standalone || result) && <>
+          {standalone && asking ? <div aria-hidden="true" className="mr-auto w-full max-w-full animate-pulse rounded-2xl rounded-bl-sm border border-ink/15 bg-paper p-5 sm:p-8">
+            <div className="flex items-center gap-2 text-sm font-semibold text-ink/60"><LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" /><span>Preparing your answer…</span></div>
+            <div className="mt-4 space-y-2"><div className="h-3 w-3/4 rounded-full bg-ink/10" /><div className="h-3 w-1/2 rounded-full bg-ink/10" /><div className="h-3 w-2/3 rounded-full bg-ink/10" /></div>
+          </div> : (!standalone || result) && <>
           {standalone && generated && <div className="ml-auto max-w-[88%] rounded-2xl rounded-br-sm bg-forest px-4 py-3 text-white sm:px-5 sm:py-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-white/70">You asked</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-white/85">You asked</p>
             <p className="mt-1 whitespace-pre-wrap break-words text-sm">{answeredQuestion}</p>
           </div>}
           <div ref={resultRef} tabIndex={-1} aria-label="Your suggested next step" className={`min-w-0 break-words rounded-2xl border border-ink/15 bg-paper p-5 sm:p-8 ${standalone ? 'scroll-mt-20 mr-auto w-full rounded-bl-sm' : 'scroll-mt-20'}`}>
@@ -136,6 +143,10 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
                     void navigator.clipboard.writeText(editedPlan).then(() => setNotice('Draft copied.'), () => setNotice('Copy was unavailable. Select the draft text to copy it manually.'));
                   }}>Copy draft</button>
                 </div>}
+              </> : standalone ? <>
+              <p className="section-kicker text-clay mb-3">AI UNAVAILABLE</p>
+              <h3 className="text-2xl sm:text-3xl font-editorial">AI guidance isn’t available right now</h3>
+              <p className="mt-4 leading-relaxed">Your question is kept in the form above — try again in a moment.</p>
               </> : <>
               <p className="section-kicker text-clay mb-3">BASIC GUIDANCE · NOT AI GENERATED</p>
               <p className="text-sm mb-3">{itemLabels[result.item]} · {intentLabels[result.intent]}</p>
@@ -153,8 +164,10 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
               <p className="mt-3 text-xs text-ink/80">Editorial starting points, not a diagnosis or a measured environmental saving. Check collection and donation acceptance locally.</p>
               </>}
               {generated?.plan.status === 'ready' && !editedPlan.trim() && <p role="status" className="mt-4 text-sm text-clay">Add some text to the draft before saving it.</p>}
+              {!(standalone && !generated) && <>
               {saved && !isSameSaved && <p className="mt-5 text-sm">Replacing your action starts a new note and outcome. Undo is available until the next replacement, removal or page reload.</p>}
               {(!generated || generated.plan.status === 'ready') && <button type="button" disabled={!!generated && !editedPlan.trim()} className={`${primary} mt-6 disabled:opacity-60`} onClick={saveResult}>{saved ? (isSameSaved ? 'View my saved action' : 'Replace my saved action with this') : 'Save this action for the week'}</button>}
+              </>}
             </> : <><h3 className="text-2xl font-editorial">Your answer will appear here.</h3><p className="mt-4 leading-relaxed">Ask a question to understand an idea or find a practical next step. Your answer will appear here, ready to review, edit and save.</p><p className="mt-4 text-sm">Include the details that matter to you. You can refine your question after reading the answer.</p></>}
           </div>
           </>}
