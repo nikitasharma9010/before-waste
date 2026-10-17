@@ -114,6 +114,21 @@ local handler, edited-plan restoration and reflow at six widths (280–1440px).
 Live Gemini output quality requires a configured deployment and is not verified by
 the simulated-provider tests. See `ai-demo-checklist.md` for that final check.
 
+## AICredits failover
+
+The server now supports auto, Gemini-only and AICredits-only modes. Auto skips
+unconfigured providers and falls back once when Gemini is unavailable, times out,
+hits quota or returns an invalid plan. Both attempts share a 20-second budget.
+AICredits uses the documented chat-completions JSON-object contract and the same
+plan validator/resource allowlist. Valid clarification does not spend backup
+credits. UI disclosure covers both services and saved plans retain provenance.
+
+74 tests pass, including credential separation, direct AICredits mode, missing
+Gemini configuration, quota/malformed output fallback, primary timeout, provider-
+only behavior, successful-primary short circuit and provider persistence. Live
+AICredits wallet/model access and actual output remain to be tested after keys
+are configured. See README.md and ai-demo-checklist.md.
+
 ## Remaining manual checks
 
 Use the [WCAG 2.2 reference](https://www.w3.org/WAI/WCAG22/quickref/) when reviewing

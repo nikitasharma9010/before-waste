@@ -4,6 +4,11 @@
 
 Set `GEMINI_API_KEY` in Vercel's project environment variables for the deployment
 environment you will demonstrate. Optional: `GEMINI_MODEL=gemini-3.8-flash`.
+For AICredits fallback, set `AICREDITS_API_KEY` and `AICREDITS_MODEL` to an available
+chat model ID, and keep `AI_PROVIDER=auto`. Set `AI_PROVIDER=aicredits` to use that
+wallet directly without trying Gemini. Redeploy after changes. In a test deployment,
+use a deliberately invalid Gemini test key with a valid AICredits key to check the
+fallback, then restore the intended configuration. Do not expose keys in recordings.
 Redeploy after changing environment variables. Keep the key out of source control,
 browser code and the recording. Confirm model access and quota in Google AI Studio.
 
@@ -37,7 +42,8 @@ description can include what was tried, exact budget limits and urgency.
 
 - Open the public URL without signing in and on a physical phone.
 - Generate a real AI plan using fictional inputs; check the AI-generated label and
-  configured model name. No static/safety fallback should be represented as AI.
+  gateway/model name. Verify AICredits is shown when that service handles the call.
+  No static/safety fallback should be represented as AI.
 - Confirm it respects budget, help and urgency and does not repeat a failed check.
 - Confirm links come from the resource catalogue, with local/US scope disclosed.
 - Change a constraint and regenerate. Check whether the advice changes usefully.

@@ -69,3 +69,13 @@ it('keeps basic guidance usable with an unfinished optional AI description', asy
   expect(host.textContent).toContain('BASIC GUIDANCE · NOT AI GENERATED');
   expect(host.querySelector('#ai-description')?.hasAttribute('minlength')).toBe(false);
 });
+
+it('discloses AICredits and retains provider provenance with a saved plan', async () => {
+  vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json({ ...generated, model: 'openai/gpt-4o-mini', provider: 'aicredits' })));
+  expect(host.querySelector('#ai-privacy')?.textContent).toContain('both services');
+  await input('ai-description', 'My coat button is loose and I have no sewing supplies.'); await click('Generate AI plan');
+  expect(host.textContent).toContain('Generated via AICredits');
+  await click('Save this action');
+  expect(readAction().action?.customPlan?.provider).toBe('aicredits');
+  expect(host.querySelector('#saved-action')?.textContent).toContain('AICredits');
+});
