@@ -74,7 +74,7 @@ export function AIPlannerForm({ decision, hasDraft, initialQuestion = '', standa
   return <form aria-label="Ask Before Waste" className="space-y-4" onSubmit={event => { event.preventDefault(); void generate(); }}>
     <div>
       <label htmlFor="ai-description" className="block font-semibold">{replyToClarification ? 'Answer the questions above' : followUp ? 'Ask a follow-up or add details' : 'Ask about an item or sustainable living'}</label>
-      <p id="ai-hint" className="mt-2 text-sm text-ink/80">Include relevant details: budget, what you tried and any constraints.</p>
+      <p id="ai-hint" className="mt-2 text-sm text-ink/80">{replyToClarification ? 'Share the details requested above so the guidance can be more useful.' : followUp ? 'Add what changed or what you would like clarified.' : 'Include relevant details: budget, what you tried and any constraints.'}</p>
     </div>
     <textarea ref={field} id="ai-description" rows={4} maxLength={1500} value={description}
       onChange={event => update(event.target.value)} aria-invalid={invalid || undefined}
@@ -99,7 +99,7 @@ export function AIPlannerForm({ decision, hasDraft, initialQuestion = '', standa
         controller.current?.abort(); setBusy(false); setStatus('Request cancelled. Your question is kept.'); field.current?.focus();
       }}>Cancel request</button>}
     </div>
-    <details className="text-sm text-ink/80"><summary className="min-h-[44px] cursor-pointer py-3 underline underline-offset-4">How your question is used</summary>
+    <details id={standalone ? 'how-it-works' : undefined} className="scroll-mt-20 text-sm text-ink/80"><summary className="min-h-[44px] cursor-pointer py-3 underline underline-offset-4">{standalone ? 'How it works and your data' : 'How your question is used'}</summary>
       <p id="ai-privacy" className="pb-3">Your question, optional location and selected answers are sent to an external AI service to prepare a response. When you follow up, your editable conversation background and up to two recent questions and abbreviated answers from this session are also sent for context. Reloading clears the conversation. Your saved notes are not sent. A successful new answer replaces the unsaved draft; your saved action stays. Answers do not include a live local-service search.</p>
     </details>
     {!description && !followUp && decision.item === 'anything' && <div role="group" aria-label="Example questions" className="flex flex-wrap gap-2">

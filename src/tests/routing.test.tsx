@@ -118,7 +118,7 @@ it('resumes a selected story and stage after visiting the assistant', async () =
   await act(async () => root.unmount()); root = createRoot(host);
   window.history.replaceState({}, '', '/ask');
   await act(async () => root.render(<App />));
-  expect([...host.querySelectorAll('a')].find(a=>a.textContent==='Back to the stories')?.getAttribute('href')).toBe('/#follow-one-thing');
+  expect(host.querySelector('header a[href="/#follow-one-thing"]')).not.toBeNull();
   await act(async () => root.unmount()); root = createRoot(host);
   window.history.replaceState({}, '', '/#follow-one-thing');
   await act(async () => root.render(<App />));
@@ -230,4 +230,17 @@ it('supports an empty saved-action deep link and a direct return to Ask', async 
   const back = host.querySelector<HTMLAnchorElement>('#saved-action a[href="#decision-title"]')!;
   await act(async () => back.click());
   expect(document.activeElement?.id).toBe('decision-title');
+});
+
+it('provides one data disclosure on ask and opens it from the footer', async () => {
+  history.replaceState({}, '', '/ask');
+  await act(async () => root.render(<App />));
+  expect(host.querySelectorAll('#how-it-works')).toHaveLength(1);
+  expect([...host.querySelectorAll('summary')].filter(summary => summary.textContent === 'How it works and your data')).toHaveLength(1);
+  expect(host.textContent).not.toContain('Back to the stories');
+  const link = host.querySelector<HTMLAnchorElement>('footer a[href="#how-it-works"]')!;
+  await act(async () => link.click());
+  expect(host.querySelector<HTMLDetailsElement>('#how-it-works')?.open).toBe(true);
+  expect(document.activeElement?.id).toBe('how-it-works');
+  expect(host.querySelector('#how-it-works')?.textContent).toContain('Your saved notes are not sent');
 });

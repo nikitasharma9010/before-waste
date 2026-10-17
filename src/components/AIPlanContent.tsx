@@ -1,13 +1,15 @@
 import { PLAN_LABELS, PLAN_RESOURCES, type GeneratedPlan } from '../data/aiPlan';
 
-export function AIPlanContent({ generated, question = '' }: { generated: GeneratedPlan; question?: string }) {
+export function AIPlanContent({ generated, question = '', standalone = false }: { generated: GeneratedPlan; question?: string; standalone?: boolean }) {
   const { plan } = generated;
+  const Heading = standalone ? 'h2' : 'h3';
+  const Subheading = standalone ? 'h3' : 'h4';
   return <div className="space-y-4">
     <p className="section-kicker text-forest">{generated.source === 'ai' ? 'AI-GENERATED DRAFT · REVIEW BEFORE ACTING' : 'SAFETY GUIDANCE · NOT AI GENERATED'}</p>
-    <h3 className="text-2xl sm:text-3xl font-editorial">{plan.action}</h3>
+    <Heading className="text-2xl sm:text-3xl font-editorial">{plan.action}</Heading>
     <p>{plan.summary}</p>
     <p><strong>{PLAN_LABELS.reason}: </strong>{plan.reason}</p>
-    {plan.steps.length > 0 && <div><h4 className="font-semibold mb-2">{PLAN_LABELS.steps}</h4><ol className="list-decimal pl-5 space-y-2">{plan.steps.map((step, i) => <li key={i}>{step}</li>)}</ol></div>}
+    {plan.steps.length > 0 && <div><Subheading className="font-semibold mb-2">{PLAN_LABELS.steps}</Subheading><ol className="list-decimal pl-5 space-y-2">{plan.steps.map((step, i) => <li key={i}>{step}</li>)}</ol></div>}
     {plan.alternative && <p><strong>{PLAN_LABELS.alternative}: </strong>{plan.alternative}</p>}
     {plan.questions.length > 0 && <div className="rounded-xl bg-sage p-4"><h4 className="font-semibold">{PLAN_LABELS.questions}</h4><ul className="list-disc pl-5 mt-2 space-y-2">{plan.questions.map(q => <li key={q}>{q}</li>)}</ul></div>}
     {plan.resourceIds.length > 0 && <div><h4 className="font-semibold">{PLAN_LABELS.resources}</h4><ul className="mt-2 space-y-2">{plan.resourceIds.map(id => <li key={id}><a className="text-forest underline underline-offset-4" href={PLAN_RESOURCES[id].url}>{PLAN_RESOURCES[id].label}</a></li>)}</ul></div>}

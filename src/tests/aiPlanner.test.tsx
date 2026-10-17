@@ -201,7 +201,7 @@ it('supports follow-ups, saves original context and clears only unsaved conversa
   const original = 'I live in Pune and want to mend my coat without spending.';
   await input('ai-description', original); await click('Get AI guidance');
   expect(host.querySelector<HTMLTextAreaElement>('#ai-description')?.value).toBe('');
-  const result = host.querySelector('[aria-label="Your suggested next step"]')!;
+  const result = host.querySelector('[aria-label="Your answer"]')!;
   const composer = host.querySelector('form')!;
   expect(result.compareDocumentPosition(composer) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   await click('Save action on this device');
@@ -265,12 +265,12 @@ it('prioritizes the first answer and keeps the submitted question in a closed di
   const summary=[...host.querySelectorAll('summary')].find(s=>s.textContent==='View your question')!;
   const details=summary.closest('details')!;
   expect(details.open).toBe(false); expect(details.textContent).toContain(question);
-  expect(host.querySelector('[aria-label="Your suggested next step"]')?.querySelector('h3')?.textContent).toBe(generated.plan.action);
+  expect(host.querySelector('[aria-label="Your answer"]')?.querySelector('h2')?.textContent).toBe(generated.plan.action);
   await act(async()=>summary.click()); expect(details.open).toBe(true);
   await input('ai-description','What if I cannot find a replacement button?'); await click('Get AI guidance');
-  expect(host.textContent).toContain('You asked');
+  expect(host.textContent).not.toContain('You asked');
   expect(host.textContent).toContain('Earlier in this conversation');
-  expect([...host.querySelectorAll('summary')].some(s=>s.textContent==='View your question')).toBe(false);
+  expect([...host.querySelectorAll('summary')].some(s=>s.textContent==='View your question')).toBe(true);
 });
 it('shows one actionable error on standalone without adding a duplicate unavailable answer', async () => {
   await act(async () => root.render(<DecisionHelper standalone onExploreObject={() => {}} />));
@@ -278,7 +278,7 @@ it('shows one actionable error on standalone without adding a duplicate unavaila
   const question='How can I reduce packaging waste at home?';
   await input('ai-description',question); await click('Get AI guidance');
   expect(host.querySelectorAll('[role="alert"]')).toHaveLength(1);
-  expect(host.querySelector('[aria-label="Your suggested next step"]')).toBeNull();
+  expect(host.querySelector('[aria-label="Your answer"]')).toBeNull();
   expect(host.querySelector<HTMLTextAreaElement>('#ai-description')?.value).toBe(question);
   expect(host.textContent).not.toContain('AI guidance isn’t available right now');
 });
@@ -348,4 +348,15 @@ it('offers a reply input for clarification without save or edit actions', async 
   expect(host.querySelector('label[for="ai-description"]')?.textContent).toBe('Answer the questions above');
   expect(host.querySelector('#reviewed-plan')).toBeNull();
   expect([...host.querySelectorAll('button')].some(button => /Save action on this device|Edit before saving/.test(button.textContent ?? ''))).toBe(false);
+});
+
+it('keeps settings after the reply form and uses a proper answer heading', async () => {
+  await act(async () => root.render(<DecisionHelper standalone onExploreObject={() => {}} />));
+  vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json(generated)));
+  await input('ai-description', 'A button fell off my jacket. What should I check?'); await click('Get AI guidance');
+  expect(host.querySelector('[aria-label="Your answer"] h2')?.textContent).toBe(generated.plan.action);
+  const composer = host.querySelector('form')!;
+  const settings = host.querySelector('#conversation-background')!.closest('details')!;
+  expect(composer.compareDocumentPosition(settings) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  expect(settings.open).toBe(false);
 });

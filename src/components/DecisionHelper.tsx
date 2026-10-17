@@ -1,6 +1,5 @@
 import { CopyTextButton } from './CopyTextButton';
 import { useRef, useState } from 'react';
-import { LoaderCircle } from 'lucide-react';
 import { barrierLabels, intentLabels, issues, itemLabels, recommend, recoveryAdvice, sameDecision, type Barrier, type Decision } from '../data/decisionData';
 import { readAction, writeAction, type SavedAction, type Outcome } from '../utils/actionStorage';
 import { planText, type GeneratedPlan, type PlannerContext } from '../data/aiPlan';
@@ -68,7 +67,7 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
     persist({ ...(updatingSaved ? saved! : { ...result, note: '', outcome: 'planned' as const }), ...(generated ? { question: answeredQuestion, customPlan: { ...generated, text: editedPlan } } : {}) });
   };
   const feedback = <div>
-        <p id="action-storage-status" role="status" className="mt-5 text-sm">{notice}</p>
+        <p id="action-storage-status" role="status" className={notice ? 'mt-5 text-sm' : 'sr-only'}>{notice}</p>
         {undoAction && <button type="button" className="min-h-[44px] py-2 font-semibold text-forest underline underline-offset-4" onClick={() => {
           persist(undoAction); setUndoAction(null);
           requestAnimationFrame(() => savedRef.current?.focus());
@@ -138,32 +137,24 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
   );
   return (
     <section id="decision-helper" tabIndex={-1} aria-labelledby="decision-title" className={`scroll-mt-20 border-y border-ink/10 bg-sage ${standalone ? 'py-8 lg:py-12' : 'py-16 lg:py-24'}`}>
-      <div className={`mx-auto ${standalone ? 'max-w-4xl' : 'max-w-7xl'} px-4 sm:px-6 lg:px-8`}>
+      <div className={`mx-auto ${standalone ? 'max-w-[52rem]' : 'max-w-7xl'} px-4 sm:px-6 lg:px-8`}>
         <div className={`max-w-3xl ${standalone ? 'mb-5' : 'mb-8'}`}>
           {!standalone && <p className="section-kicker text-forest mb-3">ONE OBJECT. ONE NEXT STEP.</p>}
           <Heading ref={titleRef} tabIndex={-1} id="decision-title" className="scroll-mt-20 font-editorial text-3xl sm:text-4xl lg:text-5xl">{standalone ? 'Ask Before Waste' : 'What should I do with this?'}</Heading>
 
-          {(!standalone || !generated) && <p className={standalone ? 'mt-2 text-base' : 'mt-4 text-lg'}>{standalone ? 'Find a practical next step for your items and lower-waste living.' : 'Before you buy, replace or let something go, find a starting point that fits your life.'}</p>}
-          {(!standalone || !generated) && <p className="mt-2 text-sm text-ink/80">{standalone ? 'No account needed. Save an action when you’re ready.' : 'Ask about any item, reducing waste or sustainable living. No account needed.'}</p>}
+          {(!standalone || !generated) && <p className={standalone ? 'mt-2 text-base' : 'mt-4 text-lg'}>{standalone ? 'Find a practical next step for your items and lower-waste living. No account needed.' : 'Before you buy, replace or let something go, find a starting point that fits your life.'}</p>}
+          {!standalone && <p className="mt-2 text-sm text-ink/80">Ask about any item, reducing waste or sustainable living. No account needed.</p>}
           <nav aria-label="Assistant sections" className="mt-4 flex flex-wrap gap-3 border-b border-ink/15 pb-3">
             <a href="#decision-title" className="inline-flex min-h-[44px] items-center rounded px-3 py-2 font-semibold text-forest underline underline-offset-4">Ask</a>
             <a href="#saved-action" className="inline-flex min-h-[44px] items-center rounded border border-forest/30 bg-paper px-3 py-2 font-semibold text-forest hover:bg-sage">My saved action <span className="ml-2 rounded-full bg-sage px-2 text-sm">{saved ? (storageAvailable ? '1' : 'Session only') : '0'}</span></a>
           </nav>
-            {generated && <details className="rounded-xl border border-ink/15 bg-paper p-4"><summary className="min-h-[44px] cursor-pointer py-2 font-semibold">Conversation settings</summary><label htmlFor="conversation-background" className="mt-2 block text-sm">Earlier details to keep using (optional)</label><p id="background-hint" className="mt-2 text-sm text-ink/80">Your first question is kept here so details survive longer conversations. Edit or clear anything that no longer applies. This background is sent with follow-ups and clears when you reload or start again.</p><textarea id="conversation-background" aria-describedby="background-hint" maxLength={1700} disabled={asking} rows={3} value={background} onChange={event => setBackground(event.target.value)} className={`${control} mt-3 disabled:opacity-60`} /><button type="button" className="mt-4 min-h-[44px] py-2 font-semibold text-forest underline underline-offset-4" onClick={startConversation}>Start a new conversation</button></details>}
+
 
         </div>
         <div className={standalone ? 'flex max-w-3xl flex-col gap-6' : 'grid gap-6 lg:grid-cols-2 items-start'}>
           {!standalone && composer}
-          {standalone && asking && !generated ? <div aria-hidden="true" className="mr-auto w-full max-w-full animate-pulse rounded-2xl rounded-bl-sm border border-ink/15 bg-paper p-5 sm:p-8">
-            <div className="flex items-center gap-2 text-sm font-semibold text-ink/60"><LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" /><span>Preparing your answer…</span></div>
-            <div className="mt-4 space-y-2"><div className="h-3 w-3/4 rounded-full bg-ink/10" /><div className="h-3 w-1/2 rounded-full bg-ink/10" /><div className="h-3 w-2/3 rounded-full bg-ink/10" /></div>
-          </div> : null}
           {(!standalone || result) && <>
-          {standalone && generated && history.length > 0 && <div className="ml-auto max-w-[88%] rounded-2xl rounded-br-sm bg-forest px-4 py-3 text-white sm:px-5 sm:py-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-white/85">You asked</p>
-            <p className="mt-1 whitespace-pre-wrap break-words text-sm">{answeredQuestion}</p>
-          </div>}
-          <div ref={resultRef} tabIndex={-1} aria-label="Your suggested next step" className={`min-w-0 break-words rounded-2xl border border-ink/15 bg-paper p-5 sm:p-8 ${standalone ? 'scroll-mt-20 mr-auto w-full rounded-bl-sm' : 'scroll-mt-20'}`}>
+          <div ref={resultRef} tabIndex={-1} aria-label="Your answer" className={`min-w-0 break-words rounded-2xl border border-ink/15 bg-surface p-5 sm:p-8 ${standalone ? 'scroll-mt-20 w-full' : 'scroll-mt-20'}`}>
             {advice && result ? <>
               {generated ? <>
                 {!standalone && <div className="mb-5 rounded-xl border border-ink/15 bg-surface p-4">
@@ -171,8 +162,8 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
                   <button type="button" onClick={editQuestion} className="mt-2 min-h-[44px] py-2 text-sm font-semibold text-forest underline underline-offset-4">{generated.plan.status === 'clarify' ? 'Add details to my question' : 'Edit my question'}</button>
                 </div>}
 
-                <AIPlanContent generated={generated} question={answeredQuestion} />
-                {standalone && history.length === 0 && <details className="mt-4 border-t border-ink/15 pt-2"><summary className="min-h-[44px] cursor-pointer py-2 text-sm font-semibold text-forest">View your question</summary><p className="whitespace-pre-wrap break-words text-sm">{answeredQuestion}</p></details>}
+                <AIPlanContent generated={generated} question={answeredQuestion} standalone={standalone} />
+                {standalone && <details className="mt-4 border-t border-ink/15 pt-2"><summary className="min-h-[44px] cursor-pointer py-2 text-sm font-semibold text-forest">View your question</summary><p className="whitespace-pre-wrap break-words text-sm">{answeredQuestion}</p></details>}
 
 
               </> : standalone ? <>
@@ -217,8 +208,10 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
             </> : <><h3 className="text-2xl font-editorial">Your answer will appear here.</h3><p className="mt-4 leading-relaxed">Ask a question to understand an idea or find a practical next step. Your answer will appear here, ready to review, edit and save.</p><p className="mt-4 text-sm">Include the details that matter to you. You can refine your question after reading the answer.</p></>}
           </div>
           </>}
-          {standalone && history.length > 0 && <details className="rounded-xl border border-ink/15 bg-paper p-4"><summary className="min-h-[44px] cursor-pointer py-2 font-semibold">Earlier in this conversation</summary>{history.map((turn, i) => <div key={i} className="mt-4 border-t border-ink/15 pt-4"><p className="whitespace-pre-wrap break-words font-semibold">{turn.question}</p><p className="mt-2 whitespace-pre-wrap break-words text-sm">{turn.answer}</p></div>)}</details>}
+
           {standalone && composer}
+          {standalone && history.length > 0 && <details className="rounded-xl border border-ink/15 bg-paper p-4"><summary className="min-h-[44px] cursor-pointer py-2 font-semibold">Earlier in this conversation</summary>{history.map((turn, i) => <div key={i} className="mt-4 border-t border-ink/15 pt-4"><p className="whitespace-pre-wrap break-words font-semibold">{turn.question}</p><p className="mt-2 whitespace-pre-wrap break-words text-sm">{turn.answer}</p></div>)}</details>}
+            {generated && <details className="rounded-xl border border-ink/15 bg-paper p-4"><summary className="min-h-[44px] cursor-pointer py-2 font-semibold">Conversation settings</summary><label htmlFor="conversation-background" className="mt-2 block text-sm">Earlier details to keep using (optional)</label><p id="background-hint" className="mt-2 text-sm text-ink/80">Your first question is kept here so details survive longer conversations. Edit or clear anything that no longer applies. This background is sent with follow-ups and clears when you reload or start again.</p><textarea id="conversation-background" aria-describedby="background-hint" maxLength={1700} disabled={asking} rows={3} value={background} onChange={event => setBackground(event.target.value)} className={`${control} mt-3 disabled:opacity-60`} /><button type="button" className="mt-4 min-h-[44px] py-2 font-semibold text-forest underline underline-offset-4" onClick={startConversation}>Start a new conversation</button></details>}
 
         </div>
         {!result && feedback}
