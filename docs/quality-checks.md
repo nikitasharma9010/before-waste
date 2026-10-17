@@ -27,6 +27,19 @@ White on forest has approximately 8.10:1 contrast, white on terracotta 5.87:1,
 and ink on paper 10.98:1. Automated contrast checks cover key text/surface pairs,
 action hover states, and muted text. These are color-pair checks, not a full audit.
 
+## Navigation follow-up
+
+The non-modal mobile drawer dismisses when focus leaves the header and when the
+home link is used. Explicit Next/Previous and Explore Another Object actions focus
+the new chapter heading before its illustration and text. Reduced-motion users get
+immediate scrolling; other users get smooth scrolling. Initial rendering and object
+selection from the top chooser do not move focus automatically.
+
+Hotspots keep fixed 44px targets. At 280, 320, 375, 768, and 1440px, circular hit
+areas do not overlap; the smallest measured gap is 1.5px at 280px. The 320x568
+browser check places the focused chapter heading at 80px, below the 65px sticky
+header. Tabbing beyond the drawer preserves focus on the now-visible next control.
+
 ## Automated checks
 
 `npm run lint`, `npm test`, and `npm run build`. The component suite covers real

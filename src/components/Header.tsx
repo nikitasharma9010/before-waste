@@ -53,12 +53,20 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSources }) => {
   };
 
   return (
-    <header ref={headerRef} className="sticky top-0 z-40 bg-paper/95 backdrop-blur-md border-b border-ink/10">
+    <header
+      ref={headerRef}
+      onBlur={(event) => {
+        // This is a non-modal disclosure: let Tab leave naturally, then dismiss it.
+        if (!event.currentTarget.contains(event.relatedTarget)) setMobileMenuOpen(false);
+      }}
+      className="sticky top-0 z-40 bg-paper/95 backdrop-blur-md border-b border-ink/10"
+    >
       {/* Top Bar Contract: 3 zones */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4 lg:gap-8">
         {/* Zone 1: Brand Wordmark */}
         <a
           href="#hero"
+          onClick={handleLinkClick}
           aria-label="Before Waste home"
           className="inline-flex items-center min-h-[44px] min-w-0 text-ink hover:text-clay rounded transition-colors"
         >
