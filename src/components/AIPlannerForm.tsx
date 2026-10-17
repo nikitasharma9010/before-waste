@@ -4,9 +4,10 @@ import type { Decision } from '../data/decisionData';
 import { parseGeneratedPlan, type GeneratedPlan, type PlannerContext } from '../data/aiPlan';
 
 const starters = ['How can I waste less food?', 'What can I do with a broken chair?', 'What does a circular economy mean?'];
-export function AIPlannerForm({ decision, hasDraft, initialQuestion = '', standalone = false, onResult, onFallback, onBusyChange, context = [], followUp = false }: {
+export function AIPlannerForm({ decision, hasDraft, initialQuestion = '', standalone = false, onResult, onFallback, onBusyChange, context = [], followUp = false, background = '' }: {
   decision: Decision;
   context?: PlannerContext[];
+  background?: string;
   followUp?: boolean;
   initialQuestion?: string;
   hasDraft: boolean;
@@ -47,7 +48,7 @@ export function AIPlannerForm({ decision, hasDraft, initialQuestion = '', standa
     const timer = setTimeout(() => pending.abort('timeout'), 25000);
     try {
       const response = await fetch('/api/plan', { method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...snapshot, description: question, ...(context.length ? { context } : {}), ...(location.trim() ? { location: location.trim() } : {}) }), signal: pending.signal });
+        body: JSON.stringify({ ...snapshot, description: question, ...(background.trim() ? { background: background.trim() } : {}), ...(context.length ? { context } : {}), ...(location.trim() ? { location: location.trim() } : {}) }), signal: pending.signal });
       const data: unknown = await response.json();
       if (pending.signal.aborted) return;
       if (!response.ok) {
@@ -99,7 +100,7 @@ export function AIPlannerForm({ decision, hasDraft, initialQuestion = '', standa
       }}>Cancel request</button>}
     </div>
     <details className="text-sm text-ink/80"><summary className="min-h-[44px] cursor-pointer py-3 underline underline-offset-4">How your question is used</summary>
-      <p id="ai-privacy" className="pb-3">Your question, optional location and selected answers are sent to an external AI service to prepare a response. When you follow up, up to two recent questions and abbreviated answers from this session are also sent for context. Reloading clears the conversation. Your saved notes are not sent. Answers do not include a live local-service search.</p>
+      <p id="ai-privacy" className="pb-3">Your question, optional location and selected answers are sent to an external AI service to prepare a response. When you follow up, your editable conversation background and up to two recent questions and abbreviated answers from this session are also sent for context. Reloading clears the conversation. Your saved notes are not sent. Answers do not include a live local-service search.</p>
     </details>
     {!description && !followUp && decision.item === 'anything' && <div role="group" aria-label="Example questions" className="flex flex-wrap gap-2">
       {starters.map(question => <button key={question} type="button" className="min-h-[44px] rounded-xl border border-ink/20 px-3 py-2 text-left text-sm hover:bg-sage" onClick={() => { update(question); field.current?.focus(); }}>{question}</button>)}

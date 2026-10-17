@@ -17,14 +17,14 @@ function allowed(id: string, max: number) {
 async function readBody(req: Request): Promise<unknown> {
   if (req.body !== undefined) {
     const text = typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
-    if (Buffer.byteLength(text) > 32000) throw new PlannerError(413, 'Please shorten your description.');
+    if (Buffer.byteLength(text) > 40000) throw new PlannerError(413, 'Please shorten your description.');
     return JSON.parse(text);
   }
   const chunks: Buffer[] = [];
   let size = 0;
   for await (const chunk of req) {
     const bytes = Buffer.from(chunk); size += bytes.length;
-    if (size > 32000) throw new PlannerError(413, 'Please shorten your description.');
+    if (size > 40000) throw new PlannerError(413, 'Please shorten your description.');
     chunks.push(bytes);
   }
   return JSON.parse(Buffer.concat(chunks).toString('utf8'));
