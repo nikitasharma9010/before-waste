@@ -53,6 +53,61 @@ it('validates input scope, size and optional issue', () => {
   for (const invalid of [{ ...input, item: 'laptop' }, { ...input, description: 'short' }, { ...input, description: 'a'.repeat(1501) }, { ...input, issue: 'button' }]) expect(parsePlannerRequest(invalid)).toBeNull();
 });
 
+const backupEnv = { ...env, AICREDITS_API_KEY: 'test-aicredits-key', AICREDITS_MODEL: 'openai/gpt-4o-mini' };
+const chatResponse = (value: unknown = plan) => Response.json({ choices: [{ finish_reason: 'stop', message: { content: JSON.stringify(value) } }] });
+it('fails over to AICredits with separate credentials and validated JSON', async () => {
+  const upstream = vi.fn().mockResolvedValueOnce(new Response('private error', { status: 503 })).mockResolvedValueOnce(chatResponse());
+  const result = await generatePlan(input, backupEnv, upstream);
+  expect(result).toMatchObject({ provider: 'aicredits', model: 'openai/gpt-4o-mini', plan });
+  expect(upstream).toHaveBeenCalledTimes(2);
+  const [url, options] = upstream.mock.calls[1];
+  expect(url).toBe('https://api.aicredits.in/v1/chat/completions');
+  expect(options.headers).toEqual({ 'Content-Type': 'application/json', Authorization: 'Bearer test-aicredits-key' });
+  expect(JSON.stringify(options)).not.toContain('test-api-key');
+  const body = JSON.parse(options.body);
+  expect(body.response_format).toEqual({ type: 'json_object' });
+  expect(body.no_cache).toBe(true); expect(body.messages[0].content).toContain('JSON schema');
+});
+it('uses AICredits directly when Gemini is unconfigured or AICredits mode is selected', async () => {
+  for (const config of [{ AICREDITS_API_KEY: 'test-aicredits-key' }, { ...backupEnv, AI_PROVIDER: 'aicredits' }]) {
+    const upstream = vi.fn().mockResolvedValue(chatResponse());
+    expect((await generatePlan(input, config, upstream)).provider).toBe('aicredits');
+    expect(upstream).toHaveBeenCalledTimes(1);
+    expect(upstream.mock.calls[0][0]).toContain('api.aicredits.in');
+  }
+});
+it('does not spend backup credits after a successful Gemini answer, including clarification', async () => {
+  const upstream = vi.fn().mockResolvedValue(Response.json(completed({ ...plan, status: 'clarify', steps: [], questions: ['Which model is it?'] })));
+  expect((await generatePlan(input, backupEnv, upstream)).plan.status).toBe('clarify');
+  expect(upstream).toHaveBeenCalledTimes(1);
+});
+it('respects Gemini-only mode even when backup credentials exist', async () => {
+  const upstream = vi.fn().mockResolvedValue(new Response('', { status: 429 }));
+  await expect(generatePlan(input, { ...backupEnv, AI_PROVIDER: 'gemini' }, upstream)).rejects.toMatchObject({ status: 429 });
+  expect(upstream).toHaveBeenCalledTimes(1);
+});
+it('rejects malformed fallback output and sanitises exhausted-credit errors', async () => {
+  const config = { ...backupEnv, AI_PROVIDER: 'aicredits' };
+  await expect(generatePlan(input, config, vi.fn().mockResolvedValue(chatResponse({ ...plan, resourceIds: ['fake'] })))).rejects.toThrow('usable plan');
+  await expect(generatePlan(input, config, vi.fn().mockResolvedValue(new Response('wallet details and secrets', { status: 402 })))).rejects.toThrow('temporarily unavailable');
+});
+it('falls back after an 8-second primary timeout within the shared request budget', async () => {
+  vi.useFakeTimers();
+  const upstream = vi.fn().mockImplementationOnce((_url: unknown, options: RequestInit) => new Promise<Response>((_resolve, reject) => {
+    options.signal?.addEventListener('abort', () => reject(new Error('aborted')));
+  })).mockResolvedValueOnce(chatResponse());
+  const pending = generatePlan(input, backupEnv, upstream);
+  await vi.advanceTimersByTimeAsync(8001);
+  expect((await pending).provider).toBe('aicredits'); expect(upstream).toHaveBeenCalledTimes(2);
+});
+it('fails over for invalid model output and quota errors without retrying the primary', async () => {
+  for (const response of [Response.json(completed({ invalid: true })), new Response('', { status: 429 })]) {
+    const upstream = vi.fn().mockResolvedValueOnce(response).mockResolvedValueOnce(chatResponse());
+    expect((await generatePlan(input, backupEnv, upstream)).provider).toBe('aicredits');
+    expect(upstream).toHaveBeenCalledTimes(2);
+  }
+});
+
 let requestId = 0;
 async function invoke(body: unknown = input, headers: Record<string, string> = {}, method = 'POST') {
   let output = '';

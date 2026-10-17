@@ -20,6 +20,9 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   if (!process.env.GEMINI_API_KEY && env.GEMINI_API_KEY) process.env.GEMINI_API_KEY = env.GEMINI_API_KEY;
   if (!process.env.GEMINI_MODEL && env.GEMINI_MODEL) process.env.GEMINI_MODEL = env.GEMINI_MODEL;
+  for (const name of ['AI_PROVIDER', 'AICREDITS_API_KEY', 'AICREDITS_MODEL']) {
+    if (!process.env[name] && env[name]) process.env[name] = env[name];
+  }
   return {
     plugins: [react(), tailwindcss(), plannerDevServer()],
     resolve: {

@@ -140,7 +140,7 @@ export function DecisionHelper({ onExploreObject }: { onExploreObject: (id: stri
           <p className="text-sm mb-2">{itemLabels[saved.item]} · {intentLabels[saved.intent]}</p>
           <h3 ref={savedRef} tabIndex={-1} id="saved-action-title" className="scroll-mt-20 text-2xl font-editorial">{saved.customPlan ? 'Your reviewed action plan' : recommend(saved).title}</h3>
           {saved.customPlan ? <>
-            <p className="mt-3 text-sm">{saved.customPlan.source === 'ai' ? `AI-assisted plan · ${saved.customPlan.model} · reviewed by you` : 'Safety guidance · reviewed by you'}</p>
+            <p className="mt-3 text-sm">{saved.customPlan.source === 'ai' ? `AI-assisted plan · ${saved.customPlan.provider === 'aicredits' ? 'AICredits' : 'Google Gemini'} · ${saved.customPlan.model} · reviewed by you` : 'Safety guidance · reviewed by you'}</p>
             <p className="mt-4 whitespace-pre-wrap leading-relaxed">{saved.customPlan.text}</p>
             <button type="button" className="min-h-[44px] mt-3 text-forest underline underline-offset-4" onClick={() => {
               void navigator.clipboard?.writeText(saved.customPlan!.text).then(() => setNotice('Plan copied.'), () => setNotice('Copy was unavailable. Select the plan text to copy it manually.'));

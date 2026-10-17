@@ -51,7 +51,7 @@ export function AIPlannerForm({ decision, onResult, onFallback, onClear }: {
       aria-describedby="ai-privacy ai-length" className="w-full min-h-32 rounded-xl border border-ink/25 bg-paper p-3 font-normal"
       placeholder="What is wrong, what have you tried, and what fits your budget, time and available tools?" />
     <p id="ai-length" className="text-xs text-ink/80">{description.length}/1500 characters. Write at least 20 to generate a plan.</p>
-    <p id="ai-privacy" className="text-sm text-ink/80">Generate sends this description and your selected answers to Google Gemini. Leave out names, contact details and other private information. Your saved notes are not sent.</p>
+    <p id="ai-privacy" className="text-sm text-ink/80">Generate sends this description and selected answers to the configured AI service: Google Gemini or AICredits and its model provider. Automatic fallback may send it to both services. Leave out private information. Your saved notes are not sent.</p>
     <button type="button" disabled={busy || description.trim().length < 20} onClick={() => void generate()}
       className="min-h-[44px] rounded-xl bg-forest px-5 py-3 font-semibold text-white hover:bg-forest-strong disabled:opacity-60 disabled:cursor-not-allowed">{busy ? 'Creating your AI plan…' : 'Generate AI plan'}</button>
     {busy && <button type="button" className="ml-3 min-h-[44px] py-2 underline" onClick={() => { controller.current?.abort(); setBusy(false); }}>Cancel</button>}

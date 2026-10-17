@@ -18,7 +18,7 @@ export interface AIPlan {
   questions: string[];
   resourceIds: ResourceId[];
 }
-export interface GeneratedPlan { plan: AIPlan; source: 'ai' | 'safety'; model: string }
+export interface GeneratedPlan { plan: AIPlan; source: 'ai' | 'safety'; model: string; provider?: 'gemini' | 'aicredits' }
 export interface PlannerRequest extends Decision { description: string }
 
 const record = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null && !Array.isArray(v);
@@ -37,8 +37,9 @@ export function parsePlan(v: unknown): AIPlan | null {
 }
 export function parseGeneratedPlan(v: unknown): GeneratedPlan | null {
   if (!record(v) || (v.source !== 'ai' && v.source !== 'safety') || typeof v.model !== 'string' || v.model.length > 100) return null;
+  if (v.provider !== undefined && v.provider !== 'gemini' && v.provider !== 'aicredits') return null;
   const plan = parsePlan(v.plan);
-  return plan ? { plan, source: v.source, model: v.model } : null;
+  return plan ? { plan, source: v.source, model: v.model, ...(v.provider ? { provider: v.provider } : {}) } : null;
 }
 export function parsePlannerRequest(v: unknown): PlannerRequest | null {
   if (!record(v) || (v.item !== 'clothes' && v.item !== 'headphones') ||
