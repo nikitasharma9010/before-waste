@@ -14,11 +14,22 @@ import { TrustAndMethod } from './components/TrustAndMethod';
 import { AssistantEntry } from './components/AssistantEntry';
 import { takeQuestionDraft } from './utils/questionDraft';
 import { Welcome } from './components/Welcome';
+import { NotFound } from './components/NotFound';
+
+const KNOWN_PATHS = new Set(['/', '/ask']);
 
 export default function App() {
-  const isAssistant = /^\/ask\/?$/.test(window.location.pathname);
+  const path = window.location.pathname.replace(/\/$/, '') || '/';
+  const isAssistant = path === '/ask';
+  const isNotFound = !KNOWN_PATHS.has(path);
   const [initialQuestion] = useState(() => isAssistant ? takeQuestionDraft() : '');
-  useEffect(() => { document.title = isAssistant ? 'Ask Before Waste - Practical sustainability guidance' : 'BEFORE WASTE - Think Before It Becomes Waste'; }, [isAssistant]);
+  useEffect(() => {
+    document.title = isAssistant
+      ? 'Ask Before Waste — Practical sustainability guidance'
+      : isNotFound
+        ? 'Page Not Found — Before Waste'
+        : 'BEFORE WASTE — Think Before It Becomes Waste';
+  }, [isAssistant, isNotFound]);
   // Single source of truth for selected object and stage
   const [selectedObjectId, setSelectedObjectId] = useState<string>(() => { const id = new URLSearchParams(window.location.search).get('story'); return id && ['tshirt', 'smartphone', 'food', 'package'].includes(id) ? id : 'tshirt'; });
   const [selectedStageIndex, setSelectedStageIndex] = useState<number>(0);
@@ -93,7 +104,7 @@ export default function App() {
 
       {/* Main Narrative Flow */}
       <main id="main-content" tabIndex={-1} className="flex-1">
-        {isAssistant ? <>
+        {isNotFound ? <NotFound /> : isAssistant ? <>
           <div className="mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:px-8"><a href="/" className="inline-flex min-h-[44px] items-center font-semibold text-forest underline underline-offset-4">Back to the stories</a></div>
           <DecisionHelper standalone initialQuestion={initialQuestion} onExploreObject={id => window.location.assign(`/?story=${encodeURIComponent(id)}#follow-one-thing`)} />
           <TrustAndMethod onOpenSources={handleOpenSources} />
@@ -135,7 +146,7 @@ export default function App() {
       </main>
 
       {/* 9. Closing Experience */}
-      {isAssistant ? <footer className="border-t border-ink/15 px-4 py-6 text-sm"><div className="mx-auto flex max-w-7xl flex-wrap gap-x-6 gap-y-2"><a href="/#follow-one-thing" className="inline-flex min-h-[44px] items-center text-forest underline">Explore the object stories</a><a href="/#pause" className="inline-flex min-h-[44px] items-center text-forest underline">Try the 7-day pause</a><button type="button" className="min-h-[44px] text-forest underline" onClick={event => handleOpenSources(event.currentTarget)}>Sources &amp; methodology</button></div></footer> : <ClosingSection
+      {isNotFound ? null : isAssistant ? <footer className="border-t border-ink/15 px-4 py-6 text-sm"><div className="mx-auto flex max-w-7xl flex-wrap gap-x-6 gap-y-2"><a href="/#follow-one-thing" className="inline-flex min-h-[44px] items-center text-forest underline">Explore the object stories</a><a href="/#pause" className="inline-flex min-h-[44px] items-center text-forest underline">Try the 7-day pause</a><button type="button" className="min-h-[44px] text-forest underline" onClick={event => handleOpenSources(event.currentTarget)}>Sources &amp; methodology</button></div></footer> : <ClosingSection
         onRestart={handleRestart}
         onOpenSources={handleOpenSources}
       />}
