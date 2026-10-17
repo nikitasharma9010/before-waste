@@ -9,7 +9,7 @@ interface StoryVisualProps {
 export const StoryVisual: React.FC<StoryVisualProps> = ({ objectId, stageNumber, accentColor }) => {
   // Render distinct SVG scenes according to object and stage
   return (
-    <div className="w-full aspect-[4/3] bg-[#FFF9F0] rounded-2xl border border-[#202A35]/10 p-6 flex flex-col items-center justify-center relative overflow-hidden shadow-inner select-none transition-all duration-300">
+    <div className="w-full aspect-[4/3] bg-[#FFF9F0] rounded-2xl border border-[#202A35]/10 p-3.5 sm:p-5 lg:p-6 flex flex-col items-center justify-center relative overflow-hidden shadow-inner select-none transition-all duration-300">
       {/* Background ambient radial glow */}
       <div
         className="absolute inset-0 opacity-20 pointer-events-none transition-opacity duration-500"
@@ -21,7 +21,7 @@ export const StoryVisual: React.FC<StoryVisualProps> = ({ objectId, stageNumber,
       {/* SVG Canvas */}
       <svg
         viewBox="0 0 400 300"
-        className="w-full h-full max-h-[260px] drop-shadow-sm transition-all duration-500"
+        className="w-full h-full drop-shadow-sm transition-all duration-500"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
@@ -152,7 +152,7 @@ export const StoryVisual: React.FC<StoryVisualProps> = ({ objectId, stageNumber,
                 {/* Percentage callout */}
                 <g transform="translate(250, 75)">
                   <rect x="0" y="0" width="110" height="54" rx="8" fill="#FFFFFF" stroke="#202A35" strokeWidth="1.5" />
-                  <text x="14" y="24" fill="#FF654F" fontSize="18" fontWeight="bold" fontFamily="Fraunces">73%</text>
+                  <text x="14" y="24" fill="#C53B27" fontSize="18" fontWeight="bold" fontFamily="Fraunces">73%</text>
                   <text x="14" y="42" fill="#202A35" fontSize="10" fontWeight="500">Landfill / Burned</text>
                 </g>
               </g>
@@ -247,12 +247,12 @@ export const StoryVisual: React.FC<StoryVisualProps> = ({ objectId, stageNumber,
                 <rect x="180" y="175" width="40" height="6" rx="3" fill="#94A3B8" opacity="0.4" />
                 {/* Battery health ring */}
                 <g transform="translate(180, 195)">
-                  <rect x="0" y="0" width="40" height="18" rx="4" fill="#0D9F91" />
-                  <rect x="40" y="5" width="3" height="8" rx="1" fill="#0D9F91" />
+                  <rect x="0" y="0" width="40" height="18" rx="4" fill="#086E64" />
+                  <rect x="40" y="5" width="3" height="8" rx="1" fill="#086E64" />
                   <text x="20" y="13" textAnchor="middle" fill="#FFFFFF" fontSize="9" fontWeight="bold">80%</text>
                 </g>
                 {/* Protective bumper case halo */}
-                <rect x="140" y="35" width="120" height="220" rx="22" stroke="#FF654F" strokeWidth="2.5" strokeDasharray="6 4" fill="none" />
+                <rect x="140" y="35" width="120" height="220" rx="22" stroke="#C53B27" strokeWidth="2.5" strokeDasharray="6 4" fill="none" />
                 <text x="200" y="282" textAnchor="middle" fill="#202A35" fontSize="12" fontWeight="600">Shielded & Maintained</text>
               </g>
             )}
@@ -277,16 +277,16 @@ export const StoryVisual: React.FC<StoryVisualProps> = ({ objectId, stageNumber,
               // Stage 5: Modular Repair & Urban Mining
               <g>
                 {/* Modular Phone exploded view */}
-                <rect x="120" y="60" width="75" height="130" rx="10" fill="#1E293B" stroke="#425BFF" strokeWidth="2" />
+                <rect x="120" y="60" width="75" height="130" rx="10" fill="#1E293B" stroke="#2840DE" strokeWidth="2" />
                 {/* Detached Battery module */}
-                <rect x="225" y="80" width="55" height="90" rx="6" fill="#0D9F91" stroke="#202A35" strokeWidth="2" />
+                <rect x="225" y="80" width="55" height="90" rx="6" fill="#086E64" stroke="#202A35" strokeWidth="2" />
                 <text x="252" y="130" textAnchor="middle" fill="#FFFFFF" fontSize="10" fontWeight="bold">BATTERY</text>
                 {/* Screwdriver */}
-                <path d="M 290 40 L 260 80" stroke="#D97706" strokeWidth="5" strokeLinecap="round" />
+                <path d="M 290 40 L 260 80" stroke="#92400E" strokeWidth="5" strokeLinecap="round" />
                 <path d="M 260 80 L 255 86" stroke="#71717A" strokeWidth="3" strokeLinecap="round" />
                 {/* Connecting arrows */}
-                <path d="M 200 125 L 220 125" stroke="#0D9F91" strokeWidth="2.5" strokeDasharray="3 3" />
-                <text x="200" y="250" textAnchor="middle" fill="#0D9F91" fontSize="14" fontWeight="bold">Right to Repair & Modularity</text>
+                <path d="M 200 125 L 220 125" stroke="#086E64" strokeWidth="2.5" strokeDasharray="3 3" />
+                <text x="200" y="250" textAnchor="middle" fill="#086E64" fontSize="14" fontWeight="bold">Right to Repair & Modularity</text>
               </g>
             )}
           </g>
@@ -376,8 +376,8 @@ export const StoryVisual: React.FC<StoryVisualProps> = ({ objectId, stageNumber,
                 />
                 <circle cx="200" cy="120" r="12" fill="#E2E8F0" />
                 {/* Anaerobic gas cloud */}
-                <path d="M 180 80 Q 200 60 220 75 Q 240 60 250 80" stroke="#F59E0B" strokeWidth="2.5" strokeDasharray="3 3" fill="none" />
-                <text x="200" y="55" textAnchor="middle" fill="#D97706" fontSize="12" fontWeight="bold">CH₄ Methane Gas</text>
+                <path d="M 180 80 Q 200 60 220 75 Q 240 60 250 80" stroke="#B45309" strokeWidth="2.5" strokeDasharray="3 3" fill="none" />
+                <text x="200" y="55" textAnchor="middle" fill="#92400E" fontSize="12" fontWeight="bold">CH₄ Methane Gas</text>
                 <text x="200" y="280" textAnchor="middle" fill="#202A35" fontSize="12" fontWeight="600">Anaerobic Decomposition in Landfills</text>
               </g>
             )}
@@ -393,7 +393,7 @@ export const StoryVisual: React.FC<StoryVisualProps> = ({ objectId, stageNumber,
                 <path d="M 200 205 L 200 145" stroke="#16A34A" strokeWidth="3.5" strokeLinecap="round" />
                 <path d="M 200 155 Q 170 140 175 120 Q 195 130 200 155 Z" fill="#22C55E" />
                 <path d="M 200 145 Q 230 130 225 110 Q 205 120 200 145 Z" fill="#22C55E" />
-                <text x="200" y="95" textAnchor="middle" fill="#0D9F91" fontSize="14" fontWeight="bold">Nutrient Humus Back to Soil</text>
+                <text x="200" y="95" textAnchor="middle" fill="#086E64" fontSize="14" fontWeight="bold">Nutrient Humus Back to Soil</text>
               </g>
             )}
           </g>
@@ -487,8 +487,8 @@ export const StoryVisual: React.FC<StoryVisualProps> = ({ objectId, stageNumber,
                 <path d="M 160 190 Q 200 150 240 210" stroke="#38BDF8" strokeWidth="6" opacity="0.6" strokeLinecap="round" />
                 {/* Empty air warning */}
                 <g transform="translate(110, 70)">
-                  <rect x="0" y="0" width="180" height="40" rx="8" fill="#FFF0EE" stroke="#FF654F" strokeWidth="1.5" />
-                  <text x="90" y="24" textAnchor="middle" fill="#FF654F" fontSize="12" fontWeight="bold">Unflattened = 80% Empty Air</text>
+                  <rect x="0" y="0" width="180" height="40" rx="8" fill="#FFF0EE" stroke="#C53B27" strokeWidth="1.5" />
+                  <text x="90" y="24" textAnchor="middle" fill="#C53B27" fontSize="12" fontWeight="bold">Unflattened = 80% Empty Air</text>
                 </g>
               </g>
             )}
@@ -504,7 +504,7 @@ export const StoryVisual: React.FC<StoryVisualProps> = ({ objectId, stageNumber,
                 <line x1="190" y1="100" x2="170" y2="210" stroke="#FEF3C7" strokeWidth="3" />
                 <line x1="210" y1="100" x2="190" y2="210" stroke="#FEF3C7" strokeWidth="3" />
                 {/* Clean Loop badge */}
-                <text x="200" y="255" textAnchor="middle" fill="#0D9F91" fontSize="14" fontWeight="bold">Repulped Up to 7 Times</text>
+                <text x="200" y="255" textAnchor="middle" fill="#086E64" fontSize="14" fontWeight="bold">Repulped Up to 7 Times</text>
               </g>
             )}
           </g>
@@ -512,7 +512,7 @@ export const StoryVisual: React.FC<StoryVisualProps> = ({ objectId, stageNumber,
       </svg>
 
       {/* Stage Indicator Mini Badge */}
-      <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm border border-[#202A35]/10 px-2.5 py-1 rounded-md text-[11px] font-semibold tracking-wide text-[#202A35]">
+      <div className="absolute top-3 right-3 sm:top-4 sm:right-4 bg-white/90 backdrop-blur-sm border border-[#202A35]/10 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md text-[10px] sm:text-[11px] font-semibold tracking-wide text-[#202A35] z-10">
         Stage {stageNumber} of 5
       </div>
     </div>

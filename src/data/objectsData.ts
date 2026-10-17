@@ -56,16 +56,16 @@ export const OBJECTS_DATA: StoryObject[] = [
         body: 'Now it rests in your drawer. Every wash cycle, cold rinse, line dry, or tumble hot influences how long its cotton fibers retain their structural strength.',
         detail: 'Washing in cold water and air-drying preserves yarn elasticity, reduces energy use by over 75%, and prevents micro-fiber breakage.',
         materialFlow: 'Gentle wash cycles · Hanging to dry · Folding · Repeated wear',
-        curiousFact: 'Extending the active life of clothing by just 9 months reduces its carbon, water, and waste footprint by 20–30%.'
+        curiousFact: 'Extending the active life of clothing by just 9 months reduces its carbon, water, and waste footprint by an estimated 20–30% (WRAP UK, Valuing Our Clothes).'
       },
       {
         stageNumber: 4,
         stageName: 'After me',
         stageTitle: 'When you no longer reach for it',
-        body: 'Globally, an estimated 73% of discarded apparel is either incinerated or sent to landfills, while less than 1% is currently recycled into new garments.',
+        body: 'Globally, an estimated 73% of discarded apparel is either incinerated or sent to landfills, while less than 1% of material is recycled into new clothing (Ellen MacArthur Foundation, 2017).',
         detail: 'Blended fibers (like cotton-polyester blends) and chemical finishes make mechanical fiber recycling technically challenging in existing municipal facilities.',
         materialFlow: 'Closet clear-out → Donation sorting → Global secondhand export / Landfill',
-        curiousFact: 'Donation bins often send surplus textiles overseas, where local markets can be overwhelmed by low-quality fast fashion.'
+        curiousFact: 'Donation bins often send surplus textiles overseas, where local sorting markets can be overwhelmed by high volumes of fast fashion.'
       },
       {
         stageNumber: 5,
@@ -120,9 +120,9 @@ export const OBJECTS_DATA: StoryObject[] = [
         stageName: 'After me',
         stageTitle: 'The fate of forgotten desk drawers',
         body: 'Millions of phones sit retired in home drawers. When finally thrown out with household trash, hazardous heavy metals risk leaching into municipal landfills.',
-        detail: 'E-waste is currently the world’s fastest-growing municipal waste stream, with formal recycling rates hovering below 25% worldwide.',
+        detail: 'According to the UN Global E-waste Monitor (2024), e-waste reached 62 million tonnes in 2022, with less than 23% documented as formally collected and recycled.',
         materialFlow: 'Desk drawer storage → Forgotten obsolescence → General waste / E-waste scrap',
-        curiousFact: 'One ton of discarded smartphones contains more gold and copper than one ton of rich gold ore mined from the earth.'
+        curiousFact: 'One ton of discarded circuit boards yields significantly more gold and copper than one ton of typical raw gold ore (UNEP).'
       },
       {
         stageNumber: 5,

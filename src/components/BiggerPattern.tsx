@@ -1,14 +1,5 @@
 import React, { useState } from 'react';
-import {
-  ArrowRight,
-  RotateCw,
-  Repeat,
-  Sparkles,
-  Layers,
-  ShieldCheck,
-  AlertCircle,
-  HelpCircle
-} from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 interface StageComparison {
   step: string;
@@ -75,7 +66,7 @@ export const BiggerPattern: React.FC = () => {
   const activeStep = COMPARISON_STAGES[selectedStepIndex];
 
   return (
-    <section id="bigger-pattern" className="py-16 lg:py-24 bg-[#FFF9F0] border-b border-[#202A35]/8">
+    <section id="bigger-pattern" className="scroll-mt-20 py-16 lg:py-24 bg-[#FFF9F0] border-b border-[#202A35]/8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="max-w-3xl mb-12">
@@ -93,7 +84,7 @@ export const BiggerPattern: React.FC = () => {
         </div>
 
         {/* Interactive Model Toggle */}
-        <div className="bg-white rounded-3xl border border-[#202A35]/10 p-6 sm:p-8 lg:p-10 shadow-sm mb-12">
+        <div className="bg-white rounded-3xl border border-[#202A35]/10 p-4 sm:p-7 lg:p-10 shadow-sm mb-12">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-6 border-b border-[#202A35]/8">
             <div>
               <span className="text-xs font-semibold text-[#202A35]/60 uppercase tracking-wider block">
@@ -104,24 +95,38 @@ export const BiggerPattern: React.FC = () => {
               </p>
             </div>
 
-            {/* Segmented Controller */}
-            <div className="inline-flex p-1 bg-[#FFF9F0] border border-[#202A35]/10 rounded-xl self-start sm:self-auto">
+            {/* Segmented Controller (Full width responsive grid on mobile, inline-flex on sm+) */}
+            <div
+              role="tablist"
+              aria-label="Economic model comparison"
+              className="w-full sm:w-auto grid grid-cols-2 sm:inline-flex p-1 bg-[#FFF9F0] border border-[#202A35]/15 rounded-xl"
+            >
               <button
+                type="button"
+                role="tab"
+                id="tab-linear"
+                aria-selected={activeModel === 'linear'}
+                aria-controls="model-panel"
                 onClick={() => setActiveModel('linear')}
-                className={`px-4 py-2 text-xs sm:text-sm font-medium rounded-lg transition-all cursor-pointer whitespace-nowrap ${
+                className={`px-3 sm:px-4 py-2 sm:py-2.5 min-h-[44px] text-xs sm:text-sm font-medium rounded-lg transition-all cursor-pointer text-center whitespace-nowrap focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#202A35] focus:outline-none ${
                   activeModel === 'linear'
                     ? 'bg-[#202A35] text-white shadow-xs'
-                    : 'text-[#202A35]/70 hover:text-[#202A35]'
+                    : 'text-[#202A35]/80 hover:text-[#202A35]'
                 }`}
               >
                 Linear: Take → Throw
               </button>
               <button
+                type="button"
+                role="tab"
+                id="tab-circular"
+                aria-selected={activeModel === 'circular'}
+                aria-controls="model-panel"
                 onClick={() => setActiveModel('circular')}
-                className={`px-4 py-2 text-xs sm:text-sm font-medium rounded-lg transition-all cursor-pointer whitespace-nowrap ${
+                className={`px-3 sm:px-4 py-2 sm:py-2.5 min-h-[44px] text-xs sm:text-sm font-medium rounded-lg transition-all cursor-pointer text-center whitespace-nowrap focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#202A35] focus:outline-none ${
                   activeModel === 'circular'
-                    ? 'bg-[#425BFF] text-white shadow-xs'
-                    : 'text-[#202A35]/70 hover:text-[#202A35]'
+                    ? 'bg-[#2840DE] text-white shadow-xs'
+                    : 'text-[#202A35]/80 hover:text-[#202A35]'
                 }`}
               >
                 A Better Next Turn
@@ -130,46 +135,53 @@ export const BiggerPattern: React.FC = () => {
           </div>
 
           {/* Visual Diagram Strip */}
-          <div className="mb-10">
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
+          <div className="mb-10" id="model-panel" role="tabpanel" aria-labelledby={activeModel === 'linear' ? 'tab-linear' : 'tab-circular'}>
+            <div role="tablist" aria-label="Lifecycle stages" className="grid grid-cols-1 md:grid-cols-5 gap-2.5 lg:gap-3">
               {COMPARISON_STAGES.map((item, idx) => {
                 const isSelected = selectedStepIndex === idx;
                 const isLinear = activeModel === 'linear';
                 return (
                   <button
                     key={item.step}
+                    type="button"
+                    role="tab"
+                    id={`step-tab-${item.step}`}
+                    aria-selected={isSelected}
+                    aria-controls="step-detail-panel"
+                    aria-label={`Step ${item.step}: ${isLinear ? item.linearName : item.circularName}`}
                     onClick={() => setSelectedStepIndex(idx)}
-                    className={`p-4 rounded-2xl text-left border transition-all cursor-pointer relative ${
+                    className={`p-3.5 sm:p-4 min-h-[44px] rounded-xl sm:rounded-2xl text-left border transition-all cursor-pointer relative focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#202A35] focus:outline-none ${
                       isSelected
                         ? isLinear
-                          ? 'bg-[#FFF0EE] border-[#FF654F] shadow-sm ring-1 ring-[#FF654F]'
-                          : 'bg-[#EEF1FF] border-[#425BFF] shadow-sm ring-1 ring-[#425BFF]'
-                        : 'bg-[#FFF9F0] border-[#202A35]/10 hover:border-[#202A35]/30'
+                          ? 'bg-[#FFF0EE] border-[#C53B27] shadow-sm ring-1 ring-[#C53B27]'
+                          : 'bg-[#EEF1FF] border-[#2840DE] shadow-sm ring-1 ring-[#2840DE]'
+                        : 'bg-[#FFF9F0] border-[#202A35]/15 hover:border-[#202A35]/40'
                     }`}
                   >
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs font-mono font-bold text-[#202A35]/50">
+                      <span className="text-xs font-mono font-bold text-[#202A35]/60">
                         {item.step}
                       </span>
                       {isSelected && (
                         <span
-                          className="w-2 h-2 rounded-full"
-                          style={{ backgroundColor: isLinear ? '#FF654F' : '#425BFF' }}
+                          className="w-2.5 h-2.5 rounded-full"
+                          style={{ backgroundColor: isLinear ? '#C53B27' : '#2840DE' }}
+                          aria-hidden="true"
                         />
                       )}
                     </div>
 
-                    <h4 className="font-editorial text-base font-semibold text-[#202A35] mb-1">
+                    <h3 className="font-editorial text-sm sm:text-base font-semibold text-[#202A35] mb-1">
                       {isLinear ? item.linearName.split(' ')[0] : item.circularName.split(' ')[0]}
-                    </h4>
-                    <p className="text-xs text-[#202A35]/65 line-clamp-2">
+                    </h3>
+                    <p className="text-xs text-[#202A35]/75 line-clamp-2">
                       {isLinear ? item.linearName : item.circularName}
                     </p>
 
                     {/* Step indicator arrow for desktop */}
                     {idx < 4 && (
-                      <div className="hidden md:block absolute -right-3 top-1/2 -translate-y-1/2 z-10 text-[#202A35]/30 pointer-events-none">
-                        <ArrowRight className="w-3.5 h-3.5" />
+                      <div className="hidden lg:flex items-center justify-center absolute left-[calc(100%+0.375rem)] top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 text-[#202A35]/40 pointer-events-none" aria-hidden="true">
+                        <ArrowRight className="w-3 h-3" />
                       </div>
                     )}
                   </button>
@@ -179,14 +191,14 @@ export const BiggerPattern: React.FC = () => {
           </div>
 
           {/* Deep Dive Card for Selected Step */}
-          <div className="p-6 sm:p-8 rounded-2xl bg-[#FFF9F0] border border-[#202A35]/10">
+          <div id="step-detail-panel" role="tabpanel" aria-labelledby={`step-tab-${activeStep.step}`} className="p-4 sm:p-6 lg:p-8 rounded-2xl bg-[#FFF9F0] border border-[#202A35]/10">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
               {/* Left Column: What Happens Here */}
               <div className="lg:col-span-7 space-y-4">
-                <div className="flex items-center gap-2 text-xs font-semibold tracking-wider uppercase text-[#202A35]/60">
+                <div className="flex items-center gap-2 text-xs font-semibold tracking-wider uppercase text-[#202A35]/70">
                   <span>STEP {activeStep.step} OF 05</span>
                   <span aria-hidden="true">·</span>
-                  <span className={activeModel === 'linear' ? 'text-[#FF654F]' : 'text-[#425BFF]'}>
+                  <span className={activeModel === 'linear' ? 'text-[#C53B27]' : 'text-[#2840DE]'}>
                     {activeModel === 'linear' ? activeStep.linearName : activeStep.circularName}
                   </span>
                 </div>
@@ -209,12 +221,12 @@ export const BiggerPattern: React.FC = () => {
                   <p className="text-xs sm:text-sm font-medium text-[#202A35]">
                     {activeModel === 'linear' ? (
                       <>
-                        <strong className="text-[#FF654F]">System Cost: </strong>
+                        <strong className="text-[#C53B27]">System Cost: </strong>
                         {activeStep.linearImpact}
                       </>
                     ) : (
                       <>
-                        <strong className="text-[#425BFF]">Circularity Advantage: </strong>
+                        <strong className="text-[#2840DE]">Circularity Advantage: </strong>
                         {activeStep.circularBenefit}
                       </>
                     )}
@@ -223,12 +235,12 @@ export const BiggerPattern: React.FC = () => {
               </div>
 
               {/* Right Column: Comparative Insight */}
-              <div className="lg:col-span-5 bg-white p-5 rounded-xl border border-[#202A35]/8 space-y-3">
-                <span className="text-xs font-semibold tracking-wider uppercase text-[#202A35]/50 block">
+              <div className="lg:col-span-5 bg-white p-5 rounded-xl border border-[#202A35]/10 space-y-3">
+                <span className="text-xs font-semibold tracking-wider uppercase text-[#202A35]/70 block">
                   Why Earlier Interventions Matter
                 </span>
-                <p className="text-xs sm:text-sm text-[#202A35]/75 leading-relaxed">
-                  Notice how intervening at Step 01 (asking &quot;Do I need this?&quot;) or Step 04 (caring and repairing) spares 100% of the energy, water, and shipping of the entire sequence.
+                <p className="text-xs sm:text-sm text-[#202A35]/80 leading-relaxed">
+                  Intervening earlier at Step 01 (asking &quot;Do I need this?&quot;) or Step 04 (caring and repairing) can significantly reduce demand for new virgin materials, processing energy, and long-distance transport, while recognizing that repair, cleaning, and maintenance also require modest energy and resources.
                 </p>
                 <div className="pt-2 border-t border-[#202A35]/8 flex items-center justify-between text-xs text-[#202A35]/70">
                   <span>Current active node:</span>

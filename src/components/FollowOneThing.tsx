@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { OBJECTS_DATA, StoryObject } from '../data/objectsData';
 import { StoryVisual } from './StoryVisual';
 import {
@@ -7,60 +7,77 @@ import {
   RotateCcw,
   Sparkles,
   ArrowRight,
-  Info,
-  CheckCircle2,
   Compass
 } from 'lucide-react';
 
 interface FollowOneThingProps {
-  selectedObjectId?: string;
-  onSelectObject?: (id: string) => void;
+  activeObjectId: string;
+  currentStageIndex: number;
+  onSelectObject: (id: string) => void;
+  onSelectStage: (stageIndex: number) => void;
+  onNextStage: () => void;
+  onPrevStage: () => void;
+  onRestartStory: () => void;
 }
 
 export const FollowOneThing: React.FC<FollowOneThingProps> = ({
-  selectedObjectId = 'tshirt',
-  onSelectObject
+  activeObjectId,
+  currentStageIndex,
+  onSelectObject,
+  onSelectStage,
+  onNextStage,
+  onPrevStage,
+  onRestartStory
 }) => {
-  const [activeObjectId, setActiveObjectId] = useState<string>(selectedObjectId);
-  const [currentStageIndex, setCurrentStageIndex] = useState<number>(0);
-
-  // Sync if parent updates selectedObjectId
-  React.useEffect(() => {
-    if (selectedObjectId && selectedObjectId !== activeObjectId) {
-      setActiveObjectId(selectedObjectId);
-      setCurrentStageIndex(0);
-    }
-  }, [selectedObjectId]);
-
   const currentObject: StoryObject =
     OBJECTS_DATA.find((obj) => obj.id === activeObjectId) || OBJECTS_DATA[0];
 
-  const currentStage = currentObject.stages[currentStageIndex];
+  const currentStage = currentObject.stages[currentStageIndex] || currentObject.stages[0];
 
-  const handleNextStage = () => {
-    if (currentStageIndex < currentObject.stages.length - 1) {
-      setCurrentStageIndex((prev) => prev + 1);
+  // Accessible button colors with >= 4.5:1 WCAG contrast
+  const getButtonStyles = (objId: string) => {
+    switch (objId) {
+      case 'tshirt':
+        return {
+          tabActive: 'bg-[#C53B27] text-white shadow-xs',
+          nextBtn: 'bg-[#C53B27] hover:bg-[#AB2F1D] text-white',
+          indicator: '#C53B27'
+        };
+      case 'smartphone':
+        return {
+          tabActive: 'bg-[#2840DE] text-white shadow-xs',
+          nextBtn: 'bg-[#2840DE] hover:bg-[#1E32B6] text-white',
+          indicator: '#2840DE'
+        };
+      case 'food':
+        return {
+          tabActive: 'bg-[#086E64] text-white shadow-xs',
+          nextBtn: 'bg-[#086E64] hover:bg-[#06574F] text-white',
+          indicator: '#086E64'
+        };
+      case 'package':
+      default:
+        return {
+          tabActive: 'bg-[#FFC857] text-[#202A35] font-semibold shadow-xs',
+          nextBtn: 'bg-[#FFC857] hover:bg-[#EBB442] text-[#202A35] font-semibold',
+          indicator: '#B88000'
+        };
     }
   };
 
-  const handlePrevStage = () => {
-    if (currentStageIndex > 0) {
-      setCurrentStageIndex((prev) => prev - 1);
-    }
-  };
-
-  const handleSwitchObject = (id: string) => {
-    setActiveObjectId(id);
-    setCurrentStageIndex(0);
-    if (onSelectObject) onSelectObject(id);
-  };
+  const themeStyle = getButtonStyles(currentObject.id);
 
   return (
-    <section id="follow-one-thing" className="py-16 lg:py-24 bg-white border-y border-[#202A35]/8">
+    <section id="follow-one-thing" className="scroll-mt-20 py-16 lg:py-24 bg-white border-y border-[#202A35]/8">
+      {/* Live Region for Screen Reader Stage Announcements */}
+      <div role="status" aria-live="polite" className="sr-only">
+        Now viewing {currentObject.name}, Stage {currentStage.stageNumber} of 5: {currentStage.stageName}. {currentStage.stageTitle}.
+      </div>
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="max-w-3xl mb-10">
-          <div className="flex items-center gap-2 text-xs font-semibold tracking-wider uppercase text-[#FF654F] mb-2">
+          <div className="flex items-center gap-2 text-xs font-semibold tracking-wider uppercase text-[#C53B27] mb-2">
             <span>SIGNATURE EXPERIENCE</span>
             <span aria-hidden="true">·</span>
             <span>FOLLOW ONE THING</span>
@@ -68,33 +85,43 @@ export const FollowOneThing: React.FC<FollowOneThingProps> = ({
           <h2 className="font-editorial text-3xl sm:text-4xl lg:text-5xl text-[#202A35] font-normal leading-tight text-balance">
             Every object carries a story before it reaches you.
           </h2>
-          <p className="mt-3 text-base text-[#202A35]/75 leading-relaxed">
+          <p className="mt-3 text-base text-[#202A35]/80 leading-relaxed">
             Choose an everyday companion and follow its journey—from raw planetary material, through human hands and daily care, to its next possible chapter.
           </p>
         </div>
 
-        {/* 4 Object Tabs (Functional button controls with clean styling) */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-3 mb-8 scrollbar-none">
+        {/* 4 Object Tabs (role=tablist) */}
+        <div
+          role="tablist"
+          aria-label="Select an object to follow"
+          className="flex items-center gap-2 overflow-x-auto pb-3 mb-8 scrollbar-none"
+        >
           {OBJECTS_DATA.map((obj) => {
             const isActive = obj.id === activeObjectId;
+            const objTheme = getButtonStyles(obj.id);
             return (
               <button
                 key={obj.id}
-                onClick={() => handleSwitchObject(obj.id)}
-                className={`flex items-center gap-2.5 px-4 py-2.5 rounded-xl font-medium text-sm transition-all whitespace-nowrap shrink-0 cursor-pointer ${
+                type="button"
+                role="tab"
+                id={`object-tab-${obj.id}`}
+                aria-selected={isActive}
+                aria-controls="story-content-panel"
+                onClick={() => onSelectObject(obj.id)}
+                className={`flex items-center gap-2.5 px-4 py-2.5 min-h-[44px] rounded-xl font-medium text-sm transition-all whitespace-nowrap shrink-0 cursor-pointer focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#202A35] focus:outline-none ${
                   isActive
-                    ? 'text-white shadow-sm'
-                    : 'bg-[#FFF9F0] text-[#202A35]/80 hover:bg-[#202A35]/5 border border-[#202A35]/10'
+                    ? objTheme.tabActive
+                    : 'bg-[#FFF9F0] text-[#202A35] hover:bg-[#202A35]/5 border border-[#202A35]/15'
                 }`}
-                style={{
-                  backgroundColor: isActive ? obj.accentColor : undefined,
-                  borderColor: isActive ? obj.accentColor : undefined
-                }}
               >
                 <span>{obj.name}</span>
                 <span
-                  className={`text-[11px] px-1.5 py-0.5 rounded ${
-                    isActive ? 'bg-white/20 text-white' : 'bg-black/5 text-[#202A35]/60'
+                  className={`text-xs px-2 py-0.5 rounded font-normal ${
+                    isActive
+                      ? obj.id === 'package'
+                        ? 'bg-black/10 text-[#202A35]'
+                        : 'bg-white/20 text-white'
+                      : 'bg-black/5 text-[#202A35]/70'
                   }`}
                 >
                   {obj.itemType}
@@ -104,8 +131,13 @@ export const FollowOneThing: React.FC<FollowOneThingProps> = ({
           })}
         </div>
 
-        {/* Story Box Main Card */}
-        <div className="bg-[#FFF9F0] rounded-3xl border border-[#202A35]/10 p-6 sm:p-8 lg:p-10 shadow-sm">
+        {/* Story Box Main Card (role=tabpanel) */}
+        <div
+          id="story-content-panel"
+          role="tabpanel"
+          aria-labelledby={`object-tab-${currentObject.id}`}
+          className="bg-[#FFF9F0] rounded-3xl border border-[#202A35]/10 p-4 sm:p-7 lg:p-10 shadow-sm"
+        >
           {/* Object Tagline & Stage Navigation Bar */}
           <div className="border-b border-[#202A35]/10 pb-6 mb-8">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
@@ -120,48 +152,52 @@ export const FollowOneThing: React.FC<FollowOneThingProps> = ({
 
               {/* Reset to Stage 1 */}
               <button
-                onClick={() => setCurrentStageIndex(0)}
-                className="inline-flex items-center gap-1.5 text-xs text-[#202A35]/60 hover:text-[#202A35] transition-colors self-start sm:self-auto cursor-pointer"
-                title="Restart this story"
+                type="button"
+                onClick={onRestartStory}
+                className="inline-flex items-center gap-1.5 px-3 py-2 min-h-[44px] rounded-lg text-xs font-semibold text-[#202A35]/75 hover:text-[#202A35] hover:bg-white transition-colors self-start sm:self-auto cursor-pointer focus-visible:ring-2 focus-visible:ring-[#202A35]"
+                aria-label={`Restart ${currentObject.name} story from stage one`}
               >
-                <RotateCcw className="w-3.5 h-3.5" />
-                <span>Restart journey</span>
+                <RotateCcw className="w-3.5 h-3.5" aria-hidden="true" />
+                <span>Restart this story</span>
               </button>
             </div>
 
-            {/* Stepper Progress Bar (5 stages) */}
-            <div className="grid grid-cols-5 gap-2 sm:gap-3">
+            {/* Stepper Progress Bar (5 stages) with accessible names */}
+            <div className="grid grid-cols-5 gap-1.5 sm:gap-3" role="group" aria-label="Story stages">
               {currentObject.stages.map((st, idx) => {
                 const isCurrent = idx === currentStageIndex;
                 const isCompleted = idx < currentStageIndex;
                 return (
                   <button
                     key={st.stageNumber}
-                    onClick={() => setCurrentStageIndex(idx)}
-                    className="group text-left focus:outline-none cursor-pointer"
+                    type="button"
+                    aria-current={isCurrent ? 'step' : undefined}
+                    aria-label={`Stage ${st.stageNumber}: ${st.stageName} (${st.stageTitle})`}
+                    onClick={() => onSelectStage(idx)}
+                    className="group text-left p-1 rounded-lg focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#202A35] focus:outline-none cursor-pointer min-h-[44px] flex flex-col justify-start"
                   >
                     <div
-                      className={`h-2 rounded-full transition-all duration-300 mb-2 ${
+                      className={`h-2.5 w-full rounded-full transition-all duration-300 mb-2 ${
                         isCurrent
                           ? 'shadow-xs'
                           : isCompleted
-                          ? 'opacity-80'
-                          : 'bg-[#202A35]/10'
+                          ? 'opacity-85'
+                          : 'bg-[#202A35]/15'
                       }`}
                       style={{
                         backgroundColor:
-                          isCurrent || isCompleted ? currentObject.accentColor : undefined
+                          isCurrent || isCompleted ? themeStyle.indicator : undefined
                       }}
                     />
-                    <div className="hidden sm:block">
-                      <span className="text-[11px] font-bold block text-[#202A35]/50 group-hover:text-[#202A35] transition-colors">
+                    <div className="w-full">
+                      <span className="text-[10px] sm:text-[11px] font-bold block text-[#202A35]/60 group-hover:text-[#202A35] transition-colors">
                         0{st.stageNumber}
                       </span>
                       <span
-                        className={`text-xs block truncate transition-colors ${
+                        className={`text-[10px] sm:text-xs block truncate transition-colors ${
                           isCurrent
                             ? 'font-bold text-[#202A35]'
-                            : 'font-medium text-[#202A35]/60 group-hover:text-[#202A35]'
+                            : 'font-medium text-[#202A35]/70 group-hover:text-[#202A35]'
                         }`}
                       >
                         {st.stageName}
@@ -180,7 +216,7 @@ export const FollowOneThing: React.FC<FollowOneThingProps> = ({
               <StoryVisual
                 objectId={currentObject.id}
                 stageNumber={currentStage.stageNumber}
-                accentColor={currentObject.accentColor}
+                accentColor={themeStyle.indicator}
               />
             </div>
 
@@ -189,32 +225,33 @@ export const FollowOneThing: React.FC<FollowOneThingProps> = ({
               <div className="inline-flex items-center gap-2 text-xs font-semibold tracking-wider uppercase">
                 <span
                   className="w-2.5 h-2.5 rounded-full"
-                  style={{ backgroundColor: currentObject.accentColor }}
+                  style={{ backgroundColor: themeStyle.indicator }}
+                  aria-hidden="true"
                 />
-                <span className="text-[#202A35]/70">Stage 0{currentStage.stageNumber}</span>
-                <span aria-hidden="true" className="text-[#202A35]/30">·</span>
-                <span style={{ color: currentObject.accentColor }}>{currentStage.stageName}</span>
+                <span className="text-[#202A35]/75">Stage 0{currentStage.stageNumber}</span>
+                <span aria-hidden="true" className="text-[#202A35]/40">·</span>
+                <span className="font-bold text-[#202A35]">{currentStage.stageName}</span>
               </div>
 
               <h4 className="font-editorial text-2xl sm:text-3xl text-[#202A35] font-normal leading-snug">
                 {currentStage.stageTitle}
               </h4>
 
-              <p className="text-base sm:text-lg text-[#202A35]/85 leading-relaxed font-sans">
+              <p className="text-base sm:text-lg text-[#202A35]/90 leading-relaxed font-sans">
                 {currentStage.body}
               </p>
 
-              <div className="bg-white/80 rounded-xl p-4 border border-[#202A35]/8 space-y-3">
-                <p className="text-xs sm:text-sm text-[#202A35]/75 leading-relaxed">
+              <div className="bg-white/85 rounded-xl p-4 border border-[#202A35]/10 space-y-3">
+                <p className="text-xs sm:text-sm text-[#202A35]/80 leading-relaxed">
                   {currentStage.detail}
                 </p>
 
                 {/* Material flow line */}
-                <div className="pt-2 border-t border-[#202A35]/8 flex items-start gap-2">
-                  <span className="text-[11px] font-semibold text-[#202A35]/50 uppercase tracking-wider shrink-0 mt-0.5">
+                <div className="pt-2 border-t border-[#202A35]/10 flex items-start gap-2">
+                  <span className="text-[11px] font-semibold text-[#202A35]/60 uppercase tracking-wider shrink-0 mt-0.5">
                     Flow:
                   </span>
-                  <span className="text-xs font-medium text-[#202A35]/80">
+                  <span className="text-xs font-medium text-[#202A35]/85">
                     {currentStage.materialFlow}
                   </span>
                 </div>
@@ -222,71 +259,73 @@ export const FollowOneThing: React.FC<FollowOneThingProps> = ({
 
               {/* Curious Fact Card */}
               <div
-                className="p-3.5 rounded-xl border flex items-start gap-3"
+                className="p-3.5 rounded-xl border flex items-start gap-3 bg-white"
                 style={{
-                  backgroundColor: `${currentObject.accentColor}0D`,
-                  borderColor: `${currentObject.accentColor}30`
+                  borderColor: `${themeStyle.indicator}40`
                 }}
               >
                 <Sparkles
-                  className="w-4 h-4 shrink-0 mt-0.5"
-                  style={{ color: currentObject.accentColor }}
+                  className="w-4 h-4 shrink-0 mt-0.5 text-[#202A35]"
+                  aria-hidden="true"
                 />
-                <p className="text-xs text-[#202A35]/85 leading-relaxed">
-                  <strong className="font-semibold text-[#202A35]">Did you know? </strong>
+                <p className="text-xs text-[#202A35]/90 leading-relaxed">
+                  <strong className="font-semibold text-[#202A35]">Insight: </strong>
                   {currentStage.curiousFact}
                 </p>
               </div>
 
-              {/* Back / Next Navigation Controls */}
-              <div className="flex items-center justify-between pt-4 border-t border-[#202A35]/8">
+              {/* Back / Next Navigation Controls (Mobile wrap/stack without clipping, Next prominent on mobile) */}
+              <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-4 border-t border-[#202A35]/10">
                 <button
-                  onClick={handlePrevStage}
+                  type="button"
+                  onClick={onPrevStage}
                   disabled={currentStageIndex === 0}
-                  className={`inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors cursor-pointer ${
+                  className={`inline-flex items-center justify-center gap-1.5 px-4 py-2.5 min-h-[44px] rounded-xl text-xs sm:text-sm font-semibold transition-colors focus-visible:ring-2 focus-visible:ring-[#202A35] ${
                     currentStageIndex === 0
-                      ? 'text-[#202A35]/30 bg-transparent cursor-not-allowed'
-                      : 'text-[#202A35] bg-white border border-[#202A35]/10 hover:bg-[#202A35]/5'
+                      ? 'text-[#202A35]/35 bg-transparent cursor-not-allowed border border-transparent'
+                      : 'text-[#202A35] bg-white border border-[#202A35]/15 hover:bg-[#202A35]/5 cursor-pointer shadow-2xs'
                   }`}
+                  aria-label="Previous story stage"
                 >
-                  <ChevronLeft className="w-4 h-4" />
-                  <span>Previous</span>
+                  <ChevronLeft className="w-4 h-4" aria-hidden="true" />
+                  <span>Previous Stage</span>
                 </button>
 
                 {currentStageIndex < currentObject.stages.length - 1 ? (
                   <button
-                    onClick={handleNextStage}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium text-white shadow-sm transition-all hover:opacity-95 cursor-pointer"
-                    style={{ backgroundColor: currentObject.accentColor }}
+                    type="button"
+                    onClick={onNextStage}
+                    className={`inline-flex items-center justify-center gap-2 px-5 py-2.5 min-h-[44px] rounded-xl text-xs sm:text-sm font-semibold shadow-xs transition-all focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#202A35] cursor-pointer ${themeStyle.nextBtn}`}
+                    aria-label={`Next: ${currentObject.stages[currentStageIndex + 1].stageName}`}
                   >
                     <span>Next: {currentObject.stages[currentStageIndex + 1].stageName}</span>
-                    <ChevronRight className="w-4 h-4" />
+                    <ChevronRight className="w-4 h-4" aria-hidden="true" />
                   </button>
                 ) : (
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => {
-                        const currentIndex = OBJECTS_DATA.findIndex((o) => o.id === activeObjectId);
-                        const nextIndex = (currentIndex + 1) % OBJECTS_DATA.length;
-                        handleSwitchObject(OBJECTS_DATA[nextIndex].id);
-                      }}
-                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium text-white bg-[#202A35] hover:bg-[#FF654F] shadow-sm transition-colors cursor-pointer"
-                    >
-                      <Compass className="w-4 h-4" />
-                      <span>Explore Another Object</span>
-                    </button>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const currentIndex = OBJECTS_DATA.findIndex((o) => o.id === activeObjectId);
+                      const nextIndex = (currentIndex + 1) % OBJECTS_DATA.length;
+                      onSelectObject(OBJECTS_DATA[nextIndex].id);
+                    }}
+                    className="inline-flex items-center justify-center gap-2 px-5 py-2.5 min-h-[44px] rounded-xl text-xs sm:text-sm font-semibold text-white bg-[#202A35] hover:bg-[#C53B27] shadow-xs transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#202A35]"
+                    aria-label="Explore the next everyday object"
+                  >
+                    <Compass className="w-4 h-4" aria-hidden="true" />
+                    <span>Explore Another Object</span>
+                  </button>
                 )}
               </div>
             </div>
           </div>
 
-          {/* Final Reflection Box (Prominently displayed when reaching stage 5 or expandable) */}
+          {/* Final Reflection Box (Shown on stage 5) */}
           {currentStageIndex === 4 && (
-            <div className="mt-10 p-6 sm:p-7 rounded-2xl bg-white border border-[#0D9F91]/30 shadow-sm animate-in fade-in slide-in-from-bottom-2 duration-300">
+            <div className="mt-10 p-6 sm:p-7 rounded-2xl bg-white border border-[#086E64]/30 shadow-xs animate-in fade-in slide-in-from-bottom-2 duration-300">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="space-y-1">
-                  <span className="text-xs font-semibold tracking-wider uppercase text-[#0D9F91]">
+                  <span className="text-xs font-semibold tracking-wider uppercase text-[#086E64]">
                     Core Reflection
                   </span>
                   <p className="font-editorial text-xl sm:text-2xl text-[#202A35] italic">
@@ -295,10 +334,10 @@ export const FollowOneThing: React.FC<FollowOneThingProps> = ({
                 </div>
                 <a
                   href="#bigger-pattern"
-                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-medium text-white bg-[#0D9F91] hover:bg-[#0a867a] transition-colors shrink-0"
+                  className="inline-flex items-center justify-center gap-2 px-4 py-2.5 min-h-[44px] rounded-xl text-xs sm:text-sm font-semibold text-white bg-[#086E64] hover:bg-[#06574F] focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#086E64] transition-colors shrink-0 shadow-xs"
                 >
                   <span>See the Bigger Pattern</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-4 h-4" aria-hidden="true" />
                 </a>
               </div>
             </div>

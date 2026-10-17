@@ -1,9 +1,11 @@
-import React, { useEffect } from 'react';
-import { X, ExternalLink, BookOpen, ShieldCheck } from 'lucide-react';
+import React from 'react';
+import { ExternalLink } from 'lucide-react';
+import { AccessibleDialog } from './AccessibleDialog';
 
 interface SourcesModalProps {
   isOpen: boolean;
   onClose: () => void;
+  triggerRef?: React.RefObject<HTMLElement | null>;
 }
 
 interface SourceItem {
@@ -17,139 +19,111 @@ interface SourceItem {
 const SOURCES: SourceItem[] = [
   {
     institution: 'UNEP (United Nations Environment Programme)',
-    reportName: 'Global Waste Management Outlook',
-    yearOrEdition: '2024 Edition',
+    reportName: 'Global Waste Management Outlook 2024: Beyond an Age of Waste',
+    yearOrEdition: 'Published 2024 (Data baseline 2020–2023)',
     url: 'https://www.unep.org/resources/global-waste-management-outlook-2024',
-    scopeSummary: 'Municipal solid waste projections, e-waste growth data, and global circular transition indicators.'
+    scopeSummary: 'Municipal solid waste projections, global recycling baselines, and environmental lifecycle analysis.'
+  },
+  {
+    institution: 'UN Global E-waste Monitor (ITU / UNITAR / UNEP)',
+    reportName: 'The Global E-waste Monitor 2024',
+    yearOrEdition: 'Published 2024 (Data year 2022)',
+    url: 'https://ewastemonitor.info/',
+    scopeSummary: 'Quantifies 62 million tonnes of global e-waste generated, with documented formal collection and recycling under 23%.'
   },
   {
     institution: 'Ellen MacArthur Foundation',
-    reportName: 'Towards a Circular Economy & Butterfly Diagram',
-    yearOrEdition: 'Core Circular Principles',
-    url: 'https://www.ellenmacarthurfoundation.org/topics/circular-economy-introduction/overview',
-    scopeSummary: 'Eliminate waste and pollution, circulate products and materials, and regenerate natural systems.'
+    reportName: 'A New Textiles Economy: Redesigning Fashion’s Future & Circular Principles',
+    yearOrEdition: 'Report published 2017 (Updated 2023)',
+    url: 'https://www.ellenmacarthurfoundation.org/a-new-textiles-economy',
+    scopeSummary: 'Textile material flow analysis identifying that less than 1% of clothing material is recycled into new clothing, and ~73% is landfilled or incinerated.'
   },
   {
     institution: 'Global Footprint Network',
     reportName: 'National Footprint and Biocapacity Accounts',
-    yearOrEdition: '2024 Edition (UN data-grounded)',
+    yearOrEdition: '2024 Edition (Data year 2022, based on UN FAO and IEA datasets)',
     url: 'https://data.footprintnetwork.org/',
-    scopeSummary: 'Ecological footprint accounting, national biocapacity deficits, and Earth Overshoot Day methodology.'
-  },
-  {
-    institution: 'Mission LiFE (Lifestyle for Environment)',
-    reportName: 'Global Movement for Mindful Consumption',
-    yearOrEdition: 'UNEP-supported framework',
-    url: 'https://missionlife-moefcc.nic.in/',
-    scopeSummary: 'Individual and community nudges prioritizing mindful utilization over mindless, disposable accumulation.'
+    scopeSummary: 'Ecological footprint accounting, national biocapacity deficits, and global Earth Overshoot Day calculations. Distinguishes systemic national infrastructure from household consumption.'
   },
   {
     institution: 'WRAP (Waste and Resources Action Programme)',
     reportName: 'Valuing Our Clothes: The Cost of UK Fashion',
-    yearOrEdition: 'Textile Lifespan Research',
+    yearOrEdition: 'Evidence report',
     url: 'https://wrap.org.uk/',
-    scopeSummary: 'Data verifying that extending clothing active use by 9 months reduces carbon, water, and waste footprints by 20–30%.'
+    scopeSummary: 'Empirical research demonstrating that extending active garment wear by an average of 9 months reduces carbon, water, and waste footprints by 20–30%.'
+  },
+  {
+    institution: 'Mission LiFE (Lifestyle for Environment)',
+    reportName: 'Framework for Mindful Consumption',
+    yearOrEdition: 'Multilateral policy framework (MoEFCC & UNEP)',
+    url: 'https://missionlife-moefcc.nic.in/',
+    scopeSummary: 'Behavioral insights encouraging thoughtful pauses, repairs, and community reuse over disposable consumption.'
   }
 ];
 
-export const SourcesModal: React.FC<SourcesModalProps> = ({ isOpen, onClose }) => {
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-      window.addEventListener('keydown', handleKeyDown);
-    }
-    return () => {
-      document.body.style.overflow = '';
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [isOpen, onClose]);
-
-  if (!isOpen) return null;
-
+export const SourcesModal: React.FC<SourcesModalProps> = ({ isOpen, onClose, triggerRef }) => {
   return (
-    <div
-      className="fixed inset-0 z-50 bg-[#202A35]/60 backdrop-blur-xs flex items-center justify-center p-4 sm:p-6"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="sources-title"
+    <AccessibleDialog
+      isOpen={isOpen}
+      onClose={onClose}
+      triggerRef={triggerRef}
+      titleId="sources-dialog-title"
+      title="Sources & Environmental Methodology"
+      descriptionId="sources-dialog-description"
+      description="Peer-reviewed research, multilateral lifecycle assessments, and accounting models underlying this project."
+      maxWidthClass="max-w-2xl"
     >
-      <div className="bg-[#FFF9F0] rounded-3xl max-w-2xl w-full max-h-[85vh] overflow-y-auto border border-[#202A35]/15 shadow-2xl p-6 sm:p-8 animate-in fade-in zoom-in-95 duration-200">
-        {/* Header */}
-        <div className="flex items-start justify-between gap-4 pb-4 border-b border-[#202A35]/10">
-          <div>
-            <div className="flex items-center gap-2 text-xs font-semibold tracking-wider uppercase text-[#425BFF] mb-1">
-              <BookOpen className="w-3.5 h-3.5" />
-              <span>CONTENT INTEGRITY & METHODOLOGY</span>
-            </div>
-            <h3 id="sources-title" className="font-editorial text-2xl font-bold text-[#202A35]">
-              Sources & Scientific Grounding
-            </h3>
-          </div>
-          <button
-            onClick={onClose}
-            className="p-2 rounded-xl text-[#202A35]/60 hover:text-[#202A35] hover:bg-[#202A35]/5 transition-colors cursor-pointer"
-            aria-label="Close modal"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
+      <div className="space-y-4">
+        <p className="text-xs sm:text-sm text-[#202A35]/80 leading-relaxed">
+          BEFORE WASTE synthesizes peer-reviewed environmental accounting, industrial lifecycle assessments (LCA), and published reports from international scientific bodies. We distinguish between systemic infrastructure (such as national energy grids and industrial supply chains) and individual household choices.
+        </p>
 
-        {/* Content */}
-        <div className="py-6 space-y-4">
-          <p className="text-xs sm:text-sm text-[#202A35]/75 leading-relaxed">
-            BEFORE WASTE is built on peer-reviewed environmental accounting, industrial lifecycle assessments (LCA), and credible multilateral institutions. We do not invent statistics or make unsubstantiated claims.
-          </p>
-
-          <div className="space-y-3 pt-2">
-            {SOURCES.map((source) => (
-              <div
-                key={source.reportName}
-                className="p-4 rounded-xl bg-white border border-[#202A35]/10 hover:border-[#425BFF]/40 transition-colors"
-              >
-                <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 mb-1">
-                  <span className="text-xs font-bold text-[#425BFF]">
-                    {source.institution}
-                  </span>
-                  <span className="text-[11px] text-[#202A35]/50 font-mono">
-                    {source.yearOrEdition}
-                  </span>
-                </div>
-                <h4 className="font-editorial text-base font-semibold text-[#202A35] mb-1">
-                  {source.reportName}
-                </h4>
-                <p className="text-xs text-[#202A35]/70 leading-relaxed mb-3">
-                  {source.scopeSummary}
-                </p>
-                <a
-                  href={source.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-xs font-medium text-[#202A35] hover:text-[#425BFF] transition-colors"
-                >
-                  <span>Visit official documentation</span>
-                  <ExternalLink className="w-3 h-3" />
-                </a>
+        <div className="space-y-3 pt-2">
+          {SOURCES.map((source) => (
+            <div
+              key={source.reportName}
+              className="p-4 rounded-xl bg-white border border-[#202A35]/10 hover:border-[#2840DE]/40 transition-colors"
+            >
+              <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 mb-1">
+                <span className="text-xs font-bold text-[#2840DE]">
+                  {source.institution}
+                </span>
+                <span className="text-[11px] text-[#202A35]/60 font-mono">
+                  {source.yearOrEdition}
+                </span>
               </div>
-            ))}
-          </div>
+              <h3 className="font-editorial text-base font-semibold text-[#202A35] mb-1">
+                {source.reportName}
+              </h3>
+              <p className="text-xs text-[#202A35]/75 leading-relaxed mb-3">
+                {source.scopeSummary}
+              </p>
+              <a
+                href={source.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-xs font-medium text-[#202A35] hover:text-[#2840DE] focus-visible:ring-2 focus-visible:ring-[#2840DE] rounded transition-colors"
+              >
+                <span>Visit official documentation</span>
+                <ExternalLink className="w-3.5 h-3.5" aria-hidden="true" />
+              </a>
+            </div>
+          ))}
         </div>
 
-        {/* Footer */}
-        <div className="pt-4 border-t border-[#202A35]/10 flex items-center justify-between">
-          <span className="text-xs text-[#202A35]/60">
-            All data strictly verified without generative hallucinations.
+        <div className="pt-4 border-t border-[#202A35]/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <span className="text-xs text-[#202A35]/65">
+            Every statistic connects directly to its corresponding publication.
           </span>
           <button
+            type="button"
             onClick={onClose}
-            className="px-4 py-2 text-xs font-medium rounded-xl text-white bg-[#202A35] hover:bg-[#FF654F] transition-colors cursor-pointer"
+            className="px-4 py-2.5 min-h-[44px] text-xs font-medium rounded-xl text-white bg-[#202A35] hover:bg-[#C53B27] focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#202A35] transition-colors cursor-pointer self-end sm:self-auto"
           >
-            Close
+            Close Dialog
           </button>
         </div>
       </div>
-    </div>
+    </AccessibleDialog>
   );
 };

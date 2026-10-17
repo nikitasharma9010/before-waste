@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { ArrowUp, Share2, RotateCcw, Check, Heart, Sparkles } from 'lucide-react';
+import { Share2, RotateCcw, Check, Sparkles } from 'lucide-react';
 
 interface ClosingSectionProps {
   onRestart: () => void;
-  onOpenSources: () => void;
+  onOpenSources: (triggerEl?: HTMLElement | null) => void;
 }
 
 export const ClosingSection: React.FC<ClosingSectionProps> = ({ onRestart, onOpenSources }) => {
-  const [copied, setCopied] = useState(false);
+  const [shareFeedback, setShareFeedback] = useState<string | null>(null);
 
   const handleShare = async () => {
     const shareData = {
@@ -16,33 +16,56 @@ export const ClosingSection: React.FC<ClosingSectionProps> = ({ onRestart, onOpe
       url: window.location.href
     };
 
-    if (navigator.share) {
+    // If Web Share API is available
+    if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
       try {
         await navigator.share(shareData);
-      } catch (err) {
-        // User cancelled or share failed, fallback to clipboard
+        setShareFeedback('Shared successfully!');
+        setTimeout(() => setShareFeedback(null), 3000);
+        return;
+      } catch (err: unknown) {
+        // Treat user cancellation as a normal, expected outcome
+        if (
+          err instanceof Error &&
+          (err.name === 'AbortError' || err.message.toLowerCase().includes('abort') || err.message.toLowerCase().includes('cancel'))
+        ) {
+          return;
+        }
+        // If native share failed for reasons other than cancellation, fall through to clipboard
       }
-    } else {
+    }
+
+    // Fallback: Copy URL to clipboard
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
       try {
         await navigator.clipboard.writeText(window.location.href);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2500);
-      } catch (err) {
-        console.warn('Clipboard write failed');
+        setShareFeedback('Link copied to clipboard!');
+        setTimeout(() => setShareFeedback(null), 3000);
+      } catch {
+        setShareFeedback('Could not copy link automatically.');
+        setTimeout(() => setShareFeedback(null), 3000);
       }
+    } else {
+      setShareFeedback('Sharing not supported on this browser.');
+      setTimeout(() => setShareFeedback(null), 3000);
     }
   };
 
   return (
-    <footer className="pt-20 pb-16 bg-[#202A35] text-[#FFF9F0] relative overflow-hidden">
+    <footer id="closing" className="scroll-mt-20 pt-20 pb-16 bg-[#202A35] text-[#FFF9F0] relative overflow-hidden">
+      {/* Accessible live status for share notifications */}
+      <div role="status" aria-live="polite" className="sr-only">
+        {shareFeedback || ''}
+      </div>
+
       {/* Soft gradient accent glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-5xl h-64 bg-gradient-to-b from-[#FF654F]/10 via-[#425BFF]/10 to-transparent pointer-events-none" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-5xl h-64 bg-gradient-to-b from-[#C53B27]/15 via-[#2840DE]/10 to-transparent pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Closing Editorial Reflection */}
         <div className="max-w-3xl mx-auto text-center space-y-6 mb-16">
           <div className="inline-flex items-center gap-2 text-xs font-semibold tracking-widest uppercase text-[#FFC857]">
-            <Sparkles className="w-3.5 h-3.5" />
+            <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
             <span>THE NEXT CHAPTER</span>
           </div>
 
@@ -50,68 +73,77 @@ export const ClosingSection: React.FC<ClosingSectionProps> = ({ onRestart, onOpe
             The next thing you buy already has a story.
           </h2>
 
-          <p className="font-editorial text-2xl sm:text-3xl italic text-[#FFF9F0]/80">
+          <p className="font-editorial text-2xl sm:text-3xl italic text-[#FFF9F0]/85">
             “You get to be part of what happens next.”
           </p>
 
-          <p className="text-sm sm:text-base text-[#FFF9F0]/70 leading-relaxed max-w-xl mx-auto font-sans pt-2">
+          <p className="text-sm sm:text-base text-[#FFF9F0]/75 leading-relaxed max-w-xl mx-auto font-sans pt-2">
             You don&apos;t have to be perfect. You don&apos;t have to renounce everything you own. Simply carry a little more curiosity into the stores, markets, and drawers of your everyday life.
           </p>
 
-          {/* Primary Action Button */}
-          <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
+          {/* Primary Action Button Bar */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 pt-4">
             <a
               href="#pause"
-              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl font-medium text-sm text-[#202A35] bg-[#FFC857] hover:bg-[#ffbe3b] transition-all shadow-md cursor-pointer"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3.5 min-h-[44px] rounded-xl font-bold text-sm text-[#202A35] bg-[#FFC857] hover:bg-[#EBB442] focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white transition-all shadow-md cursor-pointer text-center"
             >
               <span>Pause before the next thing</span>
             </a>
 
             <button
+              type="button"
               onClick={onRestart}
-              className="inline-flex items-center gap-2 px-5 py-3.5 rounded-xl font-medium text-sm text-white/90 hover:text-white bg-white/10 hover:bg-white/15 transition-colors cursor-pointer"
+              className="inline-flex items-center justify-center gap-2 px-5 py-3.5 min-h-[44px] rounded-xl font-semibold text-sm text-white/95 hover:text-white bg-white/10 hover:bg-white/20 focus-visible:ring-2 focus-visible:ring-white transition-colors cursor-pointer border border-white/15 text-center"
+              aria-label="Restart journey and return to Cotton T-Shirt stage one"
             >
-              <RotateCcw className="w-4 h-4" />
+              <RotateCcw className="w-4 h-4" aria-hidden="true" />
               <span>Explore from the beginning</span>
             </button>
 
             <button
+              type="button"
               onClick={handleShare}
-              className="inline-flex items-center gap-2 px-5 py-3.5 rounded-xl font-medium text-sm text-white/90 hover:text-white bg-white/10 hover:bg-white/15 transition-colors cursor-pointer"
+              className="inline-flex items-center justify-center gap-2 px-5 py-3.5 min-h-[44px] rounded-xl font-semibold text-sm text-white/95 hover:text-white bg-white/10 hover:bg-white/20 focus-visible:ring-2 focus-visible:ring-white transition-colors cursor-pointer border border-white/15 text-center"
+              aria-label="Share this story"
             >
-              {copied ? <Check className="w-4 h-4 text-[#0D9F91]" /> : <Share2 className="w-4 h-4" />}
-              <span>{copied ? 'Link Copied!' : 'Share Perspective'}</span>
+              {shareFeedback ? (
+                <Check className="w-4 h-4 text-[#FFC857]" aria-hidden="true" />
+              ) : (
+                <Share2 className="w-4 h-4" aria-hidden="true" />
+              )}
+              <span>{shareFeedback || 'Share Perspective'}</span>
             </button>
           </div>
         </div>
 
         {/* Divider */}
-        <div className="border-t border-white/10 pt-10 pb-8 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="border-t border-white/15 pt-10 pb-8 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-6 text-center sm:text-left">
             <span className="font-editorial text-xl font-bold tracking-tight text-white">
               BEFORE WASTE
             </span>
-            <span className="text-xs text-white/50">
+            <span className="text-xs text-white/60">
               Think before it becomes waste.
             </span>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-6 text-xs text-white/70">
-            <a href="#hero" className="hover:text-white transition-colors">
+          <div className="flex flex-wrap items-center justify-center gap-6 text-xs text-white/80">
+            <a href="#hero" className="hover:text-white focus-visible:ring-2 focus-visible:ring-white p-1 rounded transition-colors">
               Top
             </a>
-            <a href="#follow-one-thing" className="hover:text-white transition-colors">
+            <a href="#follow-one-thing" className="hover:text-white focus-visible:ring-2 focus-visible:ring-white p-1 rounded transition-colors">
               The 4 Objects
             </a>
-            <a href="#bigger-pattern" className="hover:text-white transition-colors">
+            <a href="#bigger-pattern" className="hover:text-white focus-visible:ring-2 focus-visible:ring-white p-1 rounded transition-colors">
               The Pattern
             </a>
-            <a href="#pause" className="hover:text-white transition-colors">
+            <a href="#pause" className="hover:text-white focus-visible:ring-2 focus-visible:ring-white p-1 rounded transition-colors">
               7-Day Pause
             </a>
             <button
-              onClick={onOpenSources}
-              className="hover:text-white transition-colors cursor-pointer underline underline-offset-4 decoration-white/40"
+              type="button"
+              onClick={(e) => onOpenSources(e.currentTarget)}
+              className="hover:text-white focus-visible:ring-2 focus-visible:ring-white p-1 rounded transition-colors cursor-pointer underline underline-offset-4 decoration-white/40"
             >
               Sources & Methodology
             </button>
@@ -119,7 +151,7 @@ export const ClosingSection: React.FC<ClosingSectionProps> = ({ onRestart, onOpe
         </div>
 
         {/* Quiet attribution */}
-        <div className="text-center text-xs text-white/40 pt-4">
+        <div className="text-center text-xs text-white/50 pt-2">
           <p>
             An independent educational exploration dedicated to mindful consumption and ecological curiosity.
           </p>

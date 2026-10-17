@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowDown, Compass, Sparkles, MapPin, Droplets, Users, Clock } from 'lucide-react';
+import { ArrowDown, Compass, Droplets, MapPin, Users, Clock, ChevronDown, ChevronUp } from 'lucide-react';
 
 interface HeroOpeningProps {
   onExploreObjects: (objectId?: string) => void;
@@ -8,8 +8,8 @@ interface HeroOpeningProps {
 interface Hotspot {
   id: string;
   name: string;
-  x: number; // percentage
-  y: number; // percentage
+  x: number;
+  y: number;
   icon: typeof MapPin;
   label: string;
   metric: string;
@@ -22,12 +22,12 @@ const TSHIRT_HOTSPOTS: Hotspot[] = [
     id: 'collar',
     name: 'Collar & Care Tag',
     x: 50,
-    y: 22,
+    y: 20,
     icon: MapPin,
-    label: 'The 12,000 km Transit',
+    label: 'Global Transit',
     metric: '4 Continents',
     description: 'Cotton grown in one hemisphere, spun in another, dyed in a third, and shipped across oceans before resting on your hanger.',
-    accent: '#FF654F'
+    accent: '#C53B27'
   },
   {
     id: 'chest',
@@ -36,9 +36,9 @@ const TSHIRT_HOTSPOTS: Hotspot[] = [
     y: 44,
     icon: Droplets,
     label: 'Embedded Water',
-    metric: '2,700 Liters',
-    description: 'Roughly 30 bathtubs of water were absorbed by cotton bolls in the field to produce the fabric for just one regular T-shirt.',
-    accent: '#425BFF'
+    metric: '~2,700 Liters',
+    description: 'Approximately 30 bathtubs of water were absorbed by cotton bolls in the field to produce the fabric for just one cotton shirt (Water Footprint Network).',
+    accent: '#2840DE'
   },
   {
     id: 'sleeve',
@@ -46,27 +46,27 @@ const TSHIRT_HOTSPOTS: Hotspot[] = [
     x: 23,
     y: 35,
     icon: Users,
-    label: 'Human Hands',
+    label: 'Human Labor',
     metric: '~80 Seams',
-    description: 'Over 30 individual human workers guided this garment through cutting tables, sewing lines, quality inspection, and folding.',
-    accent: '#0D9F91'
+    description: 'Garment workers in cut-and-sew workshops carefully stitch around eighty distinct seams on industrial overlock machines.',
+    accent: '#086E64'
   },
   {
     id: 'hem',
     name: 'Bottom Hem',
     x: 60,
-    y: 78,
+    y: 80,
     icon: Clock,
     label: 'Wear Frequency',
     metric: '7 to 10 Wears',
-    description: 'The average modern fast-fashion shirt is discarded after fewer than ten wears—long before its cotton fibers actually degrade.',
-    accent: '#FFC857'
+    description: 'In fast-fashion segments, garments are often discarded after fewer than ten wears—long before fibers actually degrade.',
+    accent: '#B88000'
   }
 ];
 
 export const HeroOpening: React.FC<HeroOpeningProps> = ({ onExploreObjects }) => {
   const [activeHotspot, setActiveHotspot] = useState<Hotspot>(TSHIRT_HOTSPOTS[1]);
-  const [revealedIndex, setRevealedIndex] = useState(3); // reveal all or toggle
+  const [showAllFragments, setShowAllFragments] = useState(false);
 
   const fragments = [
     { text: 'A field.', detail: 'Rainfed soil, warm sunshine, and cotton bolls.' },
@@ -76,48 +76,253 @@ export const HeroOpening: React.FC<HeroOpeningProps> = ({ onExploreObjects }) =>
   ];
 
   return (
-    <section id="hero" className="relative pt-8 pb-16 lg:pt-16 lg:pb-24 overflow-hidden">
+    <section id="hero" className="scroll-mt-20 relative pt-6 pb-16 lg:pt-14 lg:pb-24 overflow-hidden">
       {/* Background soft ambient tint */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-gradient-to-b from-[#FFF0EE]/60 via-[#FFF9F0]/30 to-transparent pointer-events-none -z-10" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-gradient-to-b from-[#FFF0EE]/50 via-[#FFF9F0]/30 to-transparent pointer-events-none -z-10" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Editorial Subtitle / Kicker (Zero pill, clean text) */}
-        <div className="flex items-center gap-2 text-xs font-semibold tracking-wider uppercase text-[#202A35]/60 mb-4">
+        {/* Editorial Kicker */}
+        <div className="flex items-center gap-2 text-xs font-semibold tracking-wider uppercase text-[#202A35]/70 mb-3">
           <span>BEFORE WASTE</span>
           <span aria-hidden="true">·</span>
           <span>AN INTERACTIVE STORY OF CONSUMPTION</span>
-          <span aria-hidden="true">·</span>
-          <span>EST. 2026</span>
         </div>
 
-        {/* Main 2-column layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
-          {/* Left Column: Compelling Question & Narrative */}
-          <div className="lg:col-span-7 space-y-8">
-            <h1 className="font-editorial text-4xl sm:text-5xl lg:text-6xl font-normal leading-[1.12] text-[#202A35] text-balance">
-              Where was your <span className="italic font-semibold text-[#FF654F]">T-shirt</span> before it was yours?
-            </h1>
+        {/* Headline */}
+        <h1 className="font-editorial text-3xl sm:text-5xl lg:text-6xl font-normal leading-[1.15] text-[#202A35] text-balance mb-6 lg:mb-10 max-w-4xl">
+          Where was your <span className="italic font-semibold text-[#C53B27]">T-shirt</span> before it was yours?
+        </h1>
 
-            {/* Revealed story fragments */}
-            <div className="space-y-3 pt-2">
-              <p className="text-xs font-medium text-[#202A35]/60 tracking-wider uppercase">
-                The hidden chapters of an everyday object:
+        {/* 2-Column Desktop Grid / Responsive Mobile Stack (Interactive T-shirt placed early on mobile) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-start">
+          
+          {/* Interactive T-Shirt Visual (Appears first on mobile right below headline!) */}
+          <div className="lg:col-span-5 order-1 lg:order-2 w-full">
+            <div className="bg-white rounded-3xl p-4 sm:p-6 lg:p-7 border border-[#202A35]/15 shadow-sm relative">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#C53B27]" aria-hidden="true" />
+                  <span className="text-xs font-semibold tracking-wider uppercase text-[#202A35]/80">
+                    Interactive Anatomy
+                  </span>
+                </div>
+                <span className="text-xs text-[#202A35]/70">Tap points on shirt</span>
+              </div>
+
+              {/* T-Shirt SVG illustration with interactive hotspots */}
+              <div className="bg-[#FFF9F0] rounded-2xl flex items-center justify-center p-3 sm:p-5 border border-[#202A35]/10 overflow-hidden">
+                {/* Aspect-ratio locked coordinate frame matching the 320:280 SVG viewBox exactly */}
+                <div className="relative w-full max-w-[320px] aspect-[320/280] select-none mx-auto">
+                  <svg
+                    viewBox="0 0 320 280"
+                    className="w-full h-full block drop-shadow-sm select-none"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    aria-label="Interactive illustration of a cotton T-shirt"
+                    role="img"
+                  >
+                    <defs>
+                      <linearGradient id="shirtGrad" x1="50" y1="20" x2="270" y2="260" gradientUnits="userSpaceOnUse">
+                        <stop offset="0%" stopColor="#FFFFFF" />
+                        <stop offset="100%" stopColor="#F5ECE2" />
+                      </linearGradient>
+                      <linearGradient id="collarGrad" x1="120" y1="20" x2="200" y2="70" gradientUnits="userSpaceOnUse">
+                        <stop offset="0%" stopColor="#EADDCF" />
+                        <stop offset="100%" stopColor="#DFD0C0" />
+                      </linearGradient>
+                      <pattern id="jerseyPattern" width="6" height="6" patternUnits="userSpaceOnUse">
+                        <path d="M 0 3 Q 3 0 6 3 Q 3 6 0 3" fill="none" stroke="#E2D6C8" strokeWidth="0.5" opacity="0.6" />
+                      </pattern>
+                    </defs>
+
+                    {/* Shirt Base Outline */}
+                    <path
+                      d="M 115 32 
+                         C 135 48, 185 48, 205 32 
+                         L 270 65 
+                         C 278 70, 285 85, 275 105 
+                         L 242 120 
+                         L 230 102 
+                         L 230 250 
+                         C 230 256, 224 260, 218 260 
+                         L 102 260 
+                         C 96 260, 90 256, 90 250 
+                         L 90 102 
+                         L 78 120 
+                         L 45 105 
+                         C 35 85, 42 70, 50 65 
+                         Z"
+                      fill="url(#shirtGrad)"
+                      stroke="#202A35"
+                      strokeWidth="2.5"
+                      strokeLinejoin="round"
+                      strokeLinecap="round"
+                    />
+
+                    {/* Jersey Texture overlay */}
+                    <path
+                      d="M 115 32 C 135 48, 185 48, 205 32 L 270 65 C 278 70, 285 85, 275 105 L 242 120 L 230 102 L 230 250 C 230 256, 224 260, 218 260 L 102 260 C 96 260, 90 256, 90 250 L 90 102 L 78 120 L 45 105 C 35 85, 42 70, 50 65 Z"
+                      fill="url(#jerseyPattern)"
+                    />
+
+                    {/* Collar detail */}
+                    <path
+                      d="M 115 32 C 135 52, 185 52, 205 32 C 185 40, 135 40, 115 32 Z"
+                      fill="url(#collarGrad)"
+                      stroke="#202A35"
+                      strokeWidth="2"
+                    />
+
+                    {/* Sleeve Stitch Lines */}
+                    <path d="M 90 102 L 115 50" stroke="#202A35" strokeWidth="1.5" strokeDasharray="3 3" opacity="0.6" />
+                    <path d="M 230 102 L 205 50" stroke="#202A35" strokeWidth="1.5" strokeDasharray="3 3" opacity="0.6" />
+                    {/* Bottom Hem Stitch Line */}
+                    <path d="M 90 248 L 230 248" stroke="#202A35" strokeWidth="1.5" strokeDasharray="4 3" opacity="0.5" />
+
+                    {/* Fabric folds */}
+                    <path d="M 155 75 Q 160 110 152 140" stroke="#E2D4C5" strokeWidth="2" strokeLinecap="round" />
+                    <path d="M 175 120 Q 170 160 178 200" stroke="#E2D4C5" strokeWidth="2" strokeLinecap="round" />
+                  </svg>
+
+                  {/* Hotspot buttons positioned relative to the EXACT SVG coordinate space */}
+                  {TSHIRT_HOTSPOTS.map((hotspot) => {
+                    const isSelected = activeHotspot.id === hotspot.id;
+                    const Icon = hotspot.icon;
+                    return (
+                      <button
+                        key={hotspot.id}
+                        type="button"
+                        onClick={() => setActiveHotspot(hotspot)}
+                        style={{ left: `${hotspot.x}%`, top: `${hotspot.y}%` }}
+                        className={`absolute -translate-x-1/2 -translate-y-1/2 min-w-[44px] min-h-[44px] flex items-center justify-center cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#202A35] rounded-full transition-transform ${
+                          isSelected ? 'scale-115 z-20' : 'hover:scale-110 z-10'
+                        }`}
+                        aria-label={`Inspect ${hotspot.name}: ${hotspot.label}`}
+                        aria-pressed={isSelected}
+                      >
+                        <div
+                          className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
+                            isSelected
+                              ? 'text-white shadow-md ring-4 ring-white'
+                              : 'bg-white text-[#202A35] shadow border border-[#202A35]/25 hover:border-[#C53B27]'
+                          }`}
+                          style={{
+                            backgroundColor: isSelected ? hotspot.accent : undefined
+                          }}
+                        >
+                          <Icon className="w-4 h-4" aria-hidden="true" />
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Active Hotspot Info Card */}
+              <div
+                className="mt-4 p-4 rounded-xl border bg-white transition-all duration-200"
+                style={{
+                  borderColor: `${activeHotspot.accent}60`
+                }}
+              >
+                <div className="flex items-center justify-between gap-2 mb-1">
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="w-2.5 h-2.5 rounded-full"
+                      style={{ backgroundColor: activeHotspot.accent }}
+                      aria-hidden="true"
+                    />
+                    <h2 className="text-sm font-semibold text-[#202A35]">
+                      {activeHotspot.name}
+                    </h2>
+                  </div>
+                  <span className="text-xs font-bold tracking-tight font-sans px-2.5 py-0.5 rounded bg-[#FFF9F0] border border-[#202A35]/15 text-[#202A35]">
+                    {activeHotspot.metric}
+                  </span>
+                </div>
+                <p className="text-xs font-medium text-[#202A35]/90 mb-1">
+                  {activeHotspot.label}
+                </p>
+                <p className="text-xs text-[#202A35]/80 leading-relaxed">
+                  {activeHotspot.description}
+                </p>
+              </div>
+
+              {/* Bottom Quick Object Selector (Wrap without clipping at 320px/375px) */}
+              <div className="mt-4 pt-4 border-t border-[#202A35]/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                <span className="text-xs font-medium text-[#202A35]/70 shrink-0">Also exploring:</span>
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => onExploreObjects('smartphone')}
+                    className="flex-1 sm:flex-none px-3 py-2 min-h-[40px] text-xs font-semibold rounded-lg bg-[#EEF1FF] text-[#1E32B6] hover:bg-[#2840DE] hover:text-white focus-visible:ring-2 focus-visible:ring-[#2840DE] transition-colors cursor-pointer text-center"
+                  >
+                    Smartphone
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onExploreObjects('food')}
+                    className="flex-1 sm:flex-none px-3 py-2 min-h-[40px] text-xs font-semibold rounded-lg bg-[#E6F8F6] text-[#06574F] hover:bg-[#086E64] hover:text-white focus-visible:ring-2 focus-visible:ring-[#086E64] transition-colors cursor-pointer text-center"
+                  >
+                    Fresh Apple
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onExploreObjects('package')}
+                    className="flex-1 sm:flex-none px-3 py-2 min-h-[40px] text-xs font-semibold rounded-lg bg-[#FFF9EB] text-[#202A35] border border-[#202A35]/15 hover:bg-[#FFC857] focus-visible:ring-2 focus-visible:ring-[#B88000] transition-colors cursor-pointer text-center"
+                  >
+                    Delivery Box
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Narrative & Progressive Disclosure (Order 2 on mobile, col-span-7 on desktop) */}
+          <div className="lg:col-span-7 order-2 lg:order-1 space-y-6">
+            {/* Supporting quote */}
+            <div>
+              <blockquote className="font-editorial text-xl sm:text-2xl text-[#202A35]/95 italic leading-snug border-l-0 pl-0">
+                “Everything has a story. Most of it happens before we notice.”
+              </blockquote>
+              <p className="mt-2 text-sm text-[#202A35]/80 leading-relaxed max-w-xl">
+                We live surrounded by objects made with planetary materials and human craftsmanship.
+                Yet we rarely think about where they came from—or what happens after we let go.
               </p>
+            </div>
+
+            {/* Revealed story fragments with progressive disclosure */}
+            <div className="space-y-3 pt-1">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-medium text-[#202A35]/70 tracking-wider uppercase">
+                  Chapters of an everyday T-shirt:
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setShowAllFragments(!showAllFragments)}
+                  className="inline-flex items-center gap-1 text-xs font-semibold text-[#202A35] hover:text-[#C53B27] cursor-pointer focus-visible:ring-2 focus-visible:ring-[#202A35] rounded p-1"
+                  aria-expanded={showAllFragments}
+                >
+                  <span>{showAllFragments ? 'Show fewer' : 'Read details'}</span>
+                  {showAllFragments ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                </button>
+              </div>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {fragments.map((frag, idx) => (
+                {fragments.slice(0, showAllFragments ? 4 : 2).map((frag, idx) => (
                   <div
                     key={frag.text}
-                    className="p-4 rounded-xl bg-white/70 border border-[#202A35]/8 hover:border-[#FF654F]/40 transition-colors"
+                    className="p-4 rounded-xl bg-white border border-[#202A35]/10 hover:border-[#C53B27]/40 transition-colors"
                   >
                     <div className="flex items-baseline gap-2 mb-1">
-                      <span className="font-editorial text-lg font-bold text-[#FF654F]">
+                      <span className="font-editorial text-lg font-bold text-[#C53B27]">
                         0{idx + 1}.
                       </span>
                       <h2 className="font-editorial text-lg font-semibold text-[#202A35]">
                         {frag.text}
                       </h2>
                     </div>
-                    <p className="text-xs text-[#202A35]/70 leading-relaxed">
+                    <p className="text-xs text-[#202A35]/75 leading-relaxed">
                       {frag.detail}
                     </p>
                   </div>
@@ -125,221 +330,35 @@ export const HeroOpening: React.FC<HeroOpeningProps> = ({ onExploreObjects }) =>
               </div>
             </div>
 
-            {/* Supporting line */}
-            <div className="pt-2">
-              <blockquote className="font-editorial text-xl sm:text-2xl text-[#202A35]/90 italic leading-snug border-l-0 pl-0">
-                “Everything has a story. Most of it happens before we notice.”
-              </blockquote>
-              <p className="mt-2 text-sm text-[#202A35]/75 leading-relaxed max-w-xl">
-                We live surrounded by objects made with incredible ingenuity, human labor, and earthly materials.
-                Yet we rarely meet them until they sit on store shelves—and we only think about waste when tossing them out.
-              </p>
-            </div>
-
-            {/* Clear Primary Action & Subtle Secondary Action */}
-            <div className="flex flex-wrap items-center gap-4 pt-4">
+            {/* Primary Action Button */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-3">
               <a
                 href="#follow-one-thing"
                 onClick={() => onExploreObjects('tshirt')}
-                className="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 text-base font-medium text-white bg-[#FF654F] hover:bg-[#e8543f] rounded-xl shadow-sm hover:shadow transition-all group"
+                className="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 min-h-[44px] text-sm font-semibold text-white bg-[#C53B27] hover:bg-[#AB2F1D] focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#C53B27] rounded-xl shadow-xs transition-all group text-center"
               >
                 <span>Follow the story</span>
-                <ArrowDown className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" />
+                <ArrowDown className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" aria-hidden="true" />
               </a>
 
               <a
                 href="#follow-one-thing"
                 onClick={() => onExploreObjects('smartphone')}
-                className="inline-flex items-center justify-center gap-2 px-5 py-3.5 text-sm font-medium text-[#202A35] hover:text-[#425BFF] bg-transparent hover:bg-[#202A35]/5 rounded-xl transition-colors"
+                className="inline-flex items-center justify-center gap-2 px-5 py-3.5 min-h-[44px] text-sm font-medium text-[#202A35] hover:text-[#1E32B6] bg-transparent hover:bg-[#202A35]/5 focus-visible:ring-2 focus-visible:ring-[#202A35] rounded-xl transition-colors text-center"
               >
-                <Compass className="w-4 h-4 text-[#425BFF]" />
+                <Compass className="w-4 h-4 text-[#2840DE]" aria-hidden="true" />
                 <span>Explore something else</span>
               </a>
             </div>
 
-            {/* Quick trust / mindset statement */}
-            <div className="pt-4 border-t border-[#202A35]/10 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-[#202A35]/70">
-              <span className="font-medium text-[#202A35]">Our Promise:</span>
-              <span>No guilt or shame</span>
-              <span aria-hidden="true">·</span>
-              <span>No lectures or preaching</span>
-              <span aria-hidden="true">·</span>
+            {/* Quiet trust statement */}
+            <div className="pt-3 border-t border-[#202A35]/10 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs text-[#202A35]/75">
+              <span className="font-semibold text-[#202A35]">Our Promise:</span>
+              <span>No guilt or lecturing</span>
+              <span aria-hidden="true" className="text-[#202A35]/40">·</span>
+              <span>No corporate spin</span>
+              <span aria-hidden="true" className="text-[#202A35]/40">·</span>
               <span>Just curiosity and better choices</span>
-            </div>
-          </div>
-
-          {/* Right Column: Original Interactive T-Shirt Visual */}
-          <div className="lg:col-span-5">
-            <div className="bg-white rounded-2xl p-6 sm:p-7 border border-[#202A35]/10 shadow-sm relative">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#FF654F]" />
-                  <span className="text-xs font-semibold tracking-wider uppercase text-[#202A35]/80">
-                    Interactive Anatomy
-                  </span>
-                </div>
-                <span className="text-xs text-[#202A35]/60">Tap points on the T-shirt</span>
-              </div>
-
-              {/* T-Shirt SVG illustration with interactive hotspots */}
-              <div className="relative aspect-[4/3.8] bg-[#FFF9F0] rounded-xl flex items-center justify-center p-4 border border-[#202A35]/5 overflow-hidden">
-                <svg
-                  viewBox="0 0 320 280"
-                  className="w-full h-full max-h-[300px] drop-shadow-md select-none transition-transform duration-300"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <defs>
-                    <linearGradient id="shirtGrad" x1="50" y1="20" x2="270" y2="260" gradientUnits="userSpaceOnUse">
-                      <stop offset="0%" stopColor="#FFFFFF" />
-                      <stop offset="100%" stopColor="#F5ECE2" />
-                    </linearGradient>
-                    <linearGradient id="collarGrad" x1="120" y1="20" x2="200" y2="70" gradientUnits="userSpaceOnUse">
-                      <stop offset="0%" stopColor="#EADDCF" />
-                      <stop offset="100%" stopColor="#DFD0C0" />
-                    </linearGradient>
-                    <pattern id="jerseyPattern" width="6" height="6" patternUnits="userSpaceOnUse">
-                      <path d="M 0 3 Q 3 0 6 3 Q 3 6 0 3" fill="none" stroke="#E2D6C8" strokeWidth="0.5" opacity="0.6" />
-                    </pattern>
-                  </defs>
-
-                  {/* Shirt Base Outline */}
-                  <path
-                    d="M 115 32 
-                       C 135 48, 185 48, 205 32 
-                       L 270 65 
-                       C 278 70, 285 85, 275 105 
-                       L 242 120 
-                       L 230 102 
-                       L 230 250 
-                       C 230 256, 224 260, 218 260 
-                       L 102 260 
-                       C 96 260, 90 256, 90 250 
-                       L 90 102 
-                       L 78 120 
-                       L 45 105 
-                       C 35 85, 42 70, 50 65 
-                       Z"
-                    fill="url(#shirtGrad)"
-                    stroke="#202A35"
-                    strokeWidth="2.5"
-                    strokeLinejoin="round"
-                    strokeLinecap="round"
-                  />
-
-                  {/* Jersey Texture overlay */}
-                  <path
-                    d="M 115 32 C 135 48, 185 48, 205 32 L 270 65 C 278 70, 285 85, 275 105 L 242 120 L 230 102 L 230 250 C 230 256, 224 260, 218 260 L 102 260 C 96 260, 90 256, 90 250 L 90 102 L 78 120 L 45 105 C 35 85, 42 70, 50 65 Z"
-                    fill="url(#jerseyPattern)"
-                  />
-
-                  {/* Collar detail */}
-                  <path
-                    d="M 115 32 C 135 52, 185 52, 205 32 C 185 40, 135 40, 115 32 Z"
-                    fill="url(#collarGrad)"
-                    stroke="#202A35"
-                    strokeWidth="2"
-                  />
-
-                  {/* Sleeve Stitch Lines */}
-                  <path d="M 90 102 L 115 50" stroke="#202A35" strokeWidth="1.5" strokeDasharray="3 3" opacity="0.6" />
-                  <path d="M 230 102 L 205 50" stroke="#202A35" strokeWidth="1.5" strokeDasharray="3 3" opacity="0.6" />
-                  {/* Bottom Hem Stitch Line */}
-                  <path d="M 90 248 L 230 248" stroke="#202A35" strokeWidth="1.5" strokeDasharray="4 3" opacity="0.5" />
-
-                  {/* Fabric folds */}
-                  <path d="M 155 75 Q 160 110 152 140" stroke="#E2D4C5" strokeWidth="2" strokeLinecap="round" />
-                  <path d="M 175 120 Q 170 160 178 200" stroke="#E2D4C5" strokeWidth="2" strokeLinecap="round" />
-                </svg>
-
-                {/* Hotspot buttons */}
-                {TSHIRT_HOTSPOTS.map((hotspot) => {
-                  const isSelected = activeHotspot.id === hotspot.id;
-                  const Icon = hotspot.icon;
-                  return (
-                    <button
-                      key={hotspot.id}
-                      onClick={() => setActiveHotspot(hotspot)}
-                      style={{ left: `${hotspot.x}%`, top: `${hotspot.y}%` }}
-                      className={`absolute -translate-x-1/2 -translate-y-1/2 group cursor-pointer focus:outline-none transition-transform ${
-                        isSelected ? 'scale-115 z-20' : 'hover:scale-110 z-10'
-                      }`}
-                      aria-label={`Inspect ${hotspot.name}`}
-                    >
-                      <div
-                        className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
-                          isSelected
-                            ? 'text-white shadow-md ring-4 ring-white'
-                            : 'bg-white text-[#202A35] shadow border border-[#202A35]/20 hover:border-[#FF654F]'
-                        }`}
-                        style={{
-                          backgroundColor: isSelected ? hotspot.accent : undefined
-                        }}
-                      >
-                        <Icon className="w-4 h-4" />
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Active Hotspot Info Card */}
-              <div
-                className="mt-4 p-4 rounded-xl border transition-all duration-200"
-                style={{
-                  backgroundColor: `${activeHotspot.accent}0D`,
-                  borderColor: `${activeHotspot.accent}40`
-                }}
-              >
-                <div className="flex items-center justify-between gap-2 mb-1">
-                  <div className="flex items-center gap-2">
-                    <span
-                      className="w-2 h-2 rounded-full"
-                      style={{ backgroundColor: activeHotspot.accent }}
-                    />
-                    <h3 className="text-sm font-semibold text-[#202A35]">
-                      {activeHotspot.name}
-                    </h3>
-                  </div>
-                  <span
-                    className="text-xs font-bold tracking-tight font-sans px-2 py-0.5 rounded bg-white border border-[#202A35]/10"
-                    style={{ color: activeHotspot.accent }}
-                  >
-                    {activeHotspot.metric}
-                  </span>
-                </div>
-                <p className="text-xs font-medium text-[#202A35]/80 mb-1">
-                  {activeHotspot.label}
-                </p>
-                <p className="text-xs text-[#202A35]/70 leading-relaxed">
-                  {activeHotspot.description}
-                </p>
-              </div>
-
-              {/* Bottom Quick Object Selector */}
-              <div className="mt-4 pt-4 border-t border-[#202A35]/8 flex items-center justify-between">
-                <span className="text-xs text-[#202A35]/60">Also exploring:</span>
-                <div className="flex items-center gap-1.5">
-                  <button
-                    onClick={() => onExploreObjects('smartphone')}
-                    className="px-2.5 py-1 text-xs font-medium rounded-md bg-[#EEF1FF] text-[#425BFF] hover:bg-[#425BFF] hover:text-white transition-colors cursor-pointer"
-                  >
-                    Smartphone
-                  </button>
-                  <button
-                    onClick={() => onExploreObjects('food')}
-                    className="px-2.5 py-1 text-xs font-medium rounded-md bg-[#E6F8F6] text-[#0D9F91] hover:bg-[#0D9F91] hover:text-white transition-colors cursor-pointer"
-                  >
-                    Fresh Produce
-                  </button>
-                  <button
-                    onClick={() => onExploreObjects('package')}
-                    className="px-2.5 py-1 text-xs font-medium rounded-md bg-[#FFF9EB] text-[#b88000] hover:bg-[#FFC857] hover:text-[#202A35] transition-colors cursor-pointer"
-                  >
-                    Delivery Box
-                  </button>
-                </div>
-              </div>
             </div>
           </div>
         </div>

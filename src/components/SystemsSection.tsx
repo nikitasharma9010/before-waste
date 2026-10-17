@@ -42,11 +42,11 @@ const SYSTEM_PILLARS: SystemPillar[] = [
 
 export const SystemsSection: React.FC = () => {
   return (
-    <section id="systems" className="py-16 lg:py-24 bg-[#FFF9F0] border-b border-[#202A35]/8">
+    <section id="systems" className="scroll-mt-20 py-16 lg:py-24 bg-[#FFF9F0] border-b border-[#202A35]/8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="max-w-3xl mb-12">
-          <div className="flex items-center gap-2 text-xs font-semibold tracking-wider uppercase text-[#0D9F91] mb-2">
+          <div className="flex items-center gap-2 text-xs font-semibold tracking-wider uppercase text-[#086E64] mb-2">
             <span>COLLECTIVE CONVERSATION</span>
             <span aria-hidden="true">·</span>
             <span>INDIVIDUALS & SYSTEMS</span>
@@ -66,7 +66,7 @@ export const SystemsSection: React.FC = () => {
             return (
               <div
                 key={pillar.title}
-                className="bg-white rounded-2xl border border-[#202A35]/10 p-6 sm:p-7 shadow-xs hover:border-[#0D9F91]/40 transition-colors flex flex-col justify-between"
+                className="bg-white rounded-2xl border border-[#202A35]/10 p-5 sm:p-7 shadow-xs hover:border-[#0D9F91]/40 transition-colors flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-center justify-between mb-4">

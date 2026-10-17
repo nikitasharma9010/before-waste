@@ -6,10 +6,10 @@
   
   --color-warm-ivory: #FFF9F0;
   --color-deep-ink: #202A35;
-  --color-vibrant-coral: #FF654F;
-  --color-electric-cobalt: #425BFF;
+  --color-vibrant-coral: #C53B27;
+  --color-electric-cobalt: #2840DE;
   --color-sunny-marigold: #FFC857;
-  --color-fresh-teal: #0D9F91;
+  --color-fresh-teal: #086E64;
   --color-soft-lavender: #EAE3FF;
 }
 
@@ -21,9 +21,26 @@ body {
   font-family: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   background-color: #FFF9F0;
   color: #202A35;
-  overflow-x: hidden;
 }
 
 h1, h2, h3, .font-editorial {
   font-family: "Fraunces", Georgia, serif;
+}
+
+/* Accessible focus visible default */
+:focus-visible {
+  outline: none;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto !important;
+  }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
