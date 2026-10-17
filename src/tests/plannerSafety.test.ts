@@ -74,3 +74,22 @@ it('keeps legacy stored plans readable while enforcing stricter new provider out
   expect(parsePlan(legacy)).not.toBeNull();
   await expect(generatePlan(input,{...env,AI_PROVIDER:'gemini'},vi.fn().mockResolvedValue(gemini(legacy)))).rejects.toThrow('usable plan');
 });
+
+it.each(['gemini','aicredits'])('supports actionable button-check guidance through %s with the same clarification rules', async provider => {
+  const buttonPlan: AIPlan = {
+    status: 'ready', action: 'Check the fabric and spare button before sewing',
+    summary: 'A simple missing button can be a manageable hand-sewing task if the attachment area is sound.',
+    reason: 'You are deciding whether sewing a spare button fits, so a short checklist helps without requiring an interview.',
+    steps: ['Check whether the attachment area is intact; torn fabric may need a different repair.', 'Compare the spare button with the buttonhole and check for a usable needle and thread.', 'If the checks fit and you feel comfortable, follow a suitable hand-sewing guide; otherwise ask for help.'],
+    alternative: '', questions: [], resourceIds: ['clothing'],
+  };
+  const upstream = vi.fn().mockResolvedValue((provider === 'gemini' ? gemini : chat)(buttonPlan));
+  const result = await generatePlan({...input,description:'A button popped off my jacket. I am considering sewing a spare button on. What should I check?'},{...env,AI_PROVIDER:provider},upstream);
+  expect(result.plan).toEqual(buttonPlan);
+  const body = JSON.parse(upstream.mock.calls[0][1].body);
+  const instructions = provider === 'gemini' ? body.system_instruction : body.messages[0].content;
+  expect(instructions).toContain('A request for checks or decision criteria should receive useful checks');
+  expect(instructions).toContain('Reserve clarify for a missing fact that materially changes safety');
+  expect(instructions).toContain('Resources are not a quota');
+  expect(instructions).toContain('Food safety, hazardous materials, structural damage and electrical risks retain their stricter boundaries');
+});
