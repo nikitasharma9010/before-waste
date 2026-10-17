@@ -121,7 +121,7 @@ it('enforces method, origin, media type, malformed and oversized body constraint
   expect((await invoke(input, { origin: 'https://other.test' })).status).toBe(403);
   expect((await invoke(input, { 'content-type': 'text/plain' })).status).toBe(415);
   expect((await invoke('not-json')).status).toBe(400);
-  expect((await invoke({ ...input, description: 'a'.repeat(7000) })).status).toBe(413);
+  expect((await invoke({ ...input, description: 'a'.repeat(33000) })).status).toBe(413);
 });
 it('returns validated AI output through the actual API handler without exposing configuration', async () => {
   vi.stubEnv('GEMINI_API_KEY', 'test-api-key'); vi.stubEnv('GEMINI_MODEL', 'gemini-3.8-flash');
@@ -209,4 +209,26 @@ it('rejects unsupported tables, HTML and fenced answers instead of displaying br
     expect(parsePlan({ ...plan, summary })).toBeNull();
   }
   expect(parsePlan({ ...plan, steps: ['- '] })).toBeNull();
+});
+it('bounds conversation context and strips extra fields before forwarding', () => {
+  const context = [{ question: 'I live in Pune and have no garden.', answer: 'Start with prevention.', note: 'private' }];
+  expect(parsePlannerRequest({ ...input, context })?.context).toEqual([{ question: context[0].question, answer: context[0].answer }]);
+  for (const context of [Array(3).fill({ question: 'q', answer: 'a' }), [{ question: 'q'.repeat(1701), answer: 'a' }], [{ question: 'q', answer: 7 }]]) {
+    expect(parsePlannerRequest({ ...input, context })).toBeNull();
+  }
+});
+it('forwards bounded previous turns and rejects extra steps for an explicit one-action request', async () => {
+  const requestInput = { ...input, description: 'Give me exactly ONE no-cost action for my headphones.', context: [{ question: 'I have no tools.', answer: 'Check support.' }] };
+  const upstream = vi.fn().mockResolvedValue(Response.json(completed(plan)));
+  await expect(generatePlan(requestInput, env, upstream)).rejects.toThrow('usable plan');
+  const body = JSON.parse(upstream.mock.calls[0][1].body);
+  expect(body.response_format.schema.properties.steps.maxItems).toBe(1);
+  expect(JSON.parse(body.input).previousTurns).toEqual(requestInput.context);
+  const one = { ...plan, steps: [plan.steps[0]] };
+  expect((await generatePlan(requestInput, env, vi.fn().mockResolvedValue(Response.json(completed(one))))).plan.steps).toHaveLength(1);
+});
+it('retains essential deterministic safety guidance even when one action is requested', async () => {
+  const result = await generatePlan({ ...input, description: 'Give me one action for my phone with a swollen battery.' }, {});
+  expect(result.source).toBe('safety');
+  expect(result.plan.steps).toHaveLength(2);
 });

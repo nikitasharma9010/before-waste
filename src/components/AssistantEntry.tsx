@@ -1,13 +1,16 @@
+import { readAction } from '../utils/actionStorage';
 import { useState } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { handoffQuestion } from '../utils/questionDraft';
 
 export function AssistantEntry() {
+  const [saved] = useState(() => readAction().action);
   const [question, setQuestion] = useState('');
   const [error, setError] = useState('');
   return <section id="assistant-entry" aria-labelledby="entry-title" className="border-y border-ink/10 bg-sage py-8 sm:py-10">
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 grid gap-6 lg:grid-cols-2 lg:items-center">
       <div><p className="section-kicker text-forest">A PRACTICAL NEXT STEP</p><h2 id="entry-title" className="mt-3 font-editorial text-2xl sm:text-3xl">A question about what comes next?</h2><p className="mt-3 max-w-xl text-ink/80">Ask about any item, repair, reuse or sustainable living. Continue to a dedicated space to add context, review guidance and save an action.</p></div>
+      <div>{saved && <a href="/ask#saved-action" className="mb-4 inline-flex min-h-[44px] items-center font-semibold text-forest underline underline-offset-4">Continue my saved action</a>}
       <form action="/ask" method="get" className="space-y-3" onSubmit={event => {
         if (!handoffQuestion(question)) { event.preventDefault(); setError('This browser could not carry your draft. Copy your question, then open the assistant using the link below.'); }
       }}>
@@ -16,7 +19,7 @@ export function AssistantEntry() {
         <p id="entry-hint" className="text-sm text-ink/80">Use 10-1500 characters. Continue keeps your draft temporarily in this tab. Nothing is sent to AI yet. Leave out private information.</p>
         <button type="submit" className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-forest px-5 py-3 font-semibold text-white hover:bg-forest-strong">Continue to assistant<ArrowRight aria-hidden="true" className="h-4 w-4" /></button>
         {error && <div role="alert" className="text-sm"><p>{error}</p><a href="/ask" className="inline-flex min-h-[44px] items-center font-semibold text-forest underline">Open assistant without the draft</a></div>}
-      </form>
+      </form></div>
     </div>
   </section>;
 }

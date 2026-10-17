@@ -38,16 +38,16 @@ export const SCENARIOS_DATA: Scenario[] = [
         actionSummary: 'Investigating whether a quick fix or local repair cafe can bring them back to life.',
         nuanceTitle: 'A curious and rewarding choice',
         nuanceBody: 'A sound problem can have several causes, including settings, connections or a damaged component. Start with the manufacturer’s troubleshooting and warranty information for your model. A repair assessment can help you decide whether a fix is practical; the time and cost vary.',
-        practicalInsight: 'Community Repair Cafes are volunteer spaces worldwide where neighbors fix electronics together for free over coffee. Many people discover that fixing something with their own hands turns frustration into confidence.',
-        nextStepSuggestion: 'Search "Repair Cafe near me" or look up your headphone model on iFixit to see step-by-step disassembly guides.'
+        practicalInsight: 'Repair Cafés are a volunteer repair network. Availability, accepted items, charges and volunteer expertise vary; contact the group before travelling.',
+        nextStepSuggestion: 'Check your model’s manufacturer troubleshooting and warranty guidance first. For internal faults or batteries, ask qualified repair support rather than opening the device.'
       },
       {
         id: 'replace_part',
         label: 'Check whether a part can be replaced',
         actionSummary: 'Inspecting whether only the battery, cable, or ear pad needs swapping.',
         nuanceTitle: 'Targeting the specific point of wear',
-        nuanceBody: 'Often, the audio drivers inside headphones are built to last for decades, but the synthetic leather ear pads flake after 18 months, or a wireless battery loses capacity after 500 charge cycles. Replacing the worn component preserves 90% of the working hardware.',
-        practicalInsight: 'Third-party ear pads and modular cables are widely available online for under $10–$15 and snap on in seconds without any special technical tools.',
+        nuanceBody: 'A worn cushion or detachable cable may be replaceable while other parts still work. Lifespan and repairability depend on the model, condition and available parts. A battery fault needs qualified advice.',
+        practicalInsight: 'Check the exact model and manufacturer fitting instructions before buying a part. Compatibility, tools, difficulty and total cost vary; a similar-looking part may not fit.',
         nextStepSuggestion: 'Check if your headphone brand sells modular replacement cushions, headbands, or audio cables.'
       }
     ]
@@ -65,15 +65,15 @@ export const SCENARIOS_DATA: Scenario[] = [
         nuanceTitle: 'When time and energy are short',
         nuanceBody: 'When we have hectic schedules or limited sewing experience, putting a garment aside is a very common response. However, charity sorting facilities often reject garments with missing buttons or tears because they lack on-site repair teams.',
         practicalInsight: 'Most quality coats come with an extra spare button stitched discreetly into the interior lining or care label tag! Taking a quick look inside often reveals the exact match.',
-        nextStepSuggestion: 'Even if you want a new style, having the button fixed first ensures the coat can actually find a happy second owner at a charity shop.'
+        nextStepSuggestion: 'Even if you want a new style, repairing the button may help, but ask the recipient whether they accept the coat in its current condition.'
       },
       {
         id: 'sew_it',
-        label: 'Sew a spare button on in 5 minutes',
+        label: 'Sew a spare button on',
         actionSummary: 'Grabbing a basic needle, thread, and stitching a replacement button in place.',
-        nuanceTitle: 'The satisfying 5-minute superpower',
-        nuanceBody: 'Sewing a button is one of the most empowering basic domestic skills. It requires zero machinery—just a needle, some thread, and two minutes. It instantly rescues a $150 coat from disuse.',
-        practicalInsight: 'Mismatched buttons can even add personalized personality (known as "visible mending" or Japanese *mottainai* / *boro*), making your coat unique and full of character.',
+        nuanceTitle: 'A useful mending skill',
+        nuanceBody: 'A basic button repair may need a needle, suitable thread and a replacement button. Time and difficulty depend on the fabric and your experience; ask someone who sews if you need help.',
+        practicalInsight: 'A contrasting button can make a repair part of the garment’s character. Check that its size and fastening work before sewing it in place.',
         nextStepSuggestion: 'Keep a small travel sewing kit in a desk drawer. You\'ll be amazed how often a needle and thread saves the day for you or a colleague.'
       },
       {
@@ -81,7 +81,7 @@ export const SCENARIOS_DATA: Scenario[] = [
         label: 'Take it to a local tailor or dry-cleaner',
         actionSummary: 'Dropping it off at the neighborhood alteration shop on the corner.',
         nuanceTitle: 'Supporting local craftspeople in your neighborhood',
-        nuanceBody: 'Local seamstresses, dry-cleaners, and cobblers are the quiet backbone of the circular economy. For just $3–$5, an experienced tailor will re-stitch the button securely with industrial thread in under two minutes.',
+        nuanceBody: 'Local seamstresses, dry-cleaners, and cobblers are the quiet backbone of the circular economy. Ask about the price, turnaround and whether you need to supply a button before agreeing to the repair.',
         practicalInsight: 'Using local repair services supports neighborhood independent small businesses while keeping skilled craft traditions alive in our communities.',
         nextStepSuggestion: 'Take a mental note of your nearest tailor or shoe repair shop the next time you walk through your neighborhood.'
       }

@@ -81,3 +81,19 @@ it('preserves the draft and offers manual recovery when tab storage is unavailab
   expect(host.querySelector('[role="alert"]')?.textContent).toContain('Copy your question');
   expect(host.querySelector('a[href="/ask"]')).not.toBeNull();
 });
+it('connects the final story stage to an editable question without calling AI', async () => {
+  Element.prototype.scrollIntoView = vi.fn();
+  const request = vi.fn(); vi.stubGlobal('fetch', request);
+  await act(async () => root.render(<App />));
+  const stages = [...host.querySelectorAll<HTMLButtonElement>('button')].filter(b => b.getAttribute('aria-label')?.startsWith('Next:'));
+  expect(stages.length).toBeGreaterThan(0);
+  for (let i = 0; i < 4; i++) {
+    const next = host.querySelector<HTMLButtonElement>('button[aria-label^="Next:"]')!;
+    await act(async () => next.click());
+  }
+  const link = [...host.querySelectorAll<HTMLAnchorElement>('a')].find(a => a.textContent === 'Plan my next step')!;
+  expect(link.getAttribute('href')).toBe('/ask');
+  await act(async () => link.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true })));
+  expect(takeQuestionDraft()).toContain('T-shirt');
+  expect(request).not.toHaveBeenCalled();
+});

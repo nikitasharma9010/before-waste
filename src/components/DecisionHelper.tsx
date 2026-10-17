@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import { LoaderCircle } from 'lucide-react';
 import { barrierLabels, intentLabels, issues, itemLabels, recommend, recoveryAdvice, sameDecision, type Barrier, type Decision } from '../data/decisionData';
 import { readAction, writeAction, type SavedAction, type Outcome } from '../utils/actionStorage';
-import { planText, type GeneratedPlan } from '../data/aiPlan';
+import { planText, type GeneratedPlan, type PlannerContext } from '../data/aiPlan';
 import { AIPlannerForm } from './AIPlannerForm';
 import { AIPlanContent } from './AIPlanContent';
 
@@ -20,6 +20,9 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
   const [editedPlan, setEditedPlan] = useState('');
   const [answeredQuestion, setAnsweredQuestion] = useState('');
   const [asking, setAsking] = useState(false);
+  const [history, setHistory] = useState<PlannerContext[]>([]);
+  const [conversationKey, setConversationKey] = useState(0);
+  const context = generated ? [...history, { question: answeredQuestion, answer: planText(generated.plan).slice(0, 1000) }].slice(-2) : [];
   const showBasic = () => {
     setDecision({ ...decision }); setGenerated(null); setEditedPlan(''); setAnsweredQuestion('');
     setResult({ ...decision });
@@ -31,7 +34,7 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
   const savedRef = useRef<HTMLHeadingElement>(null);
   const advice = result ? recommend(result) : null;
   const isSameSaved = !!(saved && result && sameDecision(saved, result) &&
-    (generated ? saved.customPlan?.text === editedPlan && saved.customPlan.source === generated.source : !saved.customPlan));
+    (generated ? saved.question === answeredQuestion && saved.customPlan?.text === editedPlan && saved.customPlan.source === generated.source : !saved.customPlan));
   const change = <K extends keyof Decision>(key: K, value: Decision[K]) => {
     setDecision({ ...decision, [key]: value, ...(key === 'item' ? { issue: 'unsure' as const } : {}) });
     setResult(null);
@@ -55,21 +58,11 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
       return;
     }
     setUndoAction(saved);
-    persist({ ...result, note: '', outcome: 'planned', ...(generated ? { customPlan: { ...generated, text: editedPlan } } : {}) });
+    persist({ ...result, note: '', outcome: 'planned', ...(generated ? { question: answeredQuestion, customPlan: { ...generated, text: editedPlan } } : {}) });
     requestAnimationFrame(() => savedRef.current?.focus());
   };
-  return (
-    <section id="decision-helper" tabIndex={-1} aria-labelledby="decision-title" className={`scroll-mt-20 border-y border-ink/10 bg-sage ${standalone ? 'py-8 lg:py-12' : 'py-16 lg:py-24'}`}>
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="max-w-3xl mb-8">
-          <p className="section-kicker text-forest mb-3">ONE OBJECT. ONE NEXT STEP.</p>
-          <Heading ref={titleRef} tabIndex={-1} id="decision-title" className="scroll-mt-20 font-editorial text-3xl sm:text-4xl lg:text-5xl">{standalone ? 'Ask Before Waste' : 'What should I do with this?'}</Heading>
-          <p className="mt-4 text-lg">{standalone ? 'Ask about everyday items and lower-waste living. Add context to find a practical starting point.' : 'Before you buy, replace or let something go, find a starting point that fits your life.'}</p>
-          <p className="mt-2 text-sm text-ink/80">{standalone ? 'No account needed. You choose what to save.' : 'Ask about any item, reducing waste or sustainable living. No account needed.'}</p>
-          {saved && <a href="#saved-action" onClick={() => savedRef.current?.focus({ preventScroll: true })} className="mt-4 inline-flex min-h-[44px] items-center font-semibold text-forest underline underline-offset-4">Return to my saved action</a>}
-        </div>
-        <div className={standalone ? 'flex max-w-3xl flex-col gap-6' : 'grid gap-6 lg:grid-cols-2 items-start'}>
-          <div className="min-w-0 rounded-2xl border border-ink/15 bg-surface p-5 sm:p-8 space-y-5">
+  const composer = (
+    <div className="min-w-0 rounded-2xl border border-ink/15 bg-surface p-5 sm:p-8 space-y-5">
             {!standalone && <div role="group" className="flex flex-wrap gap-2" aria-label="Question mode">
               {[['anything', 'Ask freely'], ['clothes', 'Use guided examples']].map(([item, label]) => <button key={item} type="button" aria-pressed={item === 'anything' ? decision.item === 'anything' : decision.item !== 'anything'} className="min-h-[44px] rounded-xl border border-forest px-4 py-2 font-semibold aria-pressed:bg-forest aria-pressed:text-white" onClick={() => {
                 setDecision({ item: item as Decision['item'], intent: item === 'anything' ? 'explore' : 'buy', support: 'myself', budget: 'free' });
@@ -103,7 +96,8 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
               </select>
             </label>}
             </>}
-            <AIPlannerForm standalone={standalone} initialQuestion={initialQuestion} decision={decision} hasDraft={!!generated} onBusyChange={setAsking} onResult={(snapshot, plan, question) => {
+            <AIPlannerForm key={conversationKey} context={context} followUp={!!generated} standalone={standalone} initialQuestion={conversationKey === 0 ? initialQuestion : ''} decision={decision} hasDraft={!!generated} onBusyChange={setAsking} onResult={(snapshot, plan, question) => {
+              if (generated) setHistory(context);
               setAnsweredQuestion(question);
               setResult(snapshot); setGenerated(plan); setEditedPlan(planText(plan.plan));
               requestAnimationFrame(() => resultRef.current?.focus());
@@ -115,10 +109,24 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
             <p className="text-sm text-ink/80">General starting points. Your object’s condition, model and local services can change what is possible.</p>
             </>}
           </div>
+  );
+  return (
+    <section id="decision-helper" tabIndex={-1} aria-labelledby="decision-title" className={`scroll-mt-20 border-y border-ink/10 bg-sage ${standalone ? 'py-8 lg:py-12' : 'py-16 lg:py-24'}`}>
+      <div className={`mx-auto ${standalone ? 'max-w-4xl' : 'max-w-7xl'} px-4 sm:px-6 lg:px-8`}>
+        <div className={`max-w-3xl ${standalone ? 'mb-5' : 'mb-8'}`}>
+          {!standalone && <p className="section-kicker text-forest mb-3">ONE OBJECT. ONE NEXT STEP.</p>}
+          <Heading ref={titleRef} tabIndex={-1} id="decision-title" className="scroll-mt-20 font-editorial text-3xl sm:text-4xl lg:text-5xl">{standalone ? 'Ask Before Waste' : 'What should I do with this?'}</Heading>
+          <p className={standalone ? 'mt-2 text-base' : 'mt-4 text-lg'}>{standalone ? 'Find a practical next step for your items and lower-waste living.' : 'Before you buy, replace or let something go, find a starting point that fits your life.'}</p>
+          <p className="mt-2 text-sm text-ink/80">{standalone ? 'No account needed. Save an action when you’re ready.' : 'Ask about any item, reducing waste or sustainable living. No account needed.'}</p>
+          {saved && <a href="#saved-action" onClick={() => savedRef.current?.focus({ preventScroll: true })} className="mt-4 inline-flex min-h-[44px] items-center font-semibold text-forest underline underline-offset-4">Return to my saved action</a>}
+        </div>
+        <div className={standalone ? 'flex max-w-3xl flex-col gap-6' : 'grid gap-6 lg:grid-cols-2 items-start'}>
+          {!standalone && composer}
           {standalone && asking ? <div aria-hidden="true" className="mr-auto w-full max-w-full animate-pulse rounded-2xl rounded-bl-sm border border-ink/15 bg-paper p-5 sm:p-8">
             <div className="flex items-center gap-2 text-sm font-semibold text-ink/60"><LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" /><span>Preparing your answer…</span></div>
             <div className="mt-4 space-y-2"><div className="h-3 w-3/4 rounded-full bg-ink/10" /><div className="h-3 w-1/2 rounded-full bg-ink/10" /><div className="h-3 w-2/3 rounded-full bg-ink/10" /></div>
-          </div> : (!standalone || result) && <>
+          </div> : null}
+          {(!standalone || result) && <>
           {standalone && generated && <div className="ml-auto max-w-[88%] rounded-2xl rounded-br-sm bg-forest px-4 py-3 text-white sm:px-5 sm:py-4">
             <p className="text-xs font-semibold uppercase tracking-wide text-white/85">You asked</p>
             <p className="mt-1 whitespace-pre-wrap break-words text-sm">{answeredQuestion}</p>
@@ -130,12 +138,12 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
                   <p className="text-xs font-semibold uppercase tracking-wide">Answering your question</p><p className="mt-2 whitespace-pre-wrap break-words text-sm">{answeredQuestion}</p>
                   <button type="button" onClick={editQuestion} className="mt-2 min-h-[44px] py-2 text-sm font-semibold text-forest underline underline-offset-4">{generated.plan.status === 'clarify' ? 'Add details to my question' : 'Edit my question'}</button>
                 </div>}
-                {standalone && <button type="button" onClick={editQuestion} className="mb-4 min-h-[44px] py-2 text-sm font-semibold text-forest underline underline-offset-4">{generated.plan.status === 'clarify' ? 'Add details to my question' : 'Edit my question'}</button>}
-                <AIPlanContent generated={generated} />
+                {standalone && <button type="button" onClick={editQuestion} className="mb-4 min-h-[44px] py-2 text-sm font-semibold text-forest underline underline-offset-4">{generated.plan.status === 'clarify' ? 'Answer these questions below' : 'Ask a follow-up below'}</button>}
+                <AIPlanContent generated={generated} question={answeredQuestion} />
                 {generated.plan.status === 'ready' && <div className="mt-6">
                   <details className="rounded-xl border border-ink/15 bg-surface p-4"><summary className="min-h-[44px] cursor-pointer py-2 font-semibold">Edit the draft before saving</summary>
                   <label htmlFor="reviewed-plan" className="block font-semibold">Review or edit the plan you want to save</label>
-                  <p className="mt-2 text-sm">You decide what to do. Saving keeps this version on your browser.</p>
+                  <p className="mt-2 text-sm">You decide what to do. Saving keeps this version and your question, including any location you supplied, on your browser.</p>
                   <textarea id="reviewed-plan" className={`${control} mt-3 min-h-48`} maxLength={6000} value={editedPlan} onChange={e => setEditedPlan(e.target.value)} />
                   </details>
                   <button type="button" className="mt-2 min-h-[44px] py-2 text-sm font-semibold text-forest underline underline-offset-4" onClick={() => {
@@ -146,7 +154,7 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
               </> : standalone ? <>
               <p className="section-kicker text-clay mb-3">AI UNAVAILABLE</p>
               <h3 className="text-2xl sm:text-3xl font-editorial">AI guidance isn’t available right now</h3>
-              <p className="mt-4 leading-relaxed">Your question is kept in the form above — try again in a moment.</p>
+              <p className="mt-4 leading-relaxed">Your question is kept in the form below — try again in a moment.</p>
               </> : <>
               <p className="section-kicker text-clay mb-3">BASIC GUIDANCE · NOT AI GENERATED</p>
               <p className="text-sm mb-3">{itemLabels[result.item]} · {intentLabels[result.intent]}</p>
@@ -166,11 +174,15 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
               {generated?.plan.status === 'ready' && !editedPlan.trim() && <p role="status" className="mt-4 text-sm text-clay">Add some text to the draft before saving it.</p>}
               {!(standalone && !generated) && <>
               {saved && !isSameSaved && <p className="mt-5 text-sm">Replacing your action starts a new note and outcome. Undo is available until the next replacement, removal or page reload.</p>}
+              {generated?.plan.status === 'ready' && <p className="mt-4 text-sm text-ink/80">Saving keeps this draft and your question, including any supplied location, in this browser.</p>}
               {(!generated || generated.plan.status === 'ready') && <button type="button" disabled={!!generated && !editedPlan.trim()} className={`${primary} mt-6 disabled:opacity-60`} onClick={saveResult}>{saved ? (isSameSaved ? 'View my saved action' : 'Replace my saved action with this') : 'Save this action for the week'}</button>}
               </>}
             </> : <><h3 className="text-2xl font-editorial">Your answer will appear here.</h3><p className="mt-4 leading-relaxed">Ask a question to understand an idea or find a practical next step. Your answer will appear here, ready to review, edit and save.</p><p className="mt-4 text-sm">Include the details that matter to you. You can refine your question after reading the answer.</p></>}
           </div>
           </>}
+          {standalone && history.length > 0 && <details className="rounded-xl border border-ink/15 bg-paper p-4"><summary className="min-h-[44px] cursor-pointer py-2 font-semibold">Earlier in this conversation</summary>{history.map((turn, i) => <div key={i} className="mt-4 border-t border-ink/15 pt-4"><p className="whitespace-pre-wrap break-words font-semibold">{turn.question}</p><p className="mt-2 whitespace-pre-wrap break-words text-sm">{turn.answer}</p></div>)}</details>}
+          {standalone && composer}
+          {standalone && generated && <button type="button" className="min-h-[44px] self-start py-2 font-semibold text-forest underline underline-offset-4" onClick={() => { if (!window.confirm('Start a new conversation? The unsaved conversation will be cleared. Your saved action stays.')) return; setGenerated(null); setResult(null); setAnsweredQuestion(''); setEditedPlan(''); setHistory([]); setConversationKey(key => key + 1); requestAnimationFrame(editQuestion); }}>Start a new conversation</button>}
         </div>
         <p id="action-storage-status" role="status" className="mt-5 text-sm">{notice}</p>
         {undoAction && <button type="button" className="min-h-[44px] py-2 font-semibold text-forest underline underline-offset-4" onClick={() => {
@@ -180,7 +192,8 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
         {saved && <div id="saved-action" className="scroll-mt-20 mt-8 rounded-2xl border border-forest/30 bg-surface p-5 sm:p-8 max-w-3xl" aria-labelledby="saved-action-title">
           <p className="section-kicker text-forest mb-3">ONE THING THIS WEEK</p>
           <p className="text-sm mb-2">{itemLabels[saved.item]} · {intentLabels[saved.intent]}</p>
-          <h3 ref={savedRef} tabIndex={-1} id="saved-action-title" className="scroll-mt-20 text-2xl font-editorial">{saved.customPlan ? 'Your reviewed action plan' : recommend(saved).title}</h3>
+          <h3 ref={savedRef} tabIndex={-1} id="saved-action-title" className="scroll-mt-20 text-2xl font-editorial">{saved.customPlan ? saved.customPlan.plan.action : recommend(saved).title}</h3>
+          {saved.question && <details className="mt-4 rounded-xl border border-ink/15 p-4"><summary className="min-h-[44px] cursor-pointer py-2 font-semibold">Your original question and context</summary><p className="whitespace-pre-wrap break-words text-sm">{saved.question}</p></details>}
           {saved.customPlan ? <>
             <p className="mt-3 text-sm">{saved.customPlan.source === 'ai' ? 'AI-assisted plan · reviewed by you' : 'Safety guidance · reviewed by you'}</p>
             <p className="mt-4 whitespace-pre-wrap leading-relaxed">{saved.customPlan.text}</p>
@@ -216,7 +229,7 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
               requestAnimationFrame(() => titleRef.current?.focus());
             }
           }}>Remove saved action</button>
-          <a className="ml-5 inline-flex min-h-[44px] items-center text-sm underline underline-offset-4" href="#pause">Explore optional reflections</a>
+          <a className="ml-5 inline-flex min-h-[44px] items-center text-sm underline underline-offset-4" href={standalone ? '/#pause' : '#pause'}>Explore optional reflections</a>
         </div>}
       </div>
     </section>
