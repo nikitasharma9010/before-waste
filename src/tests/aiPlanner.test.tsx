@@ -403,3 +403,19 @@ it('keeps the save retry inside the affected saved-action section', async () => 
   expect(retry.closest('#saved-action')).not.toBeNull();
   expect([...host.querySelectorAll('a')].some(link => link.textContent === 'Session only · View my action')).toBe(true);
 });
+
+it('explains save availability beside non-action answers and shows Save for ready plans', async () => {
+  await act(async () => root.render(<DecisionHelper standalone onExploreObject={() => {}} />));
+  for (const status of ['explanation', 'clarify', 'refused', 'unsupported', 'ready'] as const) {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json({...generated,plan:{...generated.plan,status,steps:status === 'ready' ? generated.plan.steps : [],alternative:'',questions:status === 'clarify' ? ['Which material is it?'] : []}})));
+    await input('ai-description', 'Please help me understand the next step for my situation.'); await click('Get AI guidance');
+    const save = [...host.querySelectorAll('button')].find(button => button.textContent === 'Save action on this device');
+    if (status === 'ready') {
+      expect(save).toBeDefined(); expect(save?.disabled).toBe(false);
+      expect(host.querySelector('#answer-save-hint')).toBeNull();
+    } else {
+      expect(save).toBeUndefined();
+      expect(host.querySelector('#answer-save-hint')?.textContent?.length).toBeGreaterThan(20);
+    }
+  }
+});
