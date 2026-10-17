@@ -101,10 +101,11 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSources }) => {
         {/* Zone 3: 1 Primary Action & Mobile Toggle */}
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           <a
-            href="#follow-one-thing"
+            href="#decision-helper"
+            onClick={handleLinkClick}
             className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 min-h-[44px] text-sm font-semibold text-white bg-forest hover:bg-forest-strong focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ink rounded-xl transition-colors whitespace-nowrap shrink-0 shadow-xs"
           >
-            <span>Start Exploring</span>
+            <span>Find my next step</span>
             <ArrowUpRight className="w-4 h-4" aria-hidden="true" />
           </a>
 
@@ -152,11 +153,11 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSources }) => {
             </button>
             <div className="pt-2">
               <a
-                href="#follow-one-thing"
+                href="#decision-helper"
                 onClick={handleLinkClick}
                 className="flex items-center justify-center gap-2 w-full py-3 px-4 min-h-[44px] text-center font-semibold text-white bg-forest hover:bg-forest-strong focus-visible:ring-2 focus-visible:ring-ink rounded-xl transition-colors shadow-xs"
               >
-                <span>Start Exploring</span>
+                <span>Find my next step</span>
                 <ArrowUpRight className="w-4 h-4" aria-hidden="true" />
               </a>
             </div>

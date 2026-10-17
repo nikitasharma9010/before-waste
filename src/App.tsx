@@ -10,6 +10,7 @@ import { SystemsSection } from './components/SystemsSection';
 import { ClosingSection } from './components/ClosingSection';
 import { SourcesModal } from './components/SourcesModal';
 import { DecisionHelper } from './components/DecisionHelper';
+import { Welcome } from './components/Welcome';
 
 export default function App() {
   // Single source of truth for selected object and stage
@@ -86,9 +87,11 @@ export default function App() {
       {/* Main Narrative Flow */}
       <main id="main-content" tabIndex={-1} className="flex-1">
         {/* 2. Opening Experience: Spark curiosity immediately */}
-        <HeroOpening onExploreObjects={handleExploreObject} />
+        <Welcome onExploreObjects={handleExploreObject} />
 
         <DecisionHelper onExploreObject={handleExploreObject} />
+
+        <HeroOpening onExploreObjects={handleExploreObject} />
 
         {/* 3. Signature Experience: Follow One Thing (Single Source of Truth) */}
         <FollowOneThing

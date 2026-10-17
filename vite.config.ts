@@ -1,11 +1,27 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv, type Plugin } from 'vite';
 import { fileURLToPath } from 'url';
+import planHandler from './api/plan.js';
 
-export default defineConfig(() => {
+function plannerDevServer(): Plugin {
   return {
-    plugins: [react(), tailwindcss()],
+    name: 'before-waste-planner-api',
+    configureServer(server) {
+      server.middlewares.use('/api/plan', (req, res) => {
+        void planHandler(req, res);
+      });
+    },
+  };
+}
+
+export default defineConfig(({ mode }) => {
+  // Server-only values: no VITE_ prefix and never passed through `define`.
+  const env = loadEnv(mode, process.cwd(), '');
+  if (!process.env.GEMINI_API_KEY && env.GEMINI_API_KEY) process.env.GEMINI_API_KEY = env.GEMINI_API_KEY;
+  if (!process.env.GEMINI_MODEL && env.GEMINI_MODEL) process.env.GEMINI_MODEL = env.GEMINI_MODEL;
+  return {
+    plugins: [react(), tailwindcss(), plannerDevServer()],
     resolve: {
       alias: {
         '@': fileURLToPath(new URL('.', import.meta.url)),
