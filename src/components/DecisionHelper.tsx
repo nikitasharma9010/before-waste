@@ -1,3 +1,4 @@
+import { SavedAnswersView, useAnswerLibrary, useAssistantTabs } from './SavedAnswers';
 import { CopyTextButton } from './CopyTextButton';
 import { useRef, useState } from 'react';
 import { barrierLabels, intentLabels, issues, itemLabels, recommend, recoveryAdvice, sameDecision, type Barrier, type Decision } from '../data/decisionData';
@@ -9,6 +10,8 @@ import { AIPlanContent } from './AIPlanContent';
 const control = 'w-full min-h-[44px] rounded-xl border border-ink/25 bg-paper p-3 text-base text-ink';
 const primary = 'min-h-[44px] rounded-xl bg-forest px-5 py-3 font-semibold text-white hover:bg-forest-strong';
 export function DecisionHelper({ onExploreObject, standalone = false, initialQuestion = '' }: { onExploreObject: (id: string) => void; standalone?: boolean; initialQuestion?: string }) {
+  const library = useAnswerLibrary(standalone);
+  const tabs = useAssistantTabs(standalone);
   const Heading = standalone ? 'h1' : 'h2';
   const [initial] = useState(readAction);
   const [storageAvailable, setStorageAvailable] = useState(!initial.unavailable);
@@ -29,7 +32,7 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
   const showBasic = () => {
     setDecision({ ...decision }); setGenerated(null); setEditedPlan(''); setAnsweredQuestion('');
     setResult({ ...decision });
-    requestAnimationFrame(() => resultRef.current?.focus());
+    requestAnimationFrame(() => { if (!standalone || tabs.current.current === 'ask') resultRef.current?.focus(); });
   };
   const editQuestion = () => document.getElementById('ai-description')?.focus();
   const resultRef = useRef<HTMLDivElement>(null);
@@ -39,13 +42,14 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
   const saveHint = generated ? {
     ready: '',
     clarify: 'Save is available for actionable plans. Add the requested details below to continue.',
-    explanation: 'This is an explanation, so it is not saved as an action. Ask a follow-up for a practical next step you can save.',
+    explanation: standalone ? '' : 'This is an explanation, so it is not saved as an action. Ask a follow-up for a practical next step you can save.',
     refused: 'This safety response is not an action plan to save. You can ask about a safer option below.',
     unsupported: 'This reply is outside the supported theme and cannot be saved as an action.',
   }[generated.plan.status] : '';
-  const isSameSaved = !!(saved && result && sameDecision(saved, result) &&
+  const isSameSaved = standalone ? library.answers.some(a => a.question === answeredQuestion && a.text === editedPlan) : !!(saved && result && sameDecision(saved, result) &&
     (generated ? saved.question === answeredQuestion && saved.customPlan?.text === editedPlan && saved.customPlan.source === generated.source : !saved.customPlan));
-  const hasUnsavedEdits = !!(generated && generated.plan.status === 'ready' && editedPlan !== planText(generated.plan) && !isSameSaved);
+  const canSaveAnswer = !!generated && ['ready', 'explanation'].includes(generated.plan.status);
+  const hasUnsavedEdits = !!(generated && (standalone ? canSaveAnswer : generated.plan.status === 'ready') && editedPlan !== planText(generated.plan) && !isSameSaved);
   const updatingSaved = !!(saved && result && generated && saved.customPlan && sameDecision(saved, result) && saved.question === answeredQuestion);
   const change = <K extends keyof Decision>(key: K, value: Decision[K]) => {
     setDecision({ ...decision, [key]: value, ...(key === 'item' ? { issue: 'unsure' as const } : {}) });
@@ -64,6 +68,7 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
     return true;
   };
   const saveResult = () => {
+    if (standalone) { library.save(answeredQuestion, editedPlan); return; }
     if (!result) return;
     if (saved && isSameSaved && storageAvailable) {
       setNotice('This action is already saved. Your note and outcome have been kept.');
@@ -82,7 +87,7 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
         }}>Undo last change</button>}
   </div>;
   const startConversation = () => {
-    if (!window.confirm('Start a new conversation? The unsaved conversation will be cleared. Your saved action stays.')) return;
+    if (!window.confirm('Start a new conversation? The unsaved conversation will be cleared. Your saved answers stay.')) return;
     setGenerated(null); setResult(null); setAnsweredQuestion(''); setEditedPlan('');
     setHistory([]); setNotice(''); setBackground(''); setConversationKey(key => key + 1);
     requestAnimationFrame(editQuestion);
@@ -128,11 +133,11 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
             <AIPlannerForm confirmEditedDraft={hasUnsavedEdits} background={background} key={conversationKey} context={context} followUp={!!generated} replyToClarification={generated?.plan.status === 'clarify'} standalone={standalone} initialQuestion={conversationKey === 0 ? initialQuestion : ''} decision={decision} hasDraft={!!generated} onBusyChange={setAsking} onResult={(snapshot, plan, question) => {
               if (generated) setHistory(context);
               else if (!background) setBackground(question);
-              setNotice('');
+              setNotice(''); library.clearNotice();
               setAnsweredQuestion(question);
               setResult(snapshot); setGenerated(plan); setEditedPlan(planText(plan.plan));
               if (editorDetailsRef.current) editorDetailsRef.current.open = false;
-              requestAnimationFrame(() => resultRef.current?.focus());
+              requestAnimationFrame(() => { if (!standalone || tabs.current.current === 'ask') resultRef.current?.focus(); });
             }} onFallback={snapshot => {
               if (standalone) return;
               setResult(snapshot); setGenerated(null); setEditedPlan('');
@@ -152,14 +157,21 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
 
           {(!standalone || !generated) && <p className={standalone ? 'mt-2 text-base' : 'mt-4 text-lg'}>{standalone ? 'Find a practical next step for your items and lower-waste living. No account needed.' : 'Before you buy, replace or let something go, find a starting point that fits your life.'}</p>}
           {!standalone && <p className="mt-2 text-sm text-ink/80">Ask about any item, reducing waste or sustainable living. No account needed.</p>}
-          <nav aria-label="Assistant sections" className="mt-4 flex flex-wrap gap-3 border-b border-ink/15 pb-3">
+          {standalone ? <div role="tablist" aria-label="Assistant sections" className="mt-4 flex gap-2 border-b border-ink/15 pb-3">
+            {['ask', 'saved'].map((name, index) => <button key={name} id={`${name}-tab`} type="button" role="tab" aria-selected={tabs.tab === name} aria-controls={name} tabIndex={tabs.tab === name ? 0 : -1} onClick={() => tabs.select(name)} onKeyDown={event => {
+              if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+              event.preventDefault();
+              const next = event.key === 'Home' ? 'ask' : event.key === 'End' ? 'saved' : ['ask', 'saved'][1 - index];
+              tabs.select(next); document.getElementById(`${next}-tab`)?.focus();
+            }} className="min-h-[44px] rounded-xl border border-forest/30 px-4 py-2 font-semibold text-forest aria-selected:bg-forest aria-selected:text-white">{name === 'ask' ? 'Ask' : library.unavailable ? 'Saved (unavailable)' : `Saved (${library.answers.length})`}</button>)}
+          </div> : <>          <nav aria-label="Assistant sections" className="mt-4 flex flex-wrap gap-3 border-b border-ink/15 pb-3">
             <a href="#decision-title" className="inline-flex min-h-[44px] items-center rounded px-3 py-2 font-semibold text-forest underline underline-offset-4">Ask</a>
             <a href="#saved-action" className="inline-flex min-h-[44px] items-center rounded border border-forest/30 bg-paper px-3 py-2 font-semibold text-forest hover:bg-sage">My saved action <span className="ml-2 rounded-full bg-sage px-2 text-sm">{saved ? (storageAvailable ? '1' : 'Session only') : (storageAvailable ? '0' : 'Unavailable')}</span></a>
-          </nav>
+          </nav></>}
 
 
         </div>
-        <div className={standalone ? 'flex max-w-3xl flex-col gap-6' : 'grid gap-6 lg:grid-cols-2 items-start'}>
+        <div id={standalone ? 'ask' : undefined} tabIndex={standalone ? 0 : undefined} role={standalone ? 'tabpanel' : undefined} aria-labelledby={standalone ? 'ask-tab' : undefined} hidden={standalone && tabs.tab !== 'ask'} data-assistant-panel={standalone ? '' : undefined} className={standalone ? `${tabs.tab !== 'ask' ? 'hidden' : 'flex'} max-w-3xl flex-col gap-6` : 'grid gap-6 lg:grid-cols-2 items-start'}>
           {!standalone && composer}
           {(!standalone || result) && <>
           <div ref={resultRef} tabIndex={-1} aria-label="Your answer" className={`min-w-0 break-words rounded-2xl border border-ink/15 bg-surface p-5 sm:p-8 ${standalone ? 'scroll-mt-20 w-full' : 'scroll-mt-20'}`}>
@@ -195,25 +207,25 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
               <p className="mt-3 text-xs text-ink/80">Editorial starting points, not a diagnosis or a measured environmental saving. Check collection and donation acceptance locally.</p>
               </>}
               {saveHint && <p id="answer-save-hint" className="mt-4 text-sm text-ink/80">{saveHint}</p>}
-              {generated?.plan.status === 'ready' && !editedPlan.trim() && <p role="status" className="mt-4 text-sm text-clay">Add some text to the draft before saving it.</p>}
+              {(standalone ? canSaveAnswer : generated?.plan.status === 'ready') && !editedPlan.trim() && <p role="status" className="mt-4 text-sm text-clay">Add some text to the draft before saving it.</p>}
               {!(standalone && !generated) && <>
-              {saved && !isSameSaved && !updatingSaved && (!generated || generated.plan.status === 'ready') && <p className="mt-5 text-sm">One action is kept at a time. Replacing it starts fresh notes and progress; you can undo until the next change or reload.</p>}
-              {generated?.plan.status === 'ready' && <p className="mt-4 text-sm text-ink/80">Saving keeps this draft and your question, including any supplied location, in this browser.</p>}
+              {!standalone && saved && !isSameSaved && !updatingSaved && (!generated || generated.plan.status === 'ready') && <p className="mt-5 text-sm">One action is kept at a time. Replacing it starts fresh notes and progress; you can undo until the next change or reload.</p>}
+              {(standalone ? canSaveAnswer : generated?.plan.status === 'ready') && <p className="mt-4 text-sm text-ink/80">Saving keeps this draft and your question, including any supplied location, in this browser.</p>}
               <div className="mt-3 flex flex-wrap items-start gap-3">
-                {(!generated || generated.plan.status === 'ready') && (isSameSaved
-                  ? <a href="#saved-action" onClick={() => savedRef.current?.focus({ preventScroll: true })} className="inline-flex min-h-[44px] items-center rounded py-3 font-semibold text-forest underline underline-offset-4">{storageAvailable ? 'Saved · View my action' : 'Session only · View my action'}</a>
-                  : <button type="button" disabled={!!generated && !editedPlan.trim()} className={`${primary} disabled:opacity-60`} onClick={saveResult}>{saved ? (updatingSaved ? 'Update my saved action' : 'Replace my saved action') : 'Save action on this device'}</button>)}
-                {generated?.plan.status === 'ready' && <details ref={editorDetailsRef} className="min-w-0 max-w-full rounded-xl border border-ink/20 bg-surface open:w-full">
+                {(standalone ? canSaveAnswer : (!generated || generated.plan.status === 'ready')) && (isSameSaved
+                  ? <a href={standalone ? "#saved" : "#saved-action"} onClick={() => savedRef.current?.focus({ preventScroll: true })} className="inline-flex min-h-[44px] items-center rounded py-3 font-semibold text-forest underline underline-offset-4">{standalone ? (library.sessionOnly ? 'Session only · View saved' : 'Saved · View saved') : storageAvailable ? 'Saved · View my action' : 'Session only · View my action'}</a>
+                  : <button type="button" disabled={!!generated && !editedPlan.trim()} className={`${primary} disabled:opacity-60`} onClick={saveResult}>{standalone ? 'Save answer' : saved ? (updatingSaved ? 'Update my saved action' : 'Replace my saved action') : 'Save action on this device'}</button>)}
+                {(standalone ? canSaveAnswer : generated?.plan.status === 'ready') && <details ref={editorDetailsRef} className="min-w-0 max-w-full rounded-xl border border-ink/20 bg-surface open:w-full">
                   <summary className="min-h-[44px] cursor-pointer px-4 py-3 font-semibold">Edit before saving</summary>
                   <div className="border-t border-ink/15 p-4">
-                    <label htmlFor="reviewed-plan" className="block font-semibold">Edit the action to save</label>
+                    <label htmlFor="reviewed-plan" className="block font-semibold">Edit the answer to save</label>
                     <p className="mt-2 text-sm">Adjust the wording, then use the save button above. Edits stay in the draft until you save.</p>
                     <textarea id="reviewed-plan" className={`${control} mt-3 min-h-48`} maxLength={6000} value={editedPlan} onChange={e => { setEditedPlan(e.target.value); setNotice('Edits are not saved yet. Save to keep the updated action.'); }} />
                   </div>
                 </details>}
               </div>
               </>}
-              {feedback}
+              {standalone ? <p role="status" className={library.notice ? "mt-4 text-sm" : "sr-only"}>{library.notice}</p> : feedback}
             </> : <><h3 className="text-2xl font-editorial">Your answer will appear here.</h3><p className="mt-4 leading-relaxed">Ask a question to understand an idea or find a practical next step. Your answer will appear here, ready to review, edit and save.</p><p className="mt-4 text-sm">Include the details that matter to you. You can refine your question after reading the answer.</p></>}
           </div>
           </>}
@@ -223,8 +235,9 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
             {generated && <details className="rounded-xl border border-ink/15 bg-paper p-4"><summary className="min-h-[44px] cursor-pointer py-2 font-semibold">Conversation settings</summary><label htmlFor="conversation-background" className="mt-2 block text-sm">Earlier details to keep using (optional)</label><p id="background-hint" className="mt-2 text-sm text-ink/80">Your first question is kept here so details survive longer conversations. Edit or clear anything that no longer applies. This background is sent with follow-ups and clears when you reload or start again.</p><textarea id="conversation-background" aria-describedby="background-hint" maxLength={1700} disabled={asking} rows={3} value={background} onChange={event => setBackground(event.target.value)} className={`${control} mt-3 disabled:opacity-60`} /><button type="button" className="mt-4 min-h-[44px] py-2 font-semibold text-forest underline underline-offset-4" onClick={startConversation}>Start a new conversation</button></details>}
 
         </div>
-        {!result && feedback}
-        <section id="saved-action" tabIndex={-1} className="scroll-mt-20 mt-8 rounded-2xl border border-forest/30 bg-surface p-5 sm:p-8 max-w-3xl" aria-labelledby="saved-section-title">
+        {standalone && <section id="saved" role="tabpanel" aria-labelledby="saved-tab" tabIndex={0} hidden={tabs.tab !== 'saved'} data-assistant-panel="" className="max-w-3xl"><span id="saved-action" /><SavedAnswersView library={library} /></section>}
+        {!standalone && !result && feedback}
+        {!standalone && <section id="saved-action" tabIndex={-1} className="scroll-mt-20 mt-8 rounded-2xl border border-forest/30 bg-surface p-5 sm:p-8 max-w-3xl" aria-labelledby="saved-section-title">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h2 id="saved-section-title" className="text-2xl font-editorial">My saved action</h2>
             <a href="#decision-title" className="inline-flex min-h-[44px] items-center rounded py-2 text-sm font-semibold text-forest underline underline-offset-4">Back to Ask</a>
@@ -281,7 +294,7 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
               setNotice(loaded.unavailable ? 'Your saved action still could not be read. Try another time or check this browser’s storage settings.' : loaded.action ? 'Saved action loaded on this browser.' : 'No saved action was found on this browser.');
             }}>Try loading again</button>}
           </div>}
-        </section>
+        </section>}
       </div>
     </section>
   );

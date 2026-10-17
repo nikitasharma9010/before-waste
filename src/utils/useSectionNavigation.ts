@@ -8,7 +8,7 @@ export function useSectionNavigation() {
       try { id = decodeURIComponent(window.location.hash.slice(1)); } catch { return; }
       const target = id ? document.getElementById(id) : null;
       if (!target) return;
-      if (target.closest('[data-learning-panel][hidden]')) target.dispatchEvent(new Event('section-reveal', { bubbles: true }));
+      if (target.closest('[data-learning-panel][hidden], [data-assistant-panel][hidden]')) target.dispatchEvent(new Event('section-reveal', { bubbles: true }));
       for (let parent: HTMLElement | null = target; parent; parent = parent.parentElement) {
         if (parent instanceof HTMLDetailsElement) {
           const group = parent.getAttribute('name');
@@ -20,7 +20,9 @@ export function useSectionNavigation() {
       }
       target.tabIndex = -1;
       target.focus({ preventScroll: true });
-      target.scrollIntoView?.({ block: 'start', behavior: smooth && !window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'smooth' : 'auto' });
+      const panel = target.closest<HTMLElement>('[data-assistant-panel]');
+      const scrollTarget = panel && ['ask', 'saved', 'saved-action'].includes(id) ? document.getElementById('decision-helper') ?? target : target;
+      scrollTarget.scrollIntoView?.({ block: 'start', behavior: smooth && !window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'smooth' : 'auto' });
     }
     reveal();
     const onHashChange = () => reveal(true);
