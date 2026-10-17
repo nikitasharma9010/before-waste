@@ -289,3 +289,28 @@ it('does not show replacement warnings for a clarification that cannot be saved'
   expect(host.textContent).not.toContain('Replacing your action starts a new note');
   expect(readAction().action?.note).toBe('Keep this note');
 });
+it('updates the current saved plan without resetting its note and progress', async () => {
+  vi.stubGlobal('fetch',vi.fn().mockResolvedValue(Response.json(generated)));
+  await input('ai-description','My coat has a loose button and I need a practical repair.'); await click('Get AI guidance'); await click('Save this action');
+  await input('action-note','Keep my note');
+  const outcome=host.querySelector<HTMLSelectElement>('#action-outcome')!;
+  await act(async()=>{outcome.value='done';outcome.dispatchEvent(new Event('change',{bubbles:true}));});
+  await input('reviewed-plan','My updated action\n\nAsk a friend for a matching button.');
+  await click('Update my saved action');
+  expect(readAction().action).toMatchObject({note:'Keep my note',outcome:'done'});
+  expect(host.querySelector('#saved-action-title')?.textContent).toBe('My updated action');
+  expect(readAction().action?.customPlan?.text).toContain('Ask a friend');
+  await click('Undo last change');
+  expect(readAction().action?.customPlan?.text).not.toContain('My updated action');
+  expect(readAction().action?.note).toBe('Keep my note');
+});
+it('offers a retry when browser saving fails, without dropping session edits or notes', async () => {
+  vi.stubGlobal('fetch',vi.fn().mockResolvedValue(Response.json(generated)));
+  await input('ai-description','My coat has a loose button and I need a repair plan.'); await click('Get AI guidance');
+  const write=vi.spyOn(Storage.prototype,'setItem').mockImplementation(()=>{throw new Error('blocked');});
+  await click('Save this action'); await input('action-note','Keep this session note');
+  expect(host.querySelector('#action-storage-status')?.textContent).toContain('session only');
+  write.mockRestore(); await click('Try saving again');
+  expect(readAction().action?.note).toBe('Keep this session note');
+  expect(host.querySelector('#action-storage-status')?.textContent).toContain('Action saved');
+});
