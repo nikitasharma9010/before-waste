@@ -66,7 +66,7 @@ export const StoryVisual: React.FC<StoryVisualProps> = ({ objectId, stageNumber,
                 {/* Water droplets symbol */}
                 <g transform="translate(260, 180)">
                   <path d="M 20 0 C 20 0, 35 25, 35 35 C 35 45, 27 52, 20 52 C 13 52, 5 45, 5 35 C 5 25, 20 0, 20 0 Z" fill="#425BFF" opacity="0.8" />
-                  <text x="45" y="42" fill="#202A35" fontSize="13" fontWeight="600" fontFamily="DM Sans">2,700 Liters</text>
+                  <text x="45" y="42" fill="#202A35" fontSize="13" fontWeight="600" fontFamily="DM Sans">Rain & irrigation</text>
                 </g>
               </g>
             )}

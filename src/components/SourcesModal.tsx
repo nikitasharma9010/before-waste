@@ -48,9 +48,9 @@ const SOURCES: SourceItem[] = [
   {
     institution: 'WRAP (Waste and Resources Action Programme)',
     reportName: 'Valuing Our Clothes: The Cost of UK Fashion',
-    yearOrEdition: 'Evidence report',
-    url: 'https://wrap.org.uk/',
-    scopeSummary: 'Empirical research demonstrating that extending active garment wear by an average of 9 months reduces carbon, water, and waste footprints by 20–30%.'
+    yearOrEdition: 'Published 2017 (UK clothing sector)',
+    url: 'https://www.wrap.ngo/resources/report/valuing-our-clothes-cost-uk-fashion',
+    scopeSummary: 'UK clothing-sector research on durability, longer active use, and clothing-care practices. Findings depend on the garment and study assumptions.'
   },
   {
     institution: 'Mission LiFE (Lifestyle for Environment)',
@@ -113,7 +113,7 @@ export const SourcesModal: React.FC<SourcesModalProps> = ({ isOpen, onClose, tri
 
         <div className="pt-4 border-t border-[#202A35]/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <span className="text-xs text-[#202A35]/65">
-            Every statistic connects directly to its corresponding publication.
+            These references provide background. Estimates vary by study, product, location, and data year.
           </span>
           <button
             type="button"
