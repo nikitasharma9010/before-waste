@@ -134,7 +134,7 @@ export default function App() {
           onRestartStory={handleRestartStory}
         />
 
-        <div className="mx-auto max-w-7xl px-4 pb-8 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           <details className="rounded-xl border border-ink/20 bg-surface p-4"><summary className="min-h-[44px] cursor-pointer py-2 font-semibold">Optional: a closer look at T-shirt materials</summary><HeroOpening onExploreObjects={handleExploreObject} /></details>
         </div>
         <WhatWouldYouDo />
