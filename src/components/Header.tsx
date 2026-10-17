@@ -1,5 +1,6 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Menu, X, ArrowUpRight } from 'lucide-react';
+import { Brand } from './Brand';
 
 interface HeaderProps {
   onOpenSources: (triggerEl?: HTMLElement | null) => void;
@@ -9,6 +10,30 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSources }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const sourcesButtonRef = useRef<HTMLButtonElement>(null);
+  const headerRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setMobileMenuOpen(false);
+        menuButtonRef.current?.focus();
+      }
+    };
+    const closeOutside = (event: PointerEvent) => {
+      if (!headerRef.current?.contains(event.target as Node)) setMobileMenuOpen(false);
+    };
+    const desktop = window.matchMedia('(min-width: 1280px)');
+    const closeOnDesktop = () => { if (desktop.matches) setMobileMenuOpen(false); };
+    window.addEventListener('keydown', closeOnEscape);
+    document.addEventListener('pointerdown', closeOutside);
+    desktop.addEventListener?.('change', closeOnDesktop);
+    return () => {
+      window.removeEventListener('keydown', closeOnEscape);
+      document.removeEventListener('pointerdown', closeOutside);
+      desktop.removeEventListener?.('change', closeOnDesktop);
+    };
+  }, [mobileMenuOpen]);
 
   const navLinks = [
     { label: 'Follow One Thing', href: '#follow-one-thing' },
@@ -18,20 +43,26 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSources }) => {
     { label: 'The 7-Day Pause', href: '#pause' },
   ];
 
-  const handleLinkClick = () => {
+  const handleLinkClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
     setMobileMenuOpen(false);
+    const target = document.getElementById(event.currentTarget.hash.slice(1));
+    if (target) {
+      target.tabIndex = -1;
+      target.focus({ preventScroll: true });
+    }
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-[#FFF9F0]/95 backdrop-blur-md border-b border-[#202A35]/10">
+    <header ref={headerRef} className="sticky top-0 z-40 bg-[#FFF9F0]/95 backdrop-blur-md border-b border-[#202A35]/10">
       {/* Top Bar Contract: 3 zones */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4 lg:gap-8">
         {/* Zone 1: Brand Wordmark */}
         <a
           href="#hero"
-          className="font-editorial text-xl sm:text-2xl font-bold tracking-tight text-[#202A35] hover:text-[#C53B27] focus-visible:ring-2 focus-visible:ring-[#202A35] rounded p-1 transition-colors whitespace-nowrap shrink-0"
+          aria-label="Before Waste home"
+          className="inline-flex items-center min-h-[44px] min-w-0 text-[#202A35] hover:text-[#C53B27] rounded transition-colors"
         >
-          BEFORE WASTE
+          <Brand />
         </a>
 
         {/* Zone 2: Navigation Links (Only shown when width is comfortable) */}
@@ -43,7 +74,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSources }) => {
             <a
               key={link.href}
               href={link.href}
-              className="py-1 hover:text-[#202A35] hover:underline underline-offset-4 decoration-[#C53B27] decoration-2 focus-visible:ring-2 focus-visible:ring-[#202A35] rounded transition-colors whitespace-nowrap shrink-0"
+              className="inline-flex items-center min-h-[44px] py-2 hover:text-[#202A35] hover:underline underline-offset-4 decoration-[#C53B27] decoration-2 focus-visible:ring-2 focus-visible:ring-[#202A35] rounded transition-colors whitespace-nowrap shrink-0"
             >
               {link.label}
             </a>
@@ -52,7 +83,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSources }) => {
             ref={sourcesButtonRef}
             type="button"
             onClick={() => onOpenSources(sourcesButtonRef.current)}
-            className="py-1 hover:text-[#202A35] hover:underline underline-offset-4 decoration-[#2840DE] decoration-2 focus-visible:ring-2 focus-visible:ring-[#202A35] rounded transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+            className="inline-flex items-center min-h-[44px] py-2 hover:text-[#202A35] hover:underline underline-offset-4 decoration-[#2840DE] decoration-2 focus-visible:ring-2 focus-visible:ring-[#202A35] rounded transition-colors whitespace-nowrap shrink-0 cursor-pointer"
           >
             Sources
           </button>
@@ -62,7 +93,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSources }) => {
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           <a
             href="#follow-one-thing"
-            className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 min-h-[40px] text-sm font-semibold text-white bg-[#202A35] hover:bg-[#C53B27] focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#202A35] rounded-xl transition-colors whitespace-nowrap shrink-0 shadow-xs"
+            className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 min-h-[44px] text-sm font-semibold text-white bg-[#202A35] hover:bg-[#C53B27] focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#202A35] rounded-xl transition-colors whitespace-nowrap shrink-0 shadow-xs"
           >
             <span>Start Exploring</span>
             <ArrowUpRight className="w-4 h-4" aria-hidden="true" />
@@ -87,7 +118,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSources }) => {
       {mobileMenuOpen && (
         <div
           id="mobile-navigation-menu"
-          className="xl:hidden bg-[#FFF9F0] border-b border-[#202A35]/15 px-4 pt-3 pb-6 shadow-xl animate-in fade-in slide-in-from-top-2 duration-200"
+          className="mobile-navigation xl:hidden bg-[#FFF9F0] border-b border-[#202A35]/15 px-4 pt-3 pb-6 shadow-xl animate-in fade-in slide-in-from-top-2 duration-200"
         >
           <nav aria-label="Mobile navigation" className="flex flex-col gap-2">
             {navLinks.map((link) => (

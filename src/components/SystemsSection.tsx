@@ -69,11 +69,11 @@ export const SystemsSection: React.FC = () => {
                 className="bg-white rounded-2xl border border-[#202A35]/10 p-5 sm:p-7 shadow-xs hover:border-[#0D9F91]/40 transition-colors flex flex-col justify-between"
               >
                 <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="w-10 h-10 rounded-xl bg-[#E6F8F6] text-[#0D9F91] flex items-center justify-center">
+                  <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+                    <div className="w-10 h-10 shrink-0 rounded-xl bg-[#E6F8F6] text-[#0D9F91] flex items-center justify-center">
                       <Icon className="w-5 h-5" />
                     </div>
-                    <span className="text-xs font-medium text-[#202A35]/60 bg-[#FFF9F0] px-2.5 py-1 rounded-md border border-[#202A35]/8">
+                    <span className="text-xs font-medium text-[#202A35]/75 bg-[#FFF9F0] px-2.5 py-1 rounded-md border border-[#202A35]/8">
                       {pillar.focus}
                     </span>
                   </div>
@@ -88,7 +88,7 @@ export const SystemsSection: React.FC = () => {
                 </div>
 
                 <div className="pt-4 border-t border-[#202A35]/8">
-                  <span className="text-[11px] font-semibold text-[#202A35]/50 uppercase tracking-wider block mb-2">
+                  <span className="text-[11px] font-semibold text-[#202A35]/75 uppercase tracking-wider block mb-2">
                     What this looks like:
                   </span>
                   <div className="flex flex-wrap gap-1.5">

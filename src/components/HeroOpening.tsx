@@ -197,6 +197,7 @@ export const HeroOpening: React.FC<HeroOpeningProps> = ({ onExploreObjects }) =>
                         }`}
                         aria-label={`Inspect ${hotspot.name}: ${hotspot.label}`}
                         aria-pressed={isSelected}
+                        aria-controls="hotspot-details"
                       >
                         <div
                           className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
@@ -218,12 +219,16 @@ export const HeroOpening: React.FC<HeroOpeningProps> = ({ onExploreObjects }) =>
 
               {/* Active Hotspot Info Card */}
               <div
+                id="hotspot-details"
+                role="status"
+                aria-live="polite"
+                aria-atomic="true"
                 className="mt-4 p-4 rounded-xl border bg-white transition-all duration-200"
                 style={{
                   borderColor: `${activeHotspot.accent}60`
                 }}
               >
-                <div className="flex items-center justify-between gap-2 mb-1">
+                <div className="flex flex-wrap items-center justify-between gap-2 mb-1">
                   <div className="flex items-center gap-2">
                     <span
                       className="w-2.5 h-2.5 rounded-full"
@@ -252,24 +257,27 @@ export const HeroOpening: React.FC<HeroOpeningProps> = ({ onExploreObjects }) =>
                 <div className="flex flex-wrap items-center gap-2">
                   <button
                     type="button"
+                    aria-label="Follow the Smartphone story"
                     onClick={() => onExploreObjects('smartphone')}
                     className="flex-1 px-3 py-2 min-h-[44px] text-xs font-semibold rounded-lg bg-[#EEF1FF] text-[#1E32B6] hover:bg-[#2840DE] hover:text-white focus-visible:ring-2 focus-visible:ring-[#2840DE] transition-colors cursor-pointer text-center"
                   >
-                    Smartphone
+                    Phone
                   </button>
                   <button
                     type="button"
+                    aria-label="Follow the Fresh Apple story"
                     onClick={() => onExploreObjects('food')}
                     className="flex-1 px-3 py-2 min-h-[44px] text-xs font-semibold rounded-lg bg-[#E6F8F6] text-[#06574F] hover:bg-[#086E64] hover:text-white focus-visible:ring-2 focus-visible:ring-[#086E64] transition-colors cursor-pointer text-center"
                   >
-                    Fresh Apple
+                    Apple
                   </button>
                   <button
                     type="button"
+                    aria-label="Follow the Delivery Box story"
                     onClick={() => onExploreObjects('package')}
                     className="flex-1 px-3 py-2 min-h-[44px] text-xs font-semibold rounded-lg bg-[#FFF9EB] text-[#202A35] border border-[#202A35]/15 hover:bg-[#FFC857] focus-visible:ring-2 focus-visible:ring-[#B88000] transition-colors cursor-pointer text-center"
                   >
-                    Delivery Box
+                    Box
                   </button>
                 </div>
               </div>
@@ -298,7 +306,7 @@ export const HeroOpening: React.FC<HeroOpeningProps> = ({ onExploreObjects }) =>
                 <button
                   type="button"
                   onClick={() => setShowAllFragments(!showAllFragments)}
-                  className="inline-flex items-center gap-1 text-xs font-semibold text-[#202A35] hover:text-[#C53B27] cursor-pointer focus-visible:ring-2 focus-visible:ring-[#202A35] rounded p-1"
+                  className="inline-flex items-center gap-1 text-xs font-semibold text-[#202A35] hover:text-[#C53B27] cursor-pointer focus-visible:ring-2 focus-visible:ring-[#202A35] rounded px-2 py-2 min-h-[44px]"
                   aria-expanded={showAllFragments}
                 >
                   <span>{showAllFragments ? 'Show fewer' : 'Read details'}</span>

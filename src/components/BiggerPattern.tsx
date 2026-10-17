@@ -87,7 +87,7 @@ export const BiggerPattern: React.FC = () => {
         <div className="bg-white rounded-3xl border border-[#202A35]/10 p-4 sm:p-7 lg:p-10 shadow-sm mb-12">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-8 pb-6 border-b border-[#202A35]/8">
             <div>
-              <span className="text-xs font-semibold text-[#202A35]/60 uppercase tracking-wider block">
+              <span className="text-xs font-semibold text-[#202A35]/75 uppercase tracking-wider block">
                 Interactive Model Inspector
               </span>
               <p className="font-editorial text-xl sm:text-2xl text-[#202A35] font-semibold mt-0.5">
@@ -156,7 +156,7 @@ export const BiggerPattern: React.FC = () => {
                     }`}
                   >
                     <div className="flex w-full items-center justify-between mb-2">
-                      <span className="text-xs font-mono font-bold text-[#202A35]/60">
+                      <span className="text-xs font-mono font-bold text-[#202A35]/75">
                         {item.step}
                       </span>
                       {isSelected && (

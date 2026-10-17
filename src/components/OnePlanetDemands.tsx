@@ -67,7 +67,7 @@ export const OnePlanetDemands: React.FC = () => {
                     <span>{item.country}</span>
                     <span
                       className={`text-xs px-2 py-0.5 rounded font-mono tabular-nums font-normal ${
-                        isSelected ? 'bg-white/20 text-white' : 'bg-black/5 text-[#202A35]/80'
+                        isSelected ? 'bg-black/15 text-white' : 'bg-black/5 text-[#202A35]/80'
                       }`}
                     >
                       {item.earths.toFixed(1)} Earths

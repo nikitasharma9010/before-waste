@@ -119,7 +119,7 @@ export const FollowOneThing: React.FC<FollowOneThingProps> = ({
                     isActive
                       ? obj.id === 'package'
                         ? 'bg-black/10 text-[#202A35]'
-                        : 'bg-white/20 text-white'
+                        : 'bg-black/15 text-white'
                       : 'bg-black/5 text-[#202A35]/70'
                   }`}
                 >
@@ -189,7 +189,7 @@ export const FollowOneThing: React.FC<FollowOneThingProps> = ({
                       }}
                     />
                     <div className="w-full">
-                      <span className="text-sm sm:text-xs font-bold block text-[#202A35]/60 group-hover:text-[#202A35] transition-colors">
+                      <span className="text-sm sm:text-xs font-bold block text-[#202A35]/75 group-hover:text-[#202A35] transition-colors">
                         0{st.stageNumber}
                       </span>
                       <span
@@ -217,6 +217,7 @@ export const FollowOneThing: React.FC<FollowOneThingProps> = ({
             <div className="lg:col-span-6 min-w-0">
               <StoryVisual
                 objectId={currentObject.id}
+                label={`${currentObject.name}: ${currentStage.stageTitle}`}
                 stageNumber={currentStage.stageNumber}
                 accentColor={themeStyle.indicator}
               />
@@ -250,7 +251,7 @@ export const FollowOneThing: React.FC<FollowOneThingProps> = ({
 
                 {/* Material flow line */}
                 <div className="pt-2 border-t border-[#202A35]/10 flex items-start gap-2">
-                  <span className="text-[11px] font-semibold text-[#202A35]/60 uppercase tracking-wider shrink-0 mt-0.5">
+                  <span className="text-[11px] font-semibold text-[#202A35]/75 uppercase tracking-wider shrink-0 mt-0.5">
                     Flow:
                   </span>
                   <span className="text-xs font-medium text-[#202A35]/85">

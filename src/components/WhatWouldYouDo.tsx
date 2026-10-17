@@ -122,7 +122,7 @@ export const WhatWouldYouDo: React.FC = () => {
                 >
                   <div>
                     <div className="flex items-center justify-between mb-3">
-                      <span className="text-xs font-bold uppercase tracking-wider text-[#202A35]/60">
+                      <span className="text-xs font-bold uppercase tracking-wider text-[#202A35]/75">
                         Choice
                       </span>
                       {isSelected && (
