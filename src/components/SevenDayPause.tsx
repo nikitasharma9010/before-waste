@@ -4,7 +4,6 @@ import {
   CheckCircle2,
   Circle,
   RotateCcw,
-  Sparkles,
   ChevronDown,
   ChevronUp,
   AlertTriangle
@@ -277,38 +276,8 @@ export const SevenDayPause: React.FC = () => {
                     aria-label={`Day ${day.day} details and reflection`}
                     className="px-4 sm:px-5 pb-5 sm:pb-6 pt-2 border-t border-ink/10 space-y-4 animate-in fade-in duration-200"
                   >
-                    <p className="text-sm text-ink/85 leading-relaxed max-w-3xl">
-                      {day.context}
-                    </p>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="p-4 rounded-xl bg-paper border border-ink/10">
-                        <span className="text-xs font-semibold uppercase tracking-wider text-clay block mb-1">
-                          Today&apos;s Invitation
-                        </span>
-                        <p className="text-xs sm:text-sm text-ink/85 leading-relaxed">
-                          {day.actionPrompt}
-                        </p>
-                      </div>
-
-                      <div className="p-4 rounded-xl bg-sage border border-sage-border">
-                        <span className="text-xs font-semibold uppercase tracking-wider text-forest block mb-1">
-                          Practical Tip
-                        </span>
-                        <p className="text-xs sm:text-sm text-ink/85 leading-relaxed">
-                          {day.practicalTip}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Thought starter quote */}
-                    <div className="p-3.5 bg-surface/70 rounded-xl border border-ink/10 flex items-start gap-2.5">
-                      <Sparkles className="w-4 h-4 text-clay shrink-0 mt-0.5" aria-hidden="true" />
-                      <p className="text-xs italic text-ink/85">
-                        &ldquo;{day.thoughtStarter}&rdquo;
-                      </p>
-                    </div>
-
+                    <p className="text-sm leading-relaxed">{day.actionPrompt}</p>
+                    <details className="rounded-xl border border-ink/15 p-3"><summary className="min-h-[44px] cursor-pointer py-2 text-sm font-semibold">More context and a practical tip</summary><p className="mt-2 text-sm">{day.context}</p><p className="mt-3 text-sm">{day.practicalTip}</p></details>
                     {/* Personal scratchpad note with label association */}
                     <div className="pt-2">
                       <label htmlFor={inputId} className="text-xs font-medium text-ink/80 block mb-1.5">

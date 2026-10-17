@@ -145,3 +145,13 @@ it('carries the chosen scenario into an editable question without sending it to 
   expect(question).toContain('headphones'); expect(question).toContain('repaired');
   expect(request).not.toHaveBeenCalled();
 });
+it('limits the materials detail to its hotspots and the selected T-shirt', async () => {
+  await act(async()=>root.render(<App />));
+  const panel=host.querySelector('#object-preview')!;
+  expect(panel.querySelectorAll('button[aria-label^="Inspect "]')).toHaveLength(4);
+  expect(panel.textContent).not.toContain('Chapters of an everyday T-shirt');
+  expect(panel.textContent).not.toContain('Our Promise');
+  expect(panel.querySelectorAll('a')).toHaveLength(0);
+  await act(async()=>host.querySelector<HTMLButtonElement>('#object-tab-smartphone')!.click());
+  expect(host.querySelector('#object-preview')).toBeNull();
+});

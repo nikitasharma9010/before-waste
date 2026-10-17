@@ -232,3 +232,19 @@ it('retains essential deterministic safety guidance even when one action is requ
   expect(result.source).toBe('safety');
   expect(result.plan.steps).toHaveLength(2);
 });
+it('accepts a whole-response JSON fence without weakening content validation', async () => {
+  const value = { status:'completed',steps:[{type:'model_output',content:[{type:'text',text:'```json\n'+JSON.stringify(plan)+'\n```'}]}] };
+  expect((await generatePlan(input,env,vi.fn().mockResolvedValue(Response.json(value)))).plan).toEqual(plan);
+  const bad={...value,steps:[{type:'model_output',content:[{type:'text',text:'```json\n'+JSON.stringify({...plan,steps:['Open the battery casing.']})+'\n```'}]}]};
+  await expect(generatePlan(input,env,vi.fn().mockResolvedValue(Response.json(bad)))).rejects.toMatchObject({code:'AI_OUTPUT_POLICY'});
+});
+it('distinguishes upstream access, credits, rate limits and malformed answers without logging private data', async () => {
+  const log=vi.spyOn(console,'warn').mockImplementation(()=>{});
+  for (const [status,code] of [[401,'AI_ACCESS'],[402,'AI_CREDITS'],[404,'AI_MODEL_OR_ENDPOINT'],[429,'AI_RATE_LIMIT'],[500,'AI_UPSTREAM']] as const) {
+    await expect(generatePlan({...input,description:'Private user question about a secret item.'},env,vi.fn().mockResolvedValue(new Response('secret upstream error',{status})))).rejects.toMatchObject({code});
+  }
+  await expect(generatePlan(input,env,vi.fn().mockResolvedValue(Response.json({status:'completed',steps:[]})))).rejects.toMatchObject({code:'AI_INVALID_RESPONSE'});
+  await expect(generatePlan(input,env,vi.fn().mockRejectedValue(new TypeError('secret network error')))).rejects.toMatchObject({code:'AI_NETWORK'});
+  const recorded=JSON.stringify(log.mock.calls);
+  expect(recorded).not.toContain('Private user'); expect(recorded).not.toContain('test-api-key'); expect(recorded).not.toContain('secret');
+});

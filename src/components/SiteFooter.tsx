@@ -66,7 +66,7 @@ export function SiteFooter({ assistant = false, onRestart, onOpenSources }: {
       </div>
       <div className="mt-6 flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-t border-white/15 pt-4">
         <p className="text-xs text-paper/75">Guidance to review. Local rules and services still need checking.</p>
-        {assistant ? <a href="/#follow-one-thing" className={link}>Explore the object stories</a> : <button type="button" onClick={onRestart} aria-label="Restart journey and return to Cotton T-Shirt stage one" className={link}>Restart the story</button>}
+        {assistant ? <a href="/#follow-one-thing" className={link}>Explore the object stories</a> : <button type="button" onClick={onRestart} aria-label="Restart journey and return to Cotton T-Shirt stage one" className={link}>Start over</button>}
       </div>
     </div>
   </footer>;

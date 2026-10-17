@@ -89,7 +89,7 @@ export const OnePlanetDemands: React.FC = () => {
             <div className="lg:col-span-6 bg-paper p-4 sm:p-6 lg:p-8 rounded-2xl border border-ink/10 text-center space-y-5">
               <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface border border-ink/15 text-xs font-semibold text-ink">
                 <Globe className="w-3.5 h-3.5 text-forest" aria-hidden="true" />
-                <span>Demand Comparison Ratio</span>
+                <span>Resource demand</span>
               </div>
 
               {/* Planet Multiplier Graphic */}

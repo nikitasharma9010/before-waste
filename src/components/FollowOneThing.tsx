@@ -319,7 +319,7 @@ export const FollowOneThing: React.FC<FollowOneThingProps> = ({
                       stageFocusRequested.current = true;
                       onSelectObject(OBJECTS_DATA[nextIndex].id);
                     }}
-                    className="inline-flex items-center justify-center gap-2 px-5 py-2.5 min-h-[44px] rounded-xl text-xs sm:text-sm font-semibold text-white bg-forest hover:bg-forest-strong shadow-xs transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ink"
+                    className="inline-flex items-center justify-center gap-2 px-5 py-2.5 min-h-[44px] rounded-xl text-xs sm:text-sm font-semibold text-forest border border-forest/30 hover:bg-sage transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ink"
                     aria-label="Explore the next everyday object"
                   >
                     <Compass className="w-4 h-4" aria-hidden="true" />
@@ -344,7 +344,7 @@ export const FollowOneThing: React.FC<FollowOneThingProps> = ({
                 </div>
                 <a
                   href="#bigger-pattern"
-                  className="inline-flex items-center justify-center gap-2 px-4 py-2.5 min-h-[44px] rounded-xl text-xs sm:text-sm font-semibold text-white bg-forest hover:bg-forest-strong focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-forest transition-colors shrink-0 shadow-xs"
+                  className="inline-flex items-center justify-center gap-2 px-4 py-2.5 min-h-[44px] rounded-xl text-xs sm:text-sm font-semibold text-forest underline underline-offset-4 hover:bg-sage focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-forest transition-colors shrink-0"
                 >
                   <span>See the Bigger Pattern</span>
                   <ArrowRight className="w-4 h-4" aria-hidden="true" />
