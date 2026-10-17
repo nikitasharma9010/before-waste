@@ -1,3 +1,4 @@
+import { StoryActionLink } from './StoryActionLink';
 import { THEME } from '../utils/theme';
 import React, { useEffect, useRef } from 'react';
 import { OBJECTS_DATA, StoryObject } from '../data/objectsData';
@@ -349,6 +350,7 @@ export const FollowOneThing: React.FC<FollowOneThingProps> = ({
                   <ArrowRight className="w-4 h-4" aria-hidden="true" />
                 </a>
               </div>
+              <StoryActionLink key={activeObjectId} objectId={activeObjectId} />
             </div>
           )}
         </div>

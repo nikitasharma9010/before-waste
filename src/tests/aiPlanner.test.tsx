@@ -193,3 +193,33 @@ it('keeps starter suggestions after the question field and offers optional editi
   expect(host.textContent).toContain('Add some text to the draft before saving it.');
   expect([...host.querySelectorAll('button')].find(b => b.textContent?.includes('Save this action'))?.disabled).toBe(true);
 });
+it('supports follow-ups, saves original context and clears only unsaved conversation', async () => {
+  await act(async () => root.render(<DecisionHelper standalone onExploreObject={() => {}} />));
+  const request = vi.fn().mockImplementation(async () => Response.json(generated)); vi.stubGlobal('fetch', request);
+  const original = 'I live in Pune and want to mend my coat without spending.';
+  await input('ai-description', original); await click('Get AI guidance');
+  expect(host.querySelector<HTMLTextAreaElement>('#ai-description')?.value).toBe('');
+  const result = host.querySelector('[aria-label="Your suggested next step"]')!;
+  const composer = host.querySelector('form')!;
+  expect(result.compareDocumentPosition(composer) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  await click('Save this action');
+  expect(readAction().action?.question).toBe(original);
+  await input('action-note', 'Private note that should stay local');
+  await input('ai-description', 'What if I cannot find the spare button?'); await click('Get AI guidance');
+  const body = JSON.parse(request.mock.calls[1][1].body);
+  expect(body.context[0].question).toBe(original);
+  expect(JSON.stringify(body)).not.toContain('Private note');
+  const confirm = vi.spyOn(window, 'confirm').mockReturnValue(false);
+  await click('Start a new conversation'); expect(host.textContent).toContain('AI-GENERATED DRAFT');
+  confirm.mockReturnValue(true); await click('Start a new conversation');
+  expect(host.textContent).not.toContain('AI-GENERATED DRAFT');
+  expect(host.querySelector<HTMLTextAreaElement>('#ai-description')?.value).toBe('');
+  expect(readAction().action?.note).toContain('Private note');
+  await input('ai-description', 'How can I reduce packaging waste at home?'); await click('Get AI guidance');
+  expect(JSON.parse(request.mock.calls[2][1].body).context).toBeUndefined();
+});
+it('shows food safety guidance for food-related answers', async () => {
+  vi.stubGlobal('fetch', vi.fn().mockImplementation(async () => Response.json(generated)));
+  await input('ai-description', 'How can I prevent vegetable food waste in my flat?'); await click('Get AI guidance');
+  expect(host.querySelector('[aria-label="Food safety"]')?.textContent).toContain('cannot determine whether food is safe');
+});

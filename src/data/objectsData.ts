@@ -67,10 +67,10 @@ export const OBJECTS_DATA: StoryObject[] = [
         stageNumber: 5,
         stageName: 'Another possibility',
         stageTitle: 'Wear longer, mend simply, pass it forward',
-        body: 'Its next chapter is not fixed. A loose hem can be re-stitched in five minutes. A faded shirt becomes loungewear, then cleaning cloths, then shredded acoustic insulation.',
+        body: 'Its next chapter is not fixed. A loose hem may be repairable with suitable skills and materials. A faded shirt might work as loungewear or cleaning cloths. Textile recycling depends on its fibres and what local services accept.',
         detail: 'When clothing is cared for, traded with friends, or repurposed, the materials stay in circulation—delaying the demand for virgin cotton acreage.',
         materialFlow: 'Wear longer → Visible mending → Clothing swap → Workshop rags → Insulation',
-        curiousFact: 'In circular fashion, the most sustainable garment is always the one already hanging in your closet.'
+        curiousFact: 'Keeping a useful garment in use can help avoid a replacement purchase. What works depends on its condition and your needs.'
       }
     ]
   },
@@ -104,7 +104,7 @@ export const OBJECTS_DATA: StoryObject[] = [
         stageName: 'With me',
         stageTitle: 'Your constant companion for daily life',
         body: 'It connects you to loved ones, directions, music, and ideas. How it is charged, shielded with a case, and updated defines how smoothly it ages.',
-        detail: 'Keeping the battery between 20% and 80% charge slows chemical degradation, keeping the device responsive for multiple additional years.',
+        detail: 'Follow your manufacturer’s battery-care guidance and use any supported charge-management settings. Battery ageing varies with temperature, charging and use; extra years of service are not guaranteed.',
         materialFlow: 'Protective casing · Software security updates · Battery care · Daily utility',
         curiousFact: 'A high-grade protective case and screen protector prevent 90% of screen fractures that lead to premature upgrades.'
       },
@@ -230,7 +230,7 @@ export const OBJECTS_DATA: StoryObject[] = [
         stageName: 'Another possibility',
         stageTitle: 'Reuse, gift mailing, and clean paper loops',
         body: 'A sturdy box can be used to ship a care package to a friend, store seasonal winter scarves, or protect garden beds as biodegradable sheet mulch.',
-        detail: 'When clean and flattened into paper recycling, it dissolves in water within 15 minutes at a paper mill, becoming tomorrow\'s new cereal box.',
+        detail: 'If your local collector accepts it, clean cardboard can be processed into recovered fibres at a paper mill. Processing time and the next product vary; contamination and coatings can affect acceptance.',
         materialFlow: 'Home storage box → Flat folding → Clean curbside fiber bin → Repulped carton',
         curiousFact: 'Cardboard has one of the highest recycling success rates of any packaging material when kept dry and clean.'
       }
