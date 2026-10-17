@@ -36,6 +36,13 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
   const titleRef = useRef<HTMLHeadingElement>(null);
   const savedRef = useRef<HTMLHeadingElement>(null);
   const advice = result ? recommend(result) : null;
+  const saveHint = generated ? {
+    ready: '',
+    clarify: 'Save is available for actionable plans. Add the requested details below to continue.',
+    explanation: 'This is an explanation, so it is not saved as an action. Ask a follow-up for a practical next step you can save.',
+    refused: 'This safety response is not an action plan to save. You can ask about a safer option below.',
+    unsupported: 'This reply is outside the supported theme and cannot be saved as an action.',
+  }[generated.plan.status] : '';
   const isSameSaved = !!(saved && result && sameDecision(saved, result) &&
     (generated ? saved.question === answeredQuestion && saved.customPlan?.text === editedPlan && saved.customPlan.source === generated.source : !saved.customPlan));
   const hasUnsavedEdits = !!(generated && generated.plan.status === 'ready' && editedPlan !== planText(generated.plan) && !isSameSaved);
@@ -187,6 +194,7 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
               {result.intent === 'pass' && <p className="mt-3 text-sm">Before travelling, contact the recipient or collection service. Ask whether they accept this item in its current condition{result.item === 'headphones' ? ', whether batteries need special handling,' : ''} and whether there is a fee. US guidance is background information; use your municipality or manufacturer for local rules.</p>}
               <p className="mt-3 text-xs text-ink/80">Editorial starting points, not a diagnosis or a measured environmental saving. Check collection and donation acceptance locally.</p>
               </>}
+              {saveHint && <p id="answer-save-hint" className="mt-4 text-sm text-ink/80">{saveHint}</p>}
               {generated?.plan.status === 'ready' && !editedPlan.trim() && <p role="status" className="mt-4 text-sm text-clay">Add some text to the draft before saving it.</p>}
               {!(standalone && !generated) && <>
               {saved && !isSameSaved && !updatingSaved && (!generated || generated.plan.status === 'ready') && <p className="mt-5 text-sm">One action is kept at a time. Replacing it starts fresh notes and progress; you can undo until the next change or reload.</p>}

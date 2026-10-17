@@ -93,3 +93,23 @@ it.each(['gemini','aicredits'])('supports actionable button-check guidance throu
   expect(instructions).toContain('Resources are not a quota');
   expect(instructions).toContain('Food safety, hazardous materials, structural damage and electrical risks retain their stricter boundaries');
 });
+
+it('recognizes a requested best next step without matching a story about an earlier step', () => {
+  expect(singleStep('What is the most realistic next step?')).toBe(true);
+  expect(singleStep('What’s the best next step for this jacket?')).toBe(true);
+  expect(singleStep('Which would be the most practical next action?')).toBe(true);
+  expect(singleStep('I already tried the most realistic next step and it did not work.')).toBe(false);
+});
+it.each(['gemini','aicredits'])('bounds the most realistic next step to one task for %s', async provider => {
+  const response = provider === 'gemini' ? gemini : chat;
+  const upstream = vi.fn().mockResolvedValue(response(plan));
+  await generatePlan({...input,description:'I have no tools and cannot spend money. What is the most realistic next step?'},{...env,AI_PROVIDER:provider},upstream);
+  const body = JSON.parse(upstream.mock.calls[0][1].body);
+  const instructions = provider === 'gemini' ? body.system_instruction : body.messages[0].content;
+  if (provider === 'gemini') expect(body.response_format.schema.properties.steps.maxItems).toBe(1);
+  else expect(instructions).toContain('"maxItems":1');
+  expect(instructions).toContain('A no-spending budget does not establish');
+  expect(instructions).toContain('confirm fees, materials costs and availability');
+  const tooMany = {...plan,steps:['Ask a friend for help.', 'Search for local classes.']};
+  await expect(generatePlan({...input,description:'What is the most realistic next step?'},{...env,AI_PROVIDER:provider},vi.fn().mockResolvedValue(response(tooMany)))).rejects.toThrow('usable plan');
+});
