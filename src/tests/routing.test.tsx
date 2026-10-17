@@ -97,7 +97,7 @@ it('connects the final story stage to an editable question without calling AI', 
   expect(takeQuestionDraft()).toContain('T-shirt');
   expect(request).not.toHaveBeenCalled();
 });
-it('keeps learning optional and reveals old deep links on load and hash changes', async () => {
+it('opens learning deep links and makes reflection directly accessible', async () => {
   window.history.replaceState({}, '', '/#one-planet');
   await act(async () => root.render(<App />));
   expect(host.querySelector('#one-planet')?.closest('details')?.open).toBe(true);
@@ -108,7 +108,8 @@ it('keeps learning optional and reveals old deep links on load and hash changes'
   });
   expect(host.querySelector('#systems')?.closest('details')?.open).toBe(true);
   expect(document.activeElement?.id).toBe('systems');
-  expect(host.querySelector('#pause')?.closest('details')?.open).toBe(false);
+  expect(host.querySelector('#pause')?.closest('details')).toBeNull();
+  expect(host.querySelector('#one-planet')?.closest('details')?.open).toBe(false);
 });
 it('resumes a selected story and stage after visiting the assistant', async () => {
   await act(async () => root.render(<App />));
@@ -154,4 +155,18 @@ it('limits the materials detail to its hotspots and the selected T-shirt', async
   expect(panel.querySelectorAll('a')).toHaveLength(0);
   await act(async()=>host.querySelector<HTMLButtonElement>('#object-tab-smartphone')!.click());
   expect(host.querySelector('#object-preview')).toBeNull();
+});
+
+it('starts learning open and smoothly follows repeated section links while respecting reduced motion', async () => {
+  const scroll = vi.fn(); Element.prototype.scrollIntoView = scroll;
+  await act(async () => root.render(<App />));
+  expect(host.querySelector('#bigger-pattern')?.closest('details')?.open).toBe(true);
+  const link = host.querySelector<HTMLAnchorElement>('header a[href="/#learn"]')!;
+  await act(async () => link.click());
+  expect(location.hash).toBe('#learn');
+  expect(document.activeElement?.id).toBe('learn');
+  expect(scroll).toHaveBeenLastCalledWith({ block: 'start', behavior: 'smooth' });
+  vi.stubGlobal('matchMedia', vi.fn().mockReturnValue({ matches: true }));
+  await act(async () => link.click());
+  expect(scroll).toHaveBeenLastCalledWith({ block: 'start', behavior: 'auto' });
 });
