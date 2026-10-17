@@ -91,3 +91,20 @@ model-quality advantage without evidence.
 - Check browser Back/Forward, home/story links, mobile navigation, sources dialog and saved action after changing pages.
 - Use an unrelated-location/repair example, edit with clarification details and regenerate. Context is the visible question/selected details, not an automatic hidden chat history.
 - If tab storage is blocked, the homepage must preserve the question and offer a manual recovery link.
+
+## Diagnose generation failures when credits remain
+
+Credits alone do not establish that the configured API key and model can generate. AICredits documents a per-API-key wallet balance at GET /v1/credits; its endpoint is https://api.aicredits.in/v1/chat/completions (https://aicredits.in/docs/api-reference). Never paste keys into logs or a public issue.
+
+After deploying, inspect the Vercel function logs for `beforewaste.planner.failure` or `beforewaste.planner.upstream`. These events contain provider name, a fixed diagnostic code and HTTP status only—not questions, keys, responses or headers.
+
+- AI_NOT_CONFIGURED / AI_CONFIGURATION: check environment names, target environment and redeploy.
+- AI_ACCESS: upstream 401/403. Check key validity and permissions.
+- AI_CREDITS: upstream 402. Check the wallet and API-key account used by this deployment.
+- AI_MODEL_OR_ENDPOINT: upstream 404. Check the configured model ID and provider availability.
+- AI_REQUEST_REJECTED: upstream 400. Check provider capability/request compatibility.
+- AI_RATE_LIMIT: upstream 429. Quota/rate limiting can occur even with credits.
+- AI_TIMEOUT / AI_NETWORK / AI_UPSTREAM: transient connectivity, deadline or service failure.
+- AI_INVALID_RESPONSE / AI_OUTPUT_POLICY: a response arrived but failed the app contract or policy. Credits do not bypass validation.
+
+The API error JSON includes the provider-neutral diagnostic code. Raw upstream error messages are deliberately not returned. AI_PROVIDER=gemini disables AICredits fallback; use auto to enable both configured services or aicredits to isolate that service. Environment changes need a new production deployment. Run the synthetic evaluation command in ai-evaluation.md against each configured service before changing model defaults.

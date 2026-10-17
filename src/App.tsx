@@ -36,7 +36,7 @@ export default function App() {
   // Single source of truth for selected object and stage
   const [initialStory] = useState(() => {
     const saved = readStoryProgress();
-    const requested = new URLSearchParams(window.location.search).get('story');
+    const requested = window.location.hash === '#object-preview' ? 'tshirt' : new URLSearchParams(window.location.search).get('story');
     return requested && ['tshirt', 'smartphone', 'food', 'package'].includes(requested)
       ? { id: requested, stage: requested === saved.id ? saved.stage : 0 } : saved;
   });
@@ -134,9 +134,9 @@ export default function App() {
           onRestartStory={handleRestartStory}
         />
 
-        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-          <details className="rounded-xl border border-ink/20 bg-surface p-4"><summary className="min-h-[44px] cursor-pointer py-2 font-semibold">Optional: a closer look at T-shirt materials</summary><HeroOpening onExploreObjects={handleExploreObject} /></details>
-        </div>
+        {selectedObjectId === 'tshirt' && <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+          <details className="rounded-xl border border-ink/20 bg-surface p-4"><summary className="min-h-[44px] cursor-pointer py-2 font-semibold">Explore T-shirt materials</summary><HeroOpening /></details>
+        </div>}
         <WhatWouldYouDo />
         <AssistantEntry />
         <section id="learn" tabIndex={-1} aria-labelledby="learn-title" className="scroll-mt-20 border-y border-ink/10 bg-paper px-4 py-10 sm:px-6 lg:px-8">

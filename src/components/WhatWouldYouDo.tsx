@@ -140,7 +140,7 @@ export const WhatWouldYouDo: React.FC = () => {
                     </p>
                   </div>
                   <span className="text-xs font-semibold text-forest mt-4 block">
-                    {isSelected ? 'Viewing Perspective ↓' : 'Click to explore →'}
+                    {isSelected ? 'Selected' : 'Explore this choice'}
                   </span>
                 </button>
               );
@@ -151,7 +151,7 @@ export const WhatWouldYouDo: React.FC = () => {
           <div className="p-4 sm:p-6 lg:p-8 rounded-2xl bg-surface border border-ink/15 shadow-2xs animate-in fade-in duration-200">
             <div className="section-kicker text-forest mb-2">
               <Lightbulb className="w-4 h-4 text-forest" aria-hidden="true" />
-              <span>A COMPASSIONATE PERSPECTIVE</span>
+              <span>WHAT TO CONSIDER</span>
             </div>
 
             <h4 className="font-editorial text-2xl font-semibold text-ink mb-3">
@@ -162,25 +162,7 @@ export const WhatWouldYouDo: React.FC = () => {
               {selectedOption.nuanceBody}
             </p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-ink/10">
-              <div className="p-4 rounded-xl bg-paper border border-ink/10">
-                <span className="text-xs font-semibold text-ink/75 uppercase tracking-wider block mb-1">
-                  Helpful Context
-                </span>
-                <p className="text-xs sm:text-sm text-ink/85 leading-relaxed">
-                  {selectedOption.practicalInsight}
-                </p>
-              </div>
-
-              <div className="p-4 rounded-xl bg-sage border border-sage-border">
-                <span className="text-xs font-semibold text-forest uppercase tracking-wider block mb-1">
-                  Practical Tip
-                </span>
-                <p className="text-xs sm:text-sm text-ink/90 leading-relaxed">
-                  {selectedOption.nextStepSuggestion}
-                </p>
-              </div>
-            </div>
+            <div className="rounded-xl border border-sage-border bg-sage p-4"><h5 className="font-semibold text-forest">A useful next step</h5><p className="mt-2 text-sm">{selectedOption.nextStepSuggestion}</p></div>
             <div className="mt-5 border-t border-ink/15 pt-4">
               <p className="text-sm">Want help applying this choice? Add your real situation before sending the question.</p>
               <QuestionLink key={`${activeScenarioId}-${selectedOptionId}`} label="Ask about this choice" question={`I explored this scenario: ${currentScenario.prompt} I am considering: ${selectedOption.label}. What should I check to decide whether this fits my own situation?`} />

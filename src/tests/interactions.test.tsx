@@ -151,7 +151,7 @@ describe('real application interactions', () => {
     await render(<App />);
     await click(host.querySelector('[aria-label^="Stage 5:"]')!);
     expect(host.querySelector('[aria-current="step"]')?.getAttribute('aria-label')).toContain('Stage 5');
-    await click(button('Restart the story'));
+    await click(button('Start over'));
     expect(document.activeElement).toBe(host.querySelector('#hero'));
     expect(host.querySelector('[aria-current="step"]')?.getAttribute('aria-label')).toContain('Stage 1');
     expect(host.querySelector('#object-tab-tshirt')?.getAttribute('aria-pressed')).toBe('true');
