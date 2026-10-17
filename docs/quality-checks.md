@@ -15,9 +15,17 @@ Decorative logo images have empty alt text and their home links have accessible 
 - Logo assets load in both header and footer.
 - Reflection fields use multiline native controls with 16px text at the normal font setting.
 
-Muted ink at 75% opacity on ivory has approximately 6.29:1 contrast. White on the
-darkened coral and cobalt selected badges has approximately 6.70:1 and 8.99:1
-contrast, respectively. These are computed color-pair checks, not a full contrast audit.
+## Material-inspired theme
+
+Warm paper and cream surfaces evoke the materials in the stories. Forest teal is
+reserved for primary actions and selection; terracotta provides restrained editorial
+emphasis and caution. Sage and oat surfaces support context without competing with
+controls. Illustrations retain material colors such as soil, cotton, fruit, and cardboard.
+Semantic UI tokens live in `src/index.css`; scene tints live in `src/utils/theme.ts`.
+
+White on forest has approximately 8.10:1 contrast, white on terracotta 5.87:1,
+and ink on paper 10.98:1. Automated contrast checks cover key text/surface pairs,
+action hover states, and muted text. These are color-pair checks, not a full audit.
 
 ## Automated checks
 

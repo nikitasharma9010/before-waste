@@ -87,7 +87,7 @@ export const AccessibleDialog: React.FC<AccessibleDialogProps> = ({
   return createPortal(
     <div
       ref={overlayRef}
-      className="fixed inset-0 z-50 bg-[#202A35]/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 overflow-y-auto"
+      className="fixed inset-0 z-50 bg-ink/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 overflow-y-auto"
       role="presentation"
       onClick={(e) => {
         if (e.target === e.currentTarget) {
@@ -102,16 +102,16 @@ export const AccessibleDialog: React.FC<AccessibleDialogProps> = ({
         aria-labelledby={titleId}
         aria-describedby={descriptionId}
         tabIndex={-1}
-        className={`bg-[#FFF9F0] text-[#202A35] rounded-3xl w-full ${maxWidthClass} max-h-[90vh] flex flex-col border border-[#202A35]/15 shadow-2xl focus:outline-none animate-in fade-in zoom-in-95 duration-200 my-auto`}
+        className={`bg-paper text-ink rounded-3xl w-full ${maxWidthClass} max-h-[90vh] flex flex-col border border-ink/15 shadow-2xl focus:outline-none animate-in fade-in zoom-in-95 duration-200 my-auto`}
       >
         {/* Dialog Header */}
-        <div className="flex items-start justify-between gap-4 p-5 sm:p-7 border-b border-[#202A35]/10 shrink-0">
+        <div className="flex items-start justify-between gap-4 p-5 sm:p-7 border-b border-ink/10 shrink-0">
           <div>
-            <h2 id={titleId} className="font-editorial text-2xl font-bold text-[#202A35]">
+            <h2 id={titleId} className="font-editorial text-2xl font-bold text-ink">
               {title}
             </h2>
             {description && (
-              <p id={descriptionId} className="text-xs sm:text-sm text-[#202A35]/70 mt-1">
+              <p id={descriptionId} className="text-xs sm:text-sm text-ink/75 mt-1">
                 {description}
               </p>
             )}
@@ -119,7 +119,7 @@ export const AccessibleDialog: React.FC<AccessibleDialogProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="p-2.5 rounded-xl text-[#202A35]/70 hover:text-[#202A35] hover:bg-[#202A35]/5 focus-visible:ring-2 focus-visible:ring-[#202A35] transition-colors cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-center"
+            className="p-2.5 rounded-xl text-ink/75 hover:text-ink hover:bg-ink/5 focus-visible:ring-2 focus-visible:ring-ink transition-colors cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-center"
             aria-label="Close dialog"
           >
             <X className="w-5 h-5" />
@@ -127,7 +127,7 @@ export const AccessibleDialog: React.FC<AccessibleDialogProps> = ({
         </div>
 
         {/* Dialog Body (scrollable) */}
-        <div className="p-5 sm:p-7 overflow-y-auto flex-1 text-sm text-[#202A35]/85">
+        <div className="p-5 sm:p-7 overflow-y-auto flex-1 text-sm text-ink/85">
           {children}
         </div>
       </div>

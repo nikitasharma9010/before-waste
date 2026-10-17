@@ -66,31 +66,31 @@ export const BiggerPattern: React.FC = () => {
   const activeStep = COMPARISON_STAGES[selectedStepIndex];
 
   return (
-    <section id="bigger-pattern" className="scroll-mt-20 py-16 lg:py-24 bg-[#FFF9F0] border-b border-[#202A35]/8">
+    <section id="bigger-pattern" className="scroll-mt-20 py-16 lg:py-24 bg-paper border-b border-ink/8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="max-w-3xl mb-12">
-          <div className="section-kicker text-[#425BFF] mb-2">
+          <div className="section-kicker text-forest mb-2">
             <span>THE SYSTEMIC SHIFT</span>
             <span aria-hidden="true">·</span>
             <span>REVEAL THE BIGGER PATTERN</span>
           </div>
-          <h2 className="font-editorial text-3xl sm:text-4xl lg:text-5xl text-[#202A35] font-normal leading-tight text-balance">
+          <h2 className="font-editorial text-3xl sm:text-4xl lg:text-5xl text-ink font-normal leading-tight text-balance">
             We usually notice waste at the end.
           </h2>
-          <p className="mt-3 text-lg text-[#202A35]/80 font-normal leading-relaxed">
+          <p className="mt-3 text-lg text-ink/80 font-normal leading-relaxed">
             Most environmental conversations focus on the trash can. But what if the story could change much earlier?
           </p>
         </div>
 
         {/* Interactive Model Toggle */}
-        <div className="bg-white rounded-3xl border border-[#202A35]/10 p-4 sm:p-7 lg:p-10 shadow-sm mb-12">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-8 pb-6 border-b border-[#202A35]/8">
+        <div className="bg-surface rounded-3xl border border-ink/10 p-4 sm:p-7 lg:p-10 shadow-sm mb-12">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-8 pb-6 border-b border-ink/8">
             <div>
-              <span className="text-xs font-semibold text-[#202A35]/75 uppercase tracking-wider block">
+              <span className="text-xs font-semibold text-ink/75 uppercase tracking-wider block">
                 Interactive Model Inspector
               </span>
-              <p className="font-editorial text-xl sm:text-2xl text-[#202A35] font-semibold mt-0.5">
+              <p className="font-editorial text-xl sm:text-2xl text-ink font-semibold mt-0.5">
                 {activeModel === 'linear' ? 'The Linear Highway (Take → Throw)' : 'A Better Next Turn (Curiosity & Care)'}
               </p>
             </div>
@@ -99,7 +99,7 @@ export const BiggerPattern: React.FC = () => {
             <div
               role="group"
               aria-label="Economic model comparison"
-              className="w-full lg:w-auto grid grid-cols-1 min-[400px]:grid-cols-2 lg:inline-flex p-1 bg-[#FFF9F0] border border-[#202A35]/15 rounded-xl"
+              className="w-full lg:w-auto grid grid-cols-1 min-[400px]:grid-cols-2 lg:inline-flex p-1 bg-paper border border-ink/15 rounded-xl"
             >
               <button
                 type="button"
@@ -107,10 +107,10 @@ export const BiggerPattern: React.FC = () => {
                 aria-pressed={activeModel === 'linear'}
                 aria-controls="model-panel"
                 onClick={() => setActiveModel('linear')}
-                className={`px-3 sm:px-4 py-2 sm:py-2.5 min-h-[44px] text-xs sm:text-sm font-medium rounded-lg transition-all cursor-pointer text-center whitespace-normal lg:whitespace-nowrap focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#202A35] focus:outline-none ${
+                className={`px-3 sm:px-4 py-2 sm:py-2.5 min-h-[44px] text-xs sm:text-sm font-medium rounded-lg transition-all cursor-pointer text-center whitespace-normal lg:whitespace-nowrap focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ink focus:outline-none ${
                   activeModel === 'linear'
-                    ? 'bg-[#202A35] text-white shadow-xs'
-                    : 'text-[#202A35]/80 hover:text-[#202A35]'
+                    ? 'bg-forest text-white shadow-xs'
+                    : 'text-ink/80 hover:text-ink'
                 }`}
               >
                 Linear: Take → Throw
@@ -121,10 +121,10 @@ export const BiggerPattern: React.FC = () => {
                 aria-pressed={activeModel === 'circular'}
                 aria-controls="model-panel"
                 onClick={() => setActiveModel('circular')}
-                className={`px-3 sm:px-4 py-2 sm:py-2.5 min-h-[44px] text-xs sm:text-sm font-medium rounded-lg transition-all cursor-pointer text-center whitespace-normal lg:whitespace-nowrap focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#202A35] focus:outline-none ${
+                className={`px-3 sm:px-4 py-2 sm:py-2.5 min-h-[44px] text-xs sm:text-sm font-medium rounded-lg transition-all cursor-pointer text-center whitespace-normal lg:whitespace-nowrap focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ink focus:outline-none ${
                   activeModel === 'circular'
-                    ? 'bg-[#2840DE] text-white shadow-xs'
-                    : 'text-[#202A35]/80 hover:text-[#202A35]'
+                    ? 'bg-forest text-white shadow-xs'
+                    : 'text-ink/80 hover:text-ink'
                 }`}
               >
                 A Better Next Turn
@@ -147,37 +147,37 @@ export const BiggerPattern: React.FC = () => {
                     aria-controls="step-detail-panel"
                     aria-label={`Step ${item.step}: ${isLinear ? item.linearName : item.circularName}`}
                     onClick={() => setSelectedStepIndex(idx)}
-                    className={`flex flex-col items-start justify-start p-3.5 sm:p-4 min-h-[44px] rounded-xl sm:rounded-2xl text-left border transition-all cursor-pointer relative focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#202A35] focus:outline-none ${
+                    className={`flex flex-col items-start justify-start p-3.5 sm:p-4 min-h-[44px] rounded-xl sm:rounded-2xl text-left border transition-all cursor-pointer relative focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ink focus:outline-none ${
                       isSelected
                         ? isLinear
-                          ? 'bg-[#FFF0EE] border-[#C53B27] shadow-sm ring-1 ring-[#C53B27]'
-                          : 'bg-[#EEF1FF] border-[#2840DE] shadow-sm ring-1 ring-[#2840DE]'
-                        : 'bg-[#FFF9F0] border-[#202A35]/15 hover:border-[#202A35]/40'
+                          ? 'bg-clay-tint border-clay shadow-sm ring-1 ring-clay'
+                          : 'bg-sage border-forest shadow-sm ring-1 ring-forest'
+                        : 'bg-paper border-ink/15 hover:border-ink/40'
                     }`}
                   >
                     <div className="flex w-full items-center justify-between mb-2">
-                      <span className="text-xs font-mono font-bold text-[#202A35]/75">
+                      <span className="text-xs font-mono font-bold text-ink/75">
                         {item.step}
                       </span>
                       {isSelected && (
                         <span
                           className="w-2.5 h-2.5 rounded-full"
-                          style={{ backgroundColor: isLinear ? '#C53B27' : '#2840DE' }}
+                          style={{ backgroundColor: isLinear ? 'var(--color-clay)' : 'var(--color-forest)' }}
                           aria-hidden="true"
                         />
                       )}
                     </div>
 
-                    <h3 className="font-editorial text-sm sm:text-base font-semibold text-[#202A35] mb-1">
+                    <h3 className="font-editorial text-sm sm:text-base font-semibold text-ink mb-1">
                       {isLinear ? item.linearName.split(' ')[0] : item.circularName.split(' ')[0]}
                     </h3>
-                    <p className="text-xs text-[#202A35]/75 line-clamp-2">
+                    <p className="text-xs text-ink/75 line-clamp-2">
                       {isLinear ? item.linearName : item.circularName}
                     </p>
 
                     {/* Step indicator arrow for desktop */}
                     {idx < 4 && (
-                      <div className="hidden lg:flex items-center justify-center absolute left-[calc(100%+0.375rem)] top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 text-[#202A35]/40 pointer-events-none" aria-hidden="true">
+                      <div className="hidden lg:flex items-center justify-center absolute left-[calc(100%+0.375rem)] top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 text-ink/40 pointer-events-none" aria-hidden="true">
                         <ArrowRight className="w-3 h-3" />
                       </div>
                     )}
@@ -188,42 +188,42 @@ export const BiggerPattern: React.FC = () => {
           </div>
 
           {/* Deep Dive Card for Selected Step */}
-          <div id="step-detail-panel" role="region" aria-labelledby={`step-tab-${activeStep.step}`} className="p-4 sm:p-6 lg:p-8 rounded-2xl bg-[#FFF9F0] border border-[#202A35]/10">
+          <div id="step-detail-panel" role="region" aria-labelledby={`step-tab-${activeStep.step}`} className="p-4 sm:p-6 lg:p-8 rounded-2xl bg-paper border border-ink/10">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
               {/* Left Column: What Happens Here */}
               <div className="lg:col-span-7 space-y-4">
-                <div className="flex items-center gap-2 text-xs font-semibold tracking-wider uppercase text-[#202A35]/70">
+                <div className="flex items-center gap-2 text-xs font-semibold tracking-wider uppercase text-ink/75">
                   <span>STEP {activeStep.step} OF 05</span>
                   <span aria-hidden="true">·</span>
-                  <span className={activeModel === 'linear' ? 'text-[#C53B27]' : 'text-[#2840DE]'}>
+                  <span className={activeModel === 'linear' ? 'text-clay' : 'text-forest'}>
                     {activeModel === 'linear' ? activeStep.linearName : activeStep.circularName}
                   </span>
                 </div>
 
-                <h3 className="font-editorial text-2xl sm:text-3xl font-medium text-[#202A35]">
+                <h3 className="font-editorial text-2xl sm:text-3xl font-medium text-ink">
                   {activeModel === 'linear' ? activeStep.linearName : activeStep.circularName}
                 </h3>
 
-                <p className="text-base text-[#202A35]/85 leading-relaxed">
+                <p className="text-base text-ink/85 leading-relaxed">
                   {activeModel === 'linear' ? activeStep.linearDesc : activeStep.circularDesc}
                 </p>
 
                 <div
                   className="p-4 rounded-xl border"
                   style={{
-                    backgroundColor: activeModel === 'linear' ? '#FFF0EE' : '#EEF1FF',
-                    borderColor: activeModel === 'linear' ? '#FFD6D0' : '#CCD4FF'
+                    backgroundColor: activeModel === 'linear' ? 'var(--color-clay-tint)' : 'var(--color-sage)',
+                    borderColor: activeModel === 'linear' ? 'var(--color-clay-border)' : 'var(--color-sage-border)'
                   }}
                 >
-                  <p className="text-xs sm:text-sm font-medium text-[#202A35]">
+                  <p className="text-xs sm:text-sm font-medium text-ink">
                     {activeModel === 'linear' ? (
                       <>
-                        <strong className="text-[#C53B27]">System Cost: </strong>
+                        <strong className="text-clay">System Cost: </strong>
                         {activeStep.linearImpact}
                       </>
                     ) : (
                       <>
-                        <strong className="text-[#2840DE]">Circularity Advantage: </strong>
+                        <strong className="text-forest">Circularity Advantage: </strong>
                         {activeStep.circularBenefit}
                       </>
                     )}
@@ -232,16 +232,16 @@ export const BiggerPattern: React.FC = () => {
               </div>
 
               {/* Right Column: Comparative Insight */}
-              <div className="lg:col-span-5 bg-white p-5 rounded-xl border border-[#202A35]/10 space-y-3">
-                <span className="text-xs font-semibold tracking-wider uppercase text-[#202A35]/70 block">
+              <div className="lg:col-span-5 bg-surface p-5 rounded-xl border border-ink/10 space-y-3">
+                <span className="text-xs font-semibold tracking-wider uppercase text-ink/75 block">
                   Why Earlier Interventions Matter
                 </span>
-                <p className="text-xs sm:text-sm text-[#202A35]/80 leading-relaxed">
+                <p className="text-xs sm:text-sm text-ink/80 leading-relaxed">
                   Intervening earlier at Step 01 (asking &quot;Do I need this?&quot;) or Step 04 (caring and repairing) can significantly reduce demand for new virgin materials, processing energy, and long-distance transport, while recognizing that repair, cleaning, and maintenance also require modest energy and resources.
                 </p>
-                <div className="pt-2 border-t border-[#202A35]/8 flex items-center justify-between text-xs text-[#202A35]/70">
+                <div className="pt-2 border-t border-ink/8 flex items-center justify-between text-xs text-ink/75">
                   <span>Current active node:</span>
-                  <span className="font-mono font-bold text-[#202A35]">
+                  <span className="font-mono font-bold text-ink">
                     {activeStep.step} / 05
                   </span>
                 </div>
@@ -250,11 +250,11 @@ export const BiggerPattern: React.FC = () => {
           </div>
 
           {/* Central Editorial Insight: "Not a perfect circle. A better next turn." */}
-          <div className="mt-8 pt-8 border-t border-[#202A35]/8 text-center max-w-2xl mx-auto space-y-3">
-            <h3 className="font-editorial text-2xl sm:text-3xl text-[#202A35] font-semibold">
+          <div className="mt-8 pt-8 border-t border-ink/8 text-center max-w-2xl mx-auto space-y-3">
+            <h3 className="font-editorial text-2xl sm:text-3xl text-ink font-semibold">
               “Not a perfect circle. A better next turn.”
             </h3>
-            <p className="text-sm text-[#202A35]/75 leading-relaxed">
+            <p className="text-sm text-ink/75 leading-relaxed">
               Recycling remains essential for recovered glass, aluminum, cardboard, and clean polymers. But recycling is like the ambulance at the bottom of the hill: avoiding unnecessary consumption, choosing durable goods, and caring for what we have preserves far more planetary value.
             </p>
           </div>

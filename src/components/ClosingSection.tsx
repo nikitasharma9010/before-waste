@@ -53,19 +53,19 @@ export const ClosingSection: React.FC<ClosingSectionProps> = ({ onRestart, onOpe
   };
 
   return (
-    <footer id="closing" className="scroll-mt-20 pt-20 pb-16 bg-[#202A35] text-[#FFF9F0] relative overflow-hidden">
+    <footer id="closing" className="scroll-mt-20 pt-20 pb-16 bg-ink text-paper relative overflow-hidden">
       {/* Accessible live status for share notifications */}
       <div role="status" aria-live="polite" className="sr-only">
         {shareFeedback || ''}
       </div>
 
       {/* Soft gradient accent glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-5xl h-64 bg-gradient-to-b from-[#C53B27]/15 via-[#2840DE]/10 to-transparent pointer-events-none" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-5xl h-64 bg-gradient-to-b from-clay/15 via-forest/10 to-transparent pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Closing Editorial Reflection */}
         <div className="max-w-3xl mx-auto text-center space-y-6 mb-16">
-          <div className="inline-flex items-center gap-2 text-xs font-semibold tracking-widest uppercase text-[#FFC857]">
+          <div className="inline-flex items-center gap-2 text-xs font-semibold tracking-widest uppercase text-oat">
             <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
             <span>THE NEXT CHAPTER</span>
           </div>
@@ -74,11 +74,11 @@ export const ClosingSection: React.FC<ClosingSectionProps> = ({ onRestart, onOpe
             The next thing you buy already has a story.
           </h2>
 
-          <p className="font-editorial text-2xl sm:text-3xl italic text-[#FFF9F0]/85">
+          <p className="font-editorial text-2xl sm:text-3xl italic text-paper/85">
             “You get to be part of what happens next.”
           </p>
 
-          <p className="text-sm sm:text-base text-[#FFF9F0]/75 leading-relaxed max-w-xl mx-auto font-sans pt-2">
+          <p className="text-sm sm:text-base text-paper/75 leading-relaxed max-w-xl mx-auto font-sans pt-2">
             You don&apos;t have to be perfect. You don&apos;t have to renounce everything you own. Simply carry a little more curiosity into the stores, markets, and drawers of your everyday life.
           </p>
 
@@ -86,7 +86,7 @@ export const ClosingSection: React.FC<ClosingSectionProps> = ({ onRestart, onOpe
           <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center justify-center gap-3 pt-4">
             <a
               href="#pause"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3.5 min-h-[44px] rounded-xl font-bold text-sm text-[#202A35] bg-[#FFC857] hover:bg-[#EBB442] focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white transition-all shadow-md cursor-pointer text-center"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3.5 min-h-[44px] rounded-xl font-bold text-sm text-ink bg-oat hover:bg-oat-strong focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white transition-all shadow-md cursor-pointer text-center"
             >
               <span>Pause before the next thing</span>
             </a>
@@ -94,7 +94,7 @@ export const ClosingSection: React.FC<ClosingSectionProps> = ({ onRestart, onOpe
             <button
               type="button"
               onClick={onRestart}
-              className="inline-flex items-center justify-center gap-2 px-5 py-3.5 min-h-[44px] rounded-xl font-semibold text-sm text-white/95 hover:text-white bg-white/10 hover:bg-white/20 focus-visible:ring-2 focus-visible:ring-white transition-colors cursor-pointer border border-white/15 text-center"
+              className="inline-flex items-center justify-center gap-2 px-5 py-3.5 min-h-[44px] rounded-xl font-semibold text-sm text-white/95 hover:text-white bg-surface/10 hover:bg-surface/20 focus-visible:ring-2 focus-visible:ring-white transition-colors cursor-pointer border border-white/15 text-center"
               aria-label="Restart journey and return to Cotton T-Shirt stage one"
             >
               <RotateCcw className="w-4 h-4" aria-hidden="true" />
@@ -104,11 +104,11 @@ export const ClosingSection: React.FC<ClosingSectionProps> = ({ onRestart, onOpe
             <button
               type="button"
               onClick={handleShare}
-              className="inline-flex items-center justify-center gap-2 px-5 py-3.5 min-h-[44px] rounded-xl font-semibold text-sm text-white/95 hover:text-white bg-white/10 hover:bg-white/20 focus-visible:ring-2 focus-visible:ring-white transition-colors cursor-pointer border border-white/15 text-center"
+              className="inline-flex items-center justify-center gap-2 px-5 py-3.5 min-h-[44px] rounded-xl font-semibold text-sm text-white/95 hover:text-white bg-surface/10 hover:bg-surface/20 focus-visible:ring-2 focus-visible:ring-white transition-colors cursor-pointer border border-white/15 text-center"
               aria-label="Share this story"
             >
               {shareFeedback ? (
-                <Check className="w-4 h-4 text-[#FFC857]" aria-hidden="true" />
+                <Check className="w-4 h-4 text-oat" aria-hidden="true" />
               ) : (
                 <Share2 className="w-4 h-4" aria-hidden="true" />
               )}

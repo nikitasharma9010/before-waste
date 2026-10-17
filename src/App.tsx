@@ -75,7 +75,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FFF9F0] text-[#202A35] flex flex-col font-sans selection:bg-[#C53B27]/20 selection:text-[#202A35]">
+    <div className="min-h-screen bg-paper text-ink flex flex-col font-sans selection:bg-clay/20 selection:text-ink">
       <a href="#main-content" className="skip-link">Skip to content</a>
       {/* 1. Header (Top Bar Contract: 3 Zones) */}
       <Header onOpenSources={handleOpenSources} />

@@ -94,19 +94,19 @@ export const SevenDayPause: React.FC = () => {
   };
 
   return (
-    <section id="pause" className="scroll-mt-20 py-16 lg:py-24 bg-white border-b border-[#202A35]/8">
+    <section id="pause" className="scroll-mt-20 py-16 lg:py-24 bg-surface border-b border-ink/8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="max-w-3xl mb-12">
-          <div className="section-kicker text-[#C53B27] mb-2">
+          <div className="section-kicker text-clay mb-2">
             <span>A GENTLE EXPERIMENT</span>
             <span aria-hidden="true">·</span>
             <span>THE 7-DAY PAUSE</span>
           </div>
-          <h2 className="font-editorial text-3xl sm:text-4xl lg:text-5xl text-[#202A35] font-normal leading-tight text-balance">
+          <h2 className="font-editorial text-3xl sm:text-4xl lg:text-5xl text-ink font-normal leading-tight text-balance">
             You don&apos;t have to change everything. Start by noticing one thing.
           </h2>
-          <p className="mt-3 text-lg text-[#202A35]/80 font-normal leading-relaxed">
+          <p className="mt-3 text-lg text-ink/80 font-normal leading-relaxed">
             For seven days, pause for a quiet breath before buying something. No accounts, no leaderboards, no streaks—just seven simple questions to explore at your own pace.
           </p>
         </div>
@@ -115,31 +115,31 @@ export const SevenDayPause: React.FC = () => {
         {storageUnavailableNotice && (
           <div
             role="status"
-            className="mb-6 p-4 rounded-xl bg-[#FFF9EB] border border-[#FFE7B3] flex items-start gap-3 text-xs sm:text-sm text-[#202A35]"
+            className="mb-6 p-4 rounded-xl bg-paper border border-oat-border flex items-start gap-3 text-xs sm:text-sm text-ink"
           >
-            <AlertTriangle className="w-5 h-5 text-[#B88000] shrink-0 mt-0.5" aria-hidden="true" />
+            <AlertTriangle className="w-5 h-5 text-clay shrink-0 mt-0.5" aria-hidden="true" />
             <p>{storageUnavailableNotice}</p>
           </div>
         )}
 
         {/* Progress Strip & Reset Bar */}
-        <div ref={progressRef} tabIndex={-1} aria-label="7-Day Pause progress" className="bg-[#FFF9F0] rounded-2xl border border-[#202A35]/10 p-4 sm:p-5 mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div ref={progressRef} tabIndex={-1} aria-label="7-Day Pause progress" className="bg-paper rounded-2xl border border-ink/10 p-4 sm:p-5 mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div
-              className="w-12 h-12 shrink-0 rounded-xl bg-white border border-[#202A35]/15 flex items-center justify-center text-[#C53B27] font-bold font-mono text-base"
+              className="w-12 h-12 shrink-0 rounded-xl bg-surface border border-ink/15 flex items-center justify-center text-clay font-bold font-mono text-base"
               aria-label={`${completedDays.length} of 7 days completed`}
             >
               {completedDays.length}/7
             </div>
             <div>
-              <p className="text-sm font-semibold text-[#202A35]">
+              <p className="text-sm font-semibold text-ink">
                 {completedDays.length === 0
                   ? 'Ready to begin when you are'
                   : completedDays.length === 7
                   ? 'All seven days explored! You noticed everything.'
                   : `${completedDays.length} of 7 questions explored`}
               </p>
-              <p className="text-xs text-[#202A35]/75">
+              <p className="text-xs text-ink/75">
                 {storageUnavailableNotice ? 'Device storage could not be confirmed. See the notice above.' : 'Saved privately on this browser only.'}
               </p>
             </div>
@@ -151,10 +151,10 @@ export const SevenDayPause: React.FC = () => {
                 ref={resetTriggerRef}
                 type="button"
                 onClick={() => setShowResetConfirm(true)}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 min-h-[44px] rounded-lg text-xs font-semibold text-[#202A35] bg-white border border-[#202A35]/15 hover:bg-[#202A35]/5 focus-visible:ring-2 focus-visible:ring-[#202A35] transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 min-h-[44px] rounded-lg text-xs font-semibold text-ink bg-surface border border-ink/15 hover:bg-ink/5 focus-visible:ring-2 focus-visible:ring-ink transition-colors cursor-pointer"
                 aria-label="Reset all 7-Day Pause progress and reflections"
               >
-                <RotateCcw className="w-4 h-4 text-[#C53B27]" aria-hidden="true" />
+                <RotateCcw className="w-4 h-4 text-clay" aria-hidden="true" />
                 <span>Reset Progress</span>
               </button>
             )}
@@ -174,21 +174,21 @@ export const SevenDayPause: React.FC = () => {
           maxWidthClass="max-w-md"
         >
           <div className="space-y-4">
-            <p className="text-xs sm:text-sm text-[#202A35]/80 leading-relaxed">
+            <p className="text-xs sm:text-sm text-ink/80 leading-relaxed">
               You can restart the 7-day reflection whenever you like. This action cannot be undone.
             </p>
-            <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#202A35]/10">
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-ink/10">
               <button
                 type="button"
                 onClick={() => setShowResetConfirm(false)}
-                className="px-4 py-2.5 min-h-[44px] text-xs font-semibold rounded-xl text-[#202A35] hover:bg-[#202A35]/5 focus-visible:ring-2 focus-visible:ring-[#202A35] cursor-pointer"
+                className="px-4 py-2.5 min-h-[44px] text-xs font-semibold rounded-xl text-ink hover:bg-ink/5 focus-visible:ring-2 focus-visible:ring-ink cursor-pointer"
               >
                 Keep Progress
               </button>
               <button
                 type="button"
                 onClick={handleReset}
-                className="px-4 py-2.5 min-h-[44px] text-xs font-semibold rounded-xl text-white bg-[#C53B27] hover:bg-[#AB2F1D] focus-visible:ring-2 focus-visible:ring-[#C53B27] cursor-pointer shadow-sm"
+                className="px-4 py-2.5 min-h-[44px] text-xs font-semibold rounded-xl text-white bg-clay hover:bg-clay-strong focus-visible:ring-2 focus-visible:ring-clay cursor-pointer shadow-sm"
               >
                 Yes, Reset All
               </button>
@@ -209,8 +209,8 @@ export const SevenDayPause: React.FC = () => {
                 key={day.day}
                 className={`rounded-2xl border transition-all ${
                   isCompleted
-                    ? 'bg-[#FFF9F0]/90 border-[#086E64]/40'
-                    : 'bg-white border-[#202A35]/15 hover:border-[#202A35]/30'
+                    ? 'bg-paper/90 border-forest/40'
+                    : 'bg-surface border-ink/15 hover:border-ink/30'
                 }`}
               >
                 {/* Day Header Row */}
@@ -222,29 +222,29 @@ export const SevenDayPause: React.FC = () => {
                       role="checkbox"
                       aria-checked={isCompleted}
                       onClick={() => toggleDayCompletion(day.day)}
-                      className="mt-0.5 sm:mt-0 p-1.5 sm:p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-[#202A35]/75 hover:text-[#086E64] focus-visible:ring-2 focus-visible:ring-[#086E64] rounded-lg transition-colors cursor-pointer"
+                      className="mt-0.5 sm:mt-0 p-1.5 sm:p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-ink/75 hover:text-forest focus-visible:ring-2 focus-visible:ring-forest rounded-lg transition-colors cursor-pointer"
                       aria-label={`Day ${day.day}: ${day.shortLabel} — ${isCompleted ? 'Marked complete' : 'Mark complete'}`}
                     >
                       {isCompleted ? (
-                        <CheckCircle2 className="w-6 h-6 text-[#086E64]" aria-hidden="true" />
+                        <CheckCircle2 className="w-6 h-6 text-forest" aria-hidden="true" />
                       ) : (
-                        <Circle className="w-6 h-6 text-[#202A35]/40 hover:text-[#202A35]" aria-hidden="true" />
+                        <Circle className="w-6 h-6 text-ink/40 hover:text-ink" aria-hidden="true" />
                       )}
                     </button>
 
                     <div>
                       <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                        <span className="text-xs font-mono font-bold text-[#C53B27]">
+                        <span className="text-xs font-mono font-bold text-clay">
                           DAY 0{day.day}
                         </span>
-                        <span aria-hidden="true" className="text-xs text-[#202A35]/40">·</span>
-                        <span className="text-xs font-medium text-[#202A35]/70">
+                        <span aria-hidden="true" className="text-xs text-ink/40">·</span>
+                        <span className="text-xs font-medium text-ink/75">
                           {day.shortLabel}
                         </span>
                       </div>
                       <h3
                         className={`font-editorial text-base sm:text-xl font-semibold mt-0.5 ${
-                          isCompleted ? 'text-[#202A35]/75 line-through decoration-[#086E64]/60' : 'text-[#202A35]'
+                          isCompleted ? 'text-ink/75 line-through decoration-forest/60' : 'text-ink'
                         }`}
                       >
                         {day.question}
@@ -258,7 +258,7 @@ export const SevenDayPause: React.FC = () => {
                     onClick={() => setExpandedDay(isExpanded ? null : day.day)}
                     aria-expanded={isExpanded}
                     aria-controls={contentId}
-                    className="p-2 sm:p-2.5 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl text-[#202A35]/70 hover:text-[#202A35] hover:bg-[#202A35]/5 focus-visible:ring-2 focus-visible:ring-[#202A35] transition-colors cursor-pointer shrink-0"
+                    className="p-2 sm:p-2.5 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl text-ink/75 hover:text-ink hover:bg-ink/5 focus-visible:ring-2 focus-visible:ring-ink transition-colors cursor-pointer shrink-0"
                     aria-label={`${isExpanded ? 'Collapse' : 'Expand'} details for Day ${day.day}`}
                   >
                     {isExpanded ? (
@@ -275,43 +275,43 @@ export const SevenDayPause: React.FC = () => {
                     id={contentId}
                     role="region"
                     aria-label={`Day ${day.day} details and reflection`}
-                    className="px-4 sm:px-5 pb-5 sm:pb-6 pt-2 border-t border-[#202A35]/10 space-y-4 animate-in fade-in duration-200"
+                    className="px-4 sm:px-5 pb-5 sm:pb-6 pt-2 border-t border-ink/10 space-y-4 animate-in fade-in duration-200"
                   >
-                    <p className="text-sm text-[#202A35]/85 leading-relaxed max-w-3xl">
+                    <p className="text-sm text-ink/85 leading-relaxed max-w-3xl">
                       {day.context}
                     </p>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="p-4 rounded-xl bg-[#FFF9F0] border border-[#202A35]/10">
-                        <span className="text-xs font-semibold uppercase tracking-wider text-[#C53B27] block mb-1">
+                      <div className="p-4 rounded-xl bg-paper border border-ink/10">
+                        <span className="text-xs font-semibold uppercase tracking-wider text-clay block mb-1">
                           Today&apos;s Invitation
                         </span>
-                        <p className="text-xs sm:text-sm text-[#202A35]/85 leading-relaxed">
+                        <p className="text-xs sm:text-sm text-ink/85 leading-relaxed">
                           {day.actionPrompt}
                         </p>
                       </div>
 
-                      <div className="p-4 rounded-xl bg-[#E6F8F6] border border-[#B2ECE6]">
-                        <span className="text-xs font-semibold uppercase tracking-wider text-[#086E64] block mb-1">
+                      <div className="p-4 rounded-xl bg-sage border border-sage-border">
+                        <span className="text-xs font-semibold uppercase tracking-wider text-forest block mb-1">
                           Practical Tip
                         </span>
-                        <p className="text-xs sm:text-sm text-[#202A35]/85 leading-relaxed">
+                        <p className="text-xs sm:text-sm text-ink/85 leading-relaxed">
                           {day.practicalTip}
                         </p>
                       </div>
                     </div>
 
                     {/* Thought starter quote */}
-                    <div className="p-3.5 bg-white/70 rounded-xl border border-[#202A35]/10 flex items-start gap-2.5">
-                      <Sparkles className="w-4 h-4 text-[#B88000] shrink-0 mt-0.5" aria-hidden="true" />
-                      <p className="text-xs italic text-[#202A35]/85">
+                    <div className="p-3.5 bg-surface/70 rounded-xl border border-ink/10 flex items-start gap-2.5">
+                      <Sparkles className="w-4 h-4 text-clay shrink-0 mt-0.5" aria-hidden="true" />
+                      <p className="text-xs italic text-ink/85">
                         &ldquo;{day.thoughtStarter}&rdquo;
                       </p>
                     </div>
 
                     {/* Personal scratchpad note with label association */}
                     <div className="pt-2">
-                      <label htmlFor={inputId} className="text-xs font-medium text-[#202A35]/80 block mb-1.5">
+                      <label htmlFor={inputId} className="text-xs font-medium text-ink/80 block mb-1.5">
                         Your quiet reflection or what you noticed ({storageUnavailableNotice ? 'saving unavailable' : 'saved locally'}):
                       </label>
                       <textarea
@@ -321,7 +321,7 @@ export const SevenDayPause: React.FC = () => {
                         value={notes[day.day] || ''}
                         onChange={(e) => handleNoteChange(day.day, e.target.value)}
                         placeholder="e.g. Almost bought a thermal mug, but found one in the cupboard..."
-                        className="w-full resize-y min-h-[96px] text-base px-3.5 py-2.5 rounded-xl border border-[#202A35]/20 bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C53B27]"
+                        className="w-full resize-y min-h-[96px] text-base px-3.5 py-2.5 rounded-xl border border-ink/20 bg-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-clay"
                       />
                     </div>
                   </div>

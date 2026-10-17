@@ -14,9 +14,6 @@ export interface StoryObject {
   name: string;
   itemType: string;
   tagline: string;
-  accentColor: string;
-  accentBg: string;
-  accentBorder: string;
   finalReflection: string;
   stages: StoryStage[];
 }
@@ -27,9 +24,6 @@ export const OBJECTS_DATA: StoryObject[] = [
     name: 'Cotton T-Shirt',
     itemType: 'Garment',
     tagline: 'From rainfed soil and distant looms to your morning wardrobe',
-    accentColor: '#FF654F', // vibrant coral
-    accentBg: '#FFF0EE',
-    accentBorder: '#FFD6D0',
     finalReflection: 'What if the best way to deal with clothing waste is simply wearing what we love a little longer?',
     stages: [
       {
@@ -85,9 +79,6 @@ export const OBJECTS_DATA: StoryObject[] = [
     name: 'Smartphone',
     itemType: 'Electronics',
     tagline: '16 rare elements and global micro-engineering in your palm',
-    accentColor: '#425BFF', // electric cobalt
-    accentBg: '#EEF1FF',
-    accentBorder: '#CCD4FF',
     finalReflection: 'What if keeping our devices for four years instead of two became the standard for modern tech?',
     stages: [
       {
@@ -142,9 +133,6 @@ export const OBJECTS_DATA: StoryObject[] = [
     name: 'Fresh Apple',
     itemType: 'Nourishment',
     tagline: 'Spring blossoms, orchard bee pollination, and the cold chain',
-    accentColor: '#0D9F91', // fresh teal
-    accentBg: '#E6F8F6',
-    accentBorder: '#B2ECE6',
     finalReflection: 'What if we respected food as the living energy of soil, water, and human care rather than an endless commodity?',
     stages: [
       {
@@ -199,9 +187,6 @@ export const OBJECTS_DATA: StoryObject[] = [
     name: 'Delivery Box',
     itemType: 'Packaging',
     tagline: 'Coniferous timber, corrugated fluting, and doorstep journeys',
-    accentColor: '#FFC857', // sunny marigold
-    accentBg: '#FFF9EB',
-    accentBorder: '#FFE7B3',
     finalReflection: 'What if packaging was designed to be folded flat and borrowed twenty times, instead of torn open once?',
     stages: [
       {
