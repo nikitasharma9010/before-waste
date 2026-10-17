@@ -152,6 +152,7 @@ describe('real application interactions', () => {
     await click(host.querySelector('[aria-label^="Stage 5:"]')!);
     expect(host.querySelector('[aria-current="step"]')?.getAttribute('aria-label')).toContain('Stage 5');
     await click(button('Restart the story'));
+    expect(document.activeElement).toBe(host.querySelector('#hero'));
     expect(host.querySelector('[aria-current="step"]')?.getAttribute('aria-label')).toContain('Stage 1');
     expect(host.querySelector('#object-tab-tshirt')?.getAttribute('aria-pressed')).toBe('true');
     expect(localStorage.getItem(STORAGE_KEY_COMPLETED)).toBe('[1,2]');
@@ -249,9 +250,14 @@ it('connects primary calls to action and trust details to working destinations',
   expect(primary.length).toBeGreaterThanOrEqual(3);
   for (const link of primary) expect(link.getAttribute('href')).toBe('/ask');
   const trust = host.querySelector('#how-it-works')!;
+  const preview = host.querySelector('#object-preview')!;
+  expect(preview.compareDocumentPosition(trust) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   expect(trust.textContent).toContain('external AI service');
   expect(trust.textContent).toContain('not endorsements');
   expect(trust.textContent).toContain('clearing browser data removes them');
   await click(button('Check sources & methodology'));
   expect(document.querySelector('[role="dialog"]')?.textContent).toContain('do not endorse this project or verify individual AI answers');
+  const sourceLinks = [...document.querySelectorAll('[role="dialog"] a[target="_blank"]')];
+  expect(sourceLinks.length).toBeGreaterThan(0);
+  for (const link of sourceLinks) expect(link.getAttribute('aria-label')).toContain('opens in a new tab');
 });

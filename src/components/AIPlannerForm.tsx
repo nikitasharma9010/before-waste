@@ -66,14 +66,14 @@ export function AIPlannerForm({ decision, hasDraft, initialQuestion = '', onResu
       <label htmlFor="ai-description" className="block font-semibold">Ask about an item or sustainable living</label>
       <p id="ai-hint" className="mt-2 text-sm text-ink/80">Ask a question or describe your situation. Add your location, budget, what you tried or other relevant details.</p>
     </div>
-    {!description && decision.item === 'anything' && <div role="group" aria-label="Example questions" className="flex flex-wrap gap-2">
-      {starters.map(question => <button key={question} type="button" className="min-h-[44px] rounded-xl border border-ink/20 px-3 py-2 text-left text-sm hover:bg-sage" onClick={() => { update(question); field.current?.focus(); }}>{question}</button>)}
-    </div>}
     <textarea ref={field} id="ai-description" rows={4} maxLength={1500} value={description}
       onChange={event => update(event.target.value)} aria-invalid={invalid || undefined}
       onKeyDown={event => { if (event.key === 'Enter' && (event.ctrlKey || event.metaKey) && !event.nativeEvent.isComposing) { event.preventDefault(); void generate(); } }}
       aria-describedby={`ai-hint ai-privacy-summary ai-length${error ? ' ai-error' : ''}`} className="w-full min-h-32 rounded-xl border border-ink/25 bg-paper p-3 text-base font-normal aria-invalid:border-clay"
       placeholder="What would you like to know?" />
+    {!description && decision.item === 'anything' && <div role="group" aria-label="Example questions" className="flex flex-wrap gap-2">
+      {starters.map(question => <button key={question} type="button" className="min-h-[44px] rounded-xl border border-ink/20 px-3 py-2 text-left text-sm hover:bg-sage" onClick={() => { update(question); field.current?.focus(); }}>{question}</button>)}
+    </div>}
     <p id="ai-length" className="text-xs text-ink/80">{description.length}/1500 characters · Minimum 10. Enter adds a new line; Ctrl or ⌘ + Enter sends.</p>
     <div>
       <label htmlFor="ai-location" className="block text-sm font-semibold">City or region and country <span className="font-normal">(optional)</span></label>

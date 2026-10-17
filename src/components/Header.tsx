@@ -7,6 +7,9 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ onOpenSources }) => {
+  const isAssistant = /^\/ask\/?$/.test(window.location.pathname);
+  const actionHref = isAssistant ? '/#follow-one-thing' : '/ask';
+  const actionLabel = isAssistant ? 'Explore stories' : 'Ask Before Waste';
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const sourcesButtonRef = useRef<HTMLButtonElement>(null);
@@ -78,13 +81,13 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSources }) => {
           aria-label="Primary navigation"
           className="hidden xl:flex items-center gap-6 text-sm font-medium text-ink/85"
         >
-          {navLinks.map((link) => (
+          {navLinks.filter(link => link.href !== '/ask' || isAssistant).map((link) => (
             <a
               key={link.href}
-              aria-current={link.href === '/ask' && /^\/ask\/?$/.test(window.location.pathname) ? 'page' : undefined}
+              aria-current={link.href === '/ask' && isAssistant ? 'page' : undefined}
               href={link.href}
               onClick={handleLinkClick}
-              className="inline-flex items-center min-h-[44px] py-2 hover:text-ink hover:underline underline-offset-4 decoration-clay decoration-2 focus-visible:ring-2 focus-visible:ring-ink rounded transition-colors whitespace-nowrap shrink-0"
+              className="inline-flex items-center min-h-[44px] py-2 hover:text-ink hover:underline underline-offset-4 decoration-clay decoration-2 focus-visible:ring-2 focus-visible:ring-ink rounded transition-colors whitespace-nowrap shrink-0 aria-[current=page]:font-semibold aria-[current=page]:text-forest aria-[current=page]:underline aria-[current=page]:decoration-forest"
             >
               {link.label}
             </a>
@@ -102,11 +105,11 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSources }) => {
         {/* Zone 3: 1 Primary Action & Mobile Toggle */}
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           <a
-            href="/ask"
+            href={actionHref}
             onClick={handleLinkClick}
             className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 min-h-[44px] text-sm font-semibold text-white bg-forest hover:bg-forest-strong focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ink rounded-xl transition-colors whitespace-nowrap shrink-0 shadow-xs"
           >
-            <span>Ask Before Waste</span>
+            <span>{actionLabel}</span>
             <ArrowUpRight className="w-4 h-4" aria-hidden="true" />
           </a>
 
@@ -132,13 +135,13 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSources }) => {
           className="mobile-navigation xl:hidden bg-paper border-b border-ink/15 px-4 pt-3 pb-6 shadow-xl animate-in fade-in slide-in-from-top-2 duration-200"
         >
           <nav aria-label="Mobile navigation" className="flex flex-col gap-2">
-            {navLinks.map((link) => (
+            {navLinks.filter(link => link.href !== '/ask' || isAssistant).map((link) => (
               <a
                 key={link.href}
-                aria-current={link.href === '/ask' && /^\/ask\/?$/.test(window.location.pathname) ? 'page' : undefined}
+                aria-current={link.href === '/ask' && isAssistant ? 'page' : undefined}
               href={link.href}
                 onClick={handleLinkClick}
-                className="py-3 px-4 min-h-[44px] flex items-center rounded-xl text-base font-medium text-ink hover:bg-ink/5 focus-visible:ring-2 focus-visible:ring-ink transition-colors"
+                className="py-3 px-4 min-h-[44px] flex items-center rounded-xl aria-[current=page]:bg-sage aria-[current=page]:font-semibold text-base font-medium text-ink hover:bg-ink/5 focus-visible:ring-2 focus-visible:ring-ink transition-colors"
               >
                 {link.label}
               </a>
@@ -155,11 +158,11 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSources }) => {
             </button>
             <div className="pt-2">
               <a
-                href="/ask"
+                href={actionHref}
                 onClick={handleLinkClick}
                 className="flex items-center justify-center gap-2 w-full py-3 px-4 min-h-[44px] text-center font-semibold text-white bg-forest hover:bg-forest-strong focus-visible:ring-2 focus-visible:ring-ink rounded-xl transition-colors shadow-xs"
               >
-                <span>Ask Before Waste</span>
+                <span>{actionLabel}</span>
                 <ArrowUpRight className="w-4 h-4" aria-hidden="true" />
               </a>
             </div>

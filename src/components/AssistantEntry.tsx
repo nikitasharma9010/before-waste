@@ -13,7 +13,7 @@ export function AssistantEntry() {
       }}>
         <label htmlFor="entry-question" className="block font-semibold">What would you like to know?</label>
         <textarea id="entry-question" required minLength={10} maxLength={1500} rows={2} value={question} onChange={event => {setQuestion(event.target.value);setError('');}} aria-describedby="entry-hint" className="w-full min-h-24 rounded-xl border border-ink/25 bg-paper p-3 text-base" placeholder="How can I waste less food in a small flat?" />
-        <p id="entry-hint" className="text-sm text-ink/80">Continue keeps your draft temporarily in this tab. Nothing is sent to AI yet. Leave out private information.</p>
+        <p id="entry-hint" className="text-sm text-ink/80">Use 10-1500 characters. Continue keeps your draft temporarily in this tab. Nothing is sent to AI yet. Leave out private information.</p>
         <button type="submit" className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-forest px-5 py-3 font-semibold text-white hover:bg-forest-strong">Continue to assistant<ArrowRight aria-hidden="true" className="h-4 w-4" /></button>
         {error && <div role="alert" className="text-sm"><p>{error}</p><a href="/ask" className="inline-flex min-h-[44px] items-center font-semibold text-forest underline">Open assistant without the draft</a></div>}
       </form>

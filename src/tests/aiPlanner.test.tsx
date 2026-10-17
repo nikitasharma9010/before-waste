@@ -66,7 +66,7 @@ it('discards stale AI output after a form selection changes', async () => {
   expect(host.textContent).not.toContain('AI-GENERATED DRAFT');
 });
 it('keeps basic guidance usable with an unfinished optional AI description', async () => {
-  await input('ai-description', 'short'); await click('Find my next step');
+  await input('ai-description', 'short'); await click('Browse general guidance');
   expect(host.textContent).toContain('BASIC GUIDANCE · NOT AI GENERATED');
   expect(host.querySelector('#ai-description')?.hasAttribute('minlength')).toBe(false);
 });
@@ -175,4 +175,21 @@ it('sends optional location and shows it with the answered question without prov
   expect(host.textContent).not.toMatch(/Gemini|AICredits|gemini-3/);
   expect(host.querySelector('#ai-location-hint')?.textContent).toContain('never detected automatically');
   expect([...host.querySelectorAll('h4')].map(h => h.textContent)).toContain('Suggested steps');
+});
+
+
+it('keeps starter suggestions after the question field and offers optional editing without duplicating the answer', async () => {
+  const field = host.querySelector('#ai-description')!;
+  const examples = host.querySelector('[aria-label="Example questions"]')!;
+  expect(field.compareDocumentPosition(examples) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json(generated)));
+  await input('ai-description', 'My coat button is loose. What should I do?'); await click('Get AI guidance');
+  const review = host.querySelector<HTMLDetailsElement>('#reviewed-plan')!.closest('details')!;
+  expect(review.open).toBe(false);
+  const summary = review.querySelector('summary')!;
+  await act(async () => summary.click());
+  expect(review.open).toBe(true);
+  await input('reviewed-plan', '');
+  expect(host.textContent).toContain('Add some text to the draft before saving it.');
+  expect([...host.querySelectorAll('button')].find(b => b.textContent?.includes('Save this action'))?.disabled).toBe(true);
 });

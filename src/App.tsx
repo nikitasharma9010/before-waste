@@ -60,6 +60,7 @@ export default function App() {
   const handleRestart = () => {
     setSelectedObjectId('tshirt');
     setSelectedStageIndex(0);
+    document.getElementById('hero')?.focus({ preventScroll: true });
     window.scrollTo({ top: 0, behavior: getScrollBehavior() });
   };
 
@@ -102,8 +103,6 @@ export default function App() {
 
         <AssistantEntry />
 
-        <TrustAndMethod onOpenSources={handleOpenSources} />
-
         <HeroOpening onExploreObjects={handleExploreObject} />
 
         {/* 3. Signature Experience: Follow One Thing (Single Source of Truth) */}
@@ -131,6 +130,7 @@ export default function App() {
 
         {/* 8. Individual Choices and Bigger Systems */}
         <SystemsSection />
+        <TrustAndMethod onOpenSources={handleOpenSources} />
         </>}
       </main>
 
