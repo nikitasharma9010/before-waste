@@ -16,7 +16,6 @@ beforeEach(async () => {
 });
 afterEach(async () => { await act(async () => root.unmount()); host.remove(); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
 async function input(id: string, value: string) {
-  if (id === 'reviewed-plan' && host.querySelector<HTMLElement>('#reviewed-plan')?.closest('[hidden]')) await click('Edit before saving');
   const el = host.querySelector<HTMLTextAreaElement>(`#${id}`)!;
   for (let parent = el.parentElement; parent; parent = parent.parentElement) if (parent instanceof HTMLDetailsElement) parent.open = true;
   await act(async () => {
@@ -187,13 +186,11 @@ it('keeps starter suggestions after the question field and offers optional editi
   expect(field.compareDocumentPosition(examples) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json(generated)));
   await input('ai-description', 'My coat button is loose. What should I do?'); await click('Get AI guidance');
-  const editor = host.querySelector('#reviewed-plan')!.parentElement!;
-  expect(editor.hidden).toBe(true);
-  const more = [...host.querySelectorAll('summary')].find(summary => summary.textContent === 'More')!;
-  await act(async () => more.click());
-  await click('Edit before saving');
-  expect(editor.hidden).toBe(false);
-  expect(document.activeElement?.id).toBe('reviewed-plan');
+  const editor = host.querySelector('#reviewed-plan')!.closest('details')!;
+  expect(editor.open).toBe(false);
+  expect(editor.querySelector('summary')?.textContent).toBe('Edit before saving');
+  await act(async () => editor.querySelector('summary')!.click());
+  expect(editor.open).toBe(true);
   await input('reviewed-plan', '');
   expect(host.textContent).toContain('Add some text to the draft before saving it.');
   expect([...host.querySelectorAll('button')].find(b => b.textContent?.includes('Save action on this device'))?.disabled).toBe(true);
@@ -320,13 +317,13 @@ it('offers a retry when browser saving fails, without dropping session edits or 
   expect(host.querySelector('#action-storage-status')?.textContent).toContain('Action saved');
 });
 
-it('keeps copy and editing under More and replaces Save with a saved-action link', async () => {
+it('keeps editing direct and copying only in the saved section', async () => {
   await act(async () => root.render(<DecisionHelper standalone onExploreObject={() => {}} />));
   vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json(generated)));
   await input('ai-description', 'My coat has a loose button. What should I check?'); await click('Get AI guidance');
-  const copy = [...host.querySelectorAll('button')].find(button => button.textContent === 'Copy answer')!;
-  expect(copy.closest('details')?.querySelector('summary')?.textContent).toBe('More');
-  expect(copy.closest('details')?.open).toBe(false);
+  expect([...host.querySelectorAll('button')].some(button => button.textContent === 'Copy answer')).toBe(false);
+  expect([...host.querySelectorAll('summary')].some(summary => summary.textContent === 'More')).toBe(false);
+  expect(host.querySelector('#reviewed-plan')?.closest('details')?.open).toBe(false);
   expect(host.textContent).not.toContain('Ask a follow-up below');
   expect(host.textContent).not.toContain('Answer these questions below');
   expect(host.querySelector('#conversation-background')?.closest('details')?.querySelector('summary')?.textContent).toBe('Conversation settings');
@@ -334,6 +331,9 @@ it('keeps copy and editing under More and replaces Save with a saved-action link
   expect([...host.querySelectorAll('button')].some(button => button.textContent === 'Save action on this device')).toBe(false);
   expect([...host.querySelectorAll('a')].find(link => link.textContent === 'Saved · View my action')?.getAttribute('href')).toBe('#saved-action');
   expect(host.querySelector('[aria-label="Assistant sections"] a[href="#saved-action"]')?.textContent).toContain('1');
+  const copyButtons = [...host.querySelectorAll('button')].filter(button => button.textContent?.startsWith('Copy'));
+  expect(copyButtons).toHaveLength(1);
+  expect(copyButtons[0].closest('#saved-action')).not.toBeNull();
 });
 it('provides a permanent saved-action section with an honest empty state', async () => {
   expect(host.querySelector('#saved-section-title')?.textContent).toBe('My saved action');
