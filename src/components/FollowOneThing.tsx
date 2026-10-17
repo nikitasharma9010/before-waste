@@ -1,5 +1,5 @@
 import { THEME } from '../utils/theme';
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { OBJECTS_DATA, StoryObject } from '../data/objectsData';
 import { StoryVisual } from './StoryVisual';
 import {
@@ -34,6 +34,20 @@ export const FollowOneThing: React.FC<FollowOneThingProps> = ({
     OBJECTS_DATA.find((obj) => obj.id === activeObjectId) || OBJECTS_DATA[0];
 
   const currentStage = currentObject.stages[currentStageIndex] || currentObject.stages[0];
+  const stageHeadingRef = useRef<HTMLHeadingElement>(null);
+  const stageFocusRequested = useRef(false);
+
+  useEffect(() => {
+    if (!stageFocusRequested.current) return;
+    stageFocusRequested.current = false;
+    const heading = stageHeadingRef.current;
+    if (!heading) return;
+    heading.focus({ preventScroll: true });
+    heading.scrollIntoView({
+      block: 'start',
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
+    });
+  }, [activeObjectId, currentStageIndex]);
 
   // Selection and progression use one consistent action color across every object.
   const themeStyle = {
@@ -46,7 +60,7 @@ export const FollowOneThing: React.FC<FollowOneThingProps> = ({
     <section id="follow-one-thing" className="scroll-mt-20 py-16 lg:py-24 bg-surface border-y border-ink/8">
       {/* Live Region for Screen Reader Stage Announcements */}
       <div role="status" aria-live="polite" className="sr-only">
-        Now viewing {currentObject.name}, Stage {currentStage.stageNumber} of 5: {currentStage.stageName}. {currentStage.stageTitle}.
+        Now viewing {currentObject.name}, Stage {currentStage.stageNumber} of 5: {currentStage.stageName}.
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -184,6 +198,16 @@ export const FollowOneThing: React.FC<FollowOneThingProps> = ({
             </p>
           </div>
 
+          {/* A stable starting point for each chapter, before its illustration and text. */}
+          <h4
+            id="story-stage-title"
+            ref={stageHeadingRef}
+            tabIndex={-1}
+            className="scroll-mt-20 mb-6 font-editorial text-2xl sm:text-3xl text-ink font-normal leading-snug"
+          >
+            {currentStage.stageTitle}
+          </h4>
+
           {/* Active Stage Content & Visual Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
             {/* Visual Canvas (Col 1 to 6) */}
@@ -208,10 +232,6 @@ export const FollowOneThing: React.FC<FollowOneThingProps> = ({
                 <span aria-hidden="true" className="text-ink/40">·</span>
                 <span className="font-bold text-ink">{currentStage.stageName}</span>
               </div>
-
-              <h4 className="font-editorial text-2xl sm:text-3xl text-ink font-normal leading-snug">
-                {currentStage.stageTitle}
-              </h4>
 
               <p className="text-base sm:text-lg text-ink/90 leading-relaxed font-sans">
                 {currentStage.body}
@@ -260,7 +280,10 @@ export const FollowOneThing: React.FC<FollowOneThingProps> = ({
               <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-4 border-t border-ink/10">
                 <button
                   type="button"
-                  onClick={onPrevStage}
+                  onClick={() => {
+                    stageFocusRequested.current = true;
+                    onPrevStage();
+                  }}
                   disabled={currentStageIndex === 0}
                   className={`inline-flex items-center justify-center gap-1.5 px-4 py-2.5 min-h-[44px] rounded-xl text-xs sm:text-sm font-semibold transition-colors focus-visible:ring-2 focus-visible:ring-ink ${
                     currentStageIndex === 0
@@ -276,7 +299,10 @@ export const FollowOneThing: React.FC<FollowOneThingProps> = ({
                 {currentStageIndex < currentObject.stages.length - 1 ? (
                   <button
                     type="button"
-                    onClick={onNextStage}
+                    onClick={() => {
+                      stageFocusRequested.current = true;
+                      onNextStage();
+                    }}
                     className={`inline-flex items-center justify-center gap-2 px-5 py-2.5 min-h-[44px] rounded-xl text-xs sm:text-sm font-semibold shadow-xs transition-all focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ink cursor-pointer ${themeStyle.nextBtn}`}
                     aria-label={`Next: ${currentObject.stages[currentStageIndex + 1].stageName}`}
                   >
@@ -289,6 +315,7 @@ export const FollowOneThing: React.FC<FollowOneThingProps> = ({
                     onClick={() => {
                       const currentIndex = OBJECTS_DATA.findIndex((o) => o.id === activeObjectId);
                       const nextIndex = (currentIndex + 1) % OBJECTS_DATA.length;
+                      stageFocusRequested.current = true;
                       onSelectObject(OBJECTS_DATA[nextIndex].id);
                     }}
                     className="inline-flex items-center justify-center gap-2 px-5 py-2.5 min-h-[44px] rounded-xl text-xs sm:text-sm font-semibold text-white bg-forest hover:bg-forest-strong shadow-xs transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ink"

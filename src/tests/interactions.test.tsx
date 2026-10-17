@@ -9,6 +9,7 @@ import { STORAGE_KEY_COMPLETED, STORAGE_KEY_NOTES } from '../utils/storage';
 
 let host: HTMLDivElement;
 let root: Root;
+const originalScrollIntoView = HTMLElement.prototype.scrollIntoView;
 beforeEach(() => {
   Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
   localStorage.clear();
@@ -17,12 +18,15 @@ beforeEach(() => {
   root = createRoot(host);
   vi.stubGlobal('matchMedia', vi.fn().mockReturnValue({ matches: false }));
   vi.spyOn(window, 'scrollTo').mockImplementation(() => {});
+  HTMLElement.prototype.scrollIntoView = vi.fn();
 });
 afterEach(async () => {
   await act(async () => root.unmount());
   host.remove();
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
+  if (originalScrollIntoView) HTMLElement.prototype.scrollIntoView = originalScrollIntoView;
+  else Reflect.deleteProperty(HTMLElement.prototype, 'scrollIntoView');
 });
 async function render(node: ReactNode) { await act(async () => root.render(node)); }
 async function click(element: Element) { await act(async () => (element as HTMLElement).click()); }
@@ -33,6 +37,56 @@ function button(text: string, scope: ParentNode = document) {
 }
 
 describe('real application interactions', () => {
+
+  it('dismisses the drawer when focus leaves it without stealing the new focus', async () => {
+    await render(<App />);
+    await click(host.querySelector('[aria-label="Toggle navigation menu"]')!);
+    const inside = button('Sources & Methodology', host.querySelector('#mobile-navigation-menu')!);
+    await act(async () => inside.focus());
+    expect(host.querySelector('#mobile-navigation-menu')).not.toBeNull();
+    const outside = host.querySelector<HTMLButtonElement>('[aria-label^="Inspect Collar"]')!;
+    await act(async () => outside.focus());
+    expect(host.querySelector('#mobile-navigation-menu')).toBeNull();
+    expect(document.activeElement).toBe(outside);
+  });
+
+  it('closes the drawer and focuses the hero when its home link is activated', async () => {
+    await render(<App />);
+    await click(host.querySelector('[aria-label="Toggle navigation menu"]')!);
+    await click(host.querySelector('header [aria-label="Before Waste home"]')!);
+    expect(host.querySelector('#mobile-navigation-menu')).toBeNull();
+    expect(document.activeElement).toBe(host.querySelector('#hero'));
+  });
+
+  it('brings the new chapter into view after Next and Previous', async () => {
+    await render(<App />);
+    const heading = host.querySelector<HTMLHeadingElement>('#story-stage-title')!;
+    expect(document.activeElement).not.toBe(heading);
+    await click(button('Next: Becoming'));
+    expect(heading.textContent).toContain('People, looms');
+    expect(document.activeElement).toBe(heading);
+    expect(heading.scrollIntoView).toHaveBeenLastCalledWith({ block: 'start', behavior: 'smooth' });
+    await click(button('Previous Stage'));
+    expect(heading.textContent).toContain('Before it was a T-shirt');
+    expect(document.activeElement).toBe(heading);
+  });
+
+  it('uses immediate chapter scrolling when reduced motion is preferred', async () => {
+    vi.mocked(window.matchMedia).mockReturnValue({ matches: true } as MediaQueryList);
+    await render(<App />);
+    await click(button('Next: Becoming'));
+    expect(host.querySelector('#story-stage-title')?.scrollIntoView).toHaveBeenCalledWith({ block: 'start', behavior: 'auto' });
+  });
+
+  it('orients readers to the new object after finishing a journey', async () => {
+    await render(<App />);
+    await click(host.querySelector('[aria-label^="Stage 5:"]')!);
+    await click(button('Explore Another Object'));
+    const heading = host.querySelector('#story-stage-title')!;
+    expect(heading.textContent).toContain("Extracted from the Earth's crust");
+    expect(document.activeElement).toBe(heading);
+    expect(host.querySelector('[aria-current="step"]')?.getAttribute('aria-label')).toContain('Stage 1');
+  });
 
   it('provides a skip target, shared accessible home links, and named story illustrations', async () => {
     await render(<App />);

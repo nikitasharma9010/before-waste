@@ -23,7 +23,7 @@ const TSHIRT_HOTSPOTS: Hotspot[] = [
     id: 'collar',
     name: 'Collar & Care Tag',
     x: 50,
-    y: 20,
+    y: 14,
     icon: MapPin,
     label: 'Global Transit',
     metric: 'Across borders',
@@ -44,7 +44,7 @@ const TSHIRT_HOTSPOTS: Hotspot[] = [
   {
     id: 'sleeve',
     name: 'Shoulder & Sleeve Seam',
-    x: 23,
+    x: 17,
     y: 35,
     icon: Users,
     label: 'Human Labor',
@@ -193,8 +193,8 @@ export const HeroOpening: React.FC<HeroOpeningProps> = ({ onExploreObjects }) =>
                         type="button"
                         onClick={() => setActiveHotspot(hotspot)}
                         style={{ left: `${hotspot.x}%`, top: `${hotspot.y}%` }}
-                        className={`absolute -translate-x-1/2 -translate-y-1/2 min-w-[44px] min-h-[44px] flex items-center justify-center cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ink rounded-full transition-transform ${
-                          isSelected ? 'scale-115 z-20' : 'hover:scale-110 z-10'
+                        className={`absolute -translate-x-1/2 -translate-y-1/2 min-w-[44px] min-h-[44px] flex items-center justify-center cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ink rounded-full ${
+                          isSelected ? 'z-20' : 'z-10'
                         }`}
                         aria-label={`Inspect ${hotspot.name}: ${hotspot.label}`}
                         aria-pressed={isSelected}
