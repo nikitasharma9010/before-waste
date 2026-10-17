@@ -86,14 +86,21 @@ export const HeroOpening: React.FC<HeroOpeningProps> = ({ onExploreObjects }) =>
         <div className="section-kicker text-ink/75 mb-3">
           <span>BEFORE WASTE</span>
           <span aria-hidden="true">·</span>
-          <span>AN INTERACTIVE STORY OF CONSUMPTION</span>
+          <span>EVERYDAY OBJECTS. THOUGHTFUL NEXT STEPS.</span>
         </div>
 
         {/* Headline and illustration align at the top on desktop; mobile keeps the visual next. */}
         <div className="hero-layout grid grid-cols-1 lg:grid-cols-12 lg:grid-rows-[min-content_1fr] gap-6 lg:gap-x-14 lg:gap-y-8 items-start">
-          <h1 className="lg:col-span-7 lg:row-start-1 order-0 font-editorial text-3xl sm:text-5xl lg:text-6xl font-normal leading-[1.15] text-ink text-balance min-w-0">
-            Where was your <span className="italic font-semibold text-clay">T-shirt</span> before it was yours?
-          </h1>
+          <div className="lg:col-span-7 lg:row-start-1 order-0 min-w-0">
+            <h1 className="font-editorial text-3xl sm:text-5xl lg:text-6xl font-normal leading-[1.15] text-ink text-balance">
+              Before it becomes waste, <span className="italic font-semibold text-clay">what comes next?</span>
+            </h1>
+            <p className="mt-5 text-lg leading-relaxed max-w-xl">Find a practical next step before buying, replacing or letting something go. Start with clothes or headphones, at your own pace.</p>
+            <div className="mt-6 flex flex-col sm:flex-row gap-3">
+              <a href="#decision-helper" onClick={() => { document.getElementById('decision-helper')?.focus({ preventScroll: true }); }} className="inline-flex justify-center items-center min-h-[44px] px-5 py-3 rounded-xl bg-forest text-white font-semibold hover:bg-forest-strong">Help me with a thing</a>
+              <a href="#follow-one-thing" onClick={() => onExploreObjects('tshirt')} className="inline-flex justify-center items-center min-h-[44px] px-5 py-3 rounded-xl border border-ink/25 font-semibold hover:bg-sage">Explore an object’s story</a>
+            </div>
+          </div>
 
           {/* Interactive T-Shirt Visual (Appears first on mobile right below headline!) */}
           <div className="lg:col-span-5 lg:col-start-8 lg:row-start-1 lg:row-span-2 order-1 w-full min-w-0">

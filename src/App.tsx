@@ -9,6 +9,7 @@ import { SevenDayPause } from './components/SevenDayPause';
 import { SystemsSection } from './components/SystemsSection';
 import { ClosingSection } from './components/ClosingSection';
 import { SourcesModal } from './components/SourcesModal';
+import { DecisionHelper } from './components/DecisionHelper';
 
 export default function App() {
   // Single source of truth for selected object and stage
@@ -41,6 +42,8 @@ export default function App() {
     }
     const element = document.getElementById('follow-one-thing');
     if (element) {
+      element.tabIndex = -1;
+      element.focus({ preventScroll: true });
       element.scrollIntoView({ behavior: getScrollBehavior() });
     }
   };
@@ -84,6 +87,8 @@ export default function App() {
       <main id="main-content" tabIndex={-1} className="flex-1">
         {/* 2. Opening Experience: Spark curiosity immediately */}
         <HeroOpening onExploreObjects={handleExploreObject} />
+
+        <DecisionHelper onExploreObject={handleExploreObject} />
 
         {/* 3. Signature Experience: Follow One Thing (Single Source of Truth) */}
         <FollowOneThing

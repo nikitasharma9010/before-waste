@@ -38,7 +38,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSources }) => {
   const navLinks = [
     { label: 'Follow One Thing', href: '#follow-one-thing' },
     { label: 'The Pattern', href: '#bigger-pattern' },
-    { label: 'What Would You Do?', href: '#what-would-you-do' },
+    { label: 'Find a Next Step', href: '#decision-helper' },
     { label: 'One Planet', href: '#one-planet' },
     { label: 'The 7-Day Pause', href: '#pause' },
   ];
@@ -82,6 +82,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSources }) => {
             <a
               key={link.href}
               href={link.href}
+              onClick={handleLinkClick}
               className="inline-flex items-center min-h-[44px] py-2 hover:text-ink hover:underline underline-offset-4 decoration-clay decoration-2 focus-visible:ring-2 focus-visible:ring-ink rounded transition-colors whitespace-nowrap shrink-0"
             >
               {link.label}

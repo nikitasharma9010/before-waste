@@ -37,7 +37,7 @@ export const SCENARIOS_DATA: Scenario[] = [
         label: 'See if they can be repaired',
         actionSummary: 'Investigating whether a quick fix or local repair cafe can bring them back to life.',
         nuanceTitle: 'A curious and rewarding choice',
-        nuanceBody: 'Over 60% of common wired headphone failures happen at the 3.5mm plug or inside the jack due to everyday pocket stress or accumulated lint. With a wooden toothpick or five minutes at a community repair cafe with a soldering iron, they can often work as good as new.',
+        nuanceBody: 'A sound problem can have several causes, including settings, connections or a damaged component. Start with the manufacturer’s troubleshooting and warranty information for your model. A repair assessment can help you decide whether a fix is practical; the time and cost vary.',
         practicalInsight: 'Community Repair Cafes are volunteer spaces worldwide where neighbors fix electronics together for free over coffee. Many people discover that fixing something with their own hands turns frustration into confidence.',
         nextStepSuggestion: 'Search "Repair Cafe near me" or look up your headphone model on iFixit to see step-by-step disassembly guides.'
       },
