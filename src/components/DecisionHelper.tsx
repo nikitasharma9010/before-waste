@@ -5,7 +5,7 @@ import { planText, type GeneratedPlan } from '../data/aiPlan';
 import { AIPlannerForm } from './AIPlannerForm';
 import { AIPlanContent } from './AIPlanContent';
 
-const control = 'w-full min-h-[44px] rounded-xl border border-ink/25 bg-surface p-3 text-ink';
+const control = 'w-full min-h-[44px] rounded-xl border border-ink/25 bg-paper p-3 text-base text-ink';
 const primary = 'min-h-[44px] rounded-xl bg-forest px-5 py-3 font-semibold text-white hover:bg-forest-strong';
 export function DecisionHelper({ onExploreObject, standalone = false, initialQuestion = '' }: { onExploreObject: (id: string) => void; standalone?: boolean; initialQuestion?: string }) {
   const Heading = standalone ? 'h1' : 'h2';
@@ -62,12 +62,12 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
         <div className="max-w-3xl mb-8">
           <p className="section-kicker text-forest mb-3">ONE OBJECT. ONE NEXT STEP.</p>
           <Heading ref={titleRef} tabIndex={-1} id="decision-title" className="scroll-mt-20 font-editorial text-3xl sm:text-4xl lg:text-5xl">{standalone ? 'Ask Before Waste' : 'What should I do with this?'}</Heading>
-          <p className="mt-4 text-lg">Before you buy, replace or let something go, find a starting point that fits your life.</p>
-          <p className="mt-2 text-sm text-ink/80">Ask about any item, reducing waste or sustainable living. No account needed.</p>
+          <p className="mt-4 text-lg">{standalone ? 'Ask about everyday items and lower-waste living. Add context to find a practical starting point.' : 'Before you buy, replace or let something go, find a starting point that fits your life.'}</p>
+          <p className="mt-2 text-sm text-ink/80">{standalone ? 'No account needed. You choose what to save.' : 'Ask about any item, reducing waste or sustainable living. No account needed.'}</p>
           {saved && <a href="#saved-action" onClick={() => savedRef.current?.focus({ preventScroll: true })} className="mt-4 inline-flex min-h-[44px] items-center font-semibold text-forest underline underline-offset-4">Return to my saved action</a>}
         </div>
         <div className="grid gap-6 lg:grid-cols-2 items-start">
-          <div className="rounded-2xl border border-ink/15 bg-surface p-5 sm:p-8 space-y-5">
+          <div className="min-w-0 rounded-2xl border border-ink/15 bg-surface p-5 sm:p-8 space-y-5">
             <div role="group" className="flex flex-wrap gap-2" aria-label="Question mode">
               {[['anything', 'Ask freely'], ['clothes', 'Use guided examples']].map(([item, label]) => <button key={item} type="button" aria-pressed={item === 'anything' ? decision.item === 'anything' : decision.item !== 'anything'} className="min-h-[44px] rounded-xl border border-forest px-4 py-2 font-semibold aria-pressed:bg-forest aria-pressed:text-white" onClick={() => {
                 setDecision({ item: item as Decision['item'], intent: item === 'anything' ? 'explore' : 'buy', support: 'myself', budget: 'free' });
@@ -75,12 +75,12 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
               }}>{label}</button>)}
             </div>
             {decision.item !== 'anything' && <>
-            <label className="block font-semibold">1. What is the object?
+            <label className="block font-semibold">What is the object?
               <select className={`${control} mt-2`} value={decision.item} onChange={e => change('item', e.target.value as Decision['item'])}>
                 {Object.entries(itemLabels).filter(([id]) => id !== 'anything').map(([id, label]) => <option key={id} value={id}>{label}</option>)}
               </select>
             </label>
-            <label className="block font-semibold">2. What brings you here?
+            <label className="block font-semibold">What brings you here?
               <select className={`${control} mt-2`} value={decision.intent} onChange={e => change('intent', e.target.value as Decision['intent'])}>
                 {Object.entries(intentLabels).filter(([id]) => id !== 'explore').map(([id, label]) => <option key={id} value={id}>{label}</option>)}
               </select>
@@ -95,7 +95,7 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
                 <option value="myself">Explore what I can do myself</option><option value="help">Find help with it</option>
               </select>
             </label>}
-            {decision.intent !== 'pass' && <label className="block font-semibold">3. What fits your budget right now?
+            {decision.intent !== 'pass' && <label className="block font-semibold">What fits your budget right now?
               <select className={`${control} mt-2`} value={decision.budget} onChange={e => change('budget', e.target.value as Decision['budget'])}>
                 <option value="free">Start without spending</option><option value="flexible">I can consider a cost</option>
               </select>
@@ -108,7 +108,7 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
             }} onFallback={snapshot => {
               setResult(snapshot); setGenerated(null); setEditedPlan('');
             }} />
-            <button className="min-h-[44px] rounded-xl border border-ink/25 px-5 py-3 font-semibold hover:bg-sage" type="button" onClick={showBasic}>Find my next step (basic guidance)</button>
+            <button className="min-h-[44px] py-2 text-sm font-semibold text-forest underline underline-offset-4" type="button" onClick={showBasic}>{decision.item === 'anything' ? 'Browse general guidance (no AI)' : 'Find my next step (basic guidance)'}</button>
             <p className="text-sm text-ink/80">General starting points. Your object’s condition, model and local services can change what is possible.</p>
           </div>
           <div ref={resultRef} tabIndex={-1} aria-label="Your suggested next step" className="scroll-mt-20 min-w-0 break-words rounded-2xl border border-ink/15 bg-paper p-5 sm:p-8">
@@ -120,9 +120,11 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
                 </div>
                 <AIPlanContent generated={generated} />
                 {generated.plan.status === 'ready' && <div className="mt-6">
+                  <details className="rounded-xl border border-ink/15 bg-surface p-4"><summary className="min-h-[44px] cursor-pointer py-2 font-semibold">Edit the draft before saving</summary>
                   <label htmlFor="reviewed-plan" className="block font-semibold">Review or edit the plan you want to save</label>
                   <p className="mt-2 text-sm">You decide what to do. Saving keeps this version on your browser.</p>
                   <textarea id="reviewed-plan" className={`${control} mt-3 min-h-48`} maxLength={6000} value={editedPlan} onChange={e => setEditedPlan(e.target.value)} />
+                  </details>
                   <button type="button" className="mt-2 min-h-[44px] py-2 text-sm font-semibold text-forest underline underline-offset-4" onClick={() => {
                     if (!navigator.clipboard) { setNotice('Select the draft text to copy it manually.'); return; }
                     void navigator.clipboard.writeText(editedPlan).then(() => setNotice('Draft copied.'), () => setNotice('Copy was unavailable. Select the draft text to copy it manually.'));
@@ -144,9 +146,10 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
               {result.intent === 'pass' && <p className="mt-3 text-sm">Before travelling, contact the recipient or collection service. Ask whether they accept this item in its current condition{result.item === 'headphones' ? ', whether batteries need special handling,' : ''} and whether there is a fee. US guidance is background information; use your municipality or manufacturer for local rules.</p>}
               <p className="mt-3 text-xs text-ink/80">Editorial starting points, not a diagnosis or a measured environmental saving. Check collection and donation acceptance locally.</p>
               </>}
+              {generated?.plan.status === 'ready' && !editedPlan.trim() && <p role="status" className="mt-4 text-sm text-clay">Add some text to the draft before saving it.</p>}
               {saved && !isSameSaved && <p className="mt-5 text-sm">Replacing your action starts a new note and outcome. Undo is available until the next replacement, removal or page reload.</p>}
               {(!generated || generated.plan.status === 'ready') && <button type="button" disabled={!!generated && !editedPlan.trim()} className={`${primary} mt-6 disabled:opacity-60`} onClick={saveResult}>{saved ? (isSameSaved ? 'View my saved action' : 'Replace my saved action with this') : 'Save this action for the week'}</button>}
-            </> : <><h3 className="text-2xl font-editorial">A small decision, made easier.</h3><p className="mt-4 leading-relaxed">Ask a question to understand an idea or find a practical next step. Your answer will appear here, ready to review, edit and save.</p><p className="mt-4 text-sm">Your budget and access to help matter. Choose what is realistic for you.</p></>}
+            </> : <><h3 className="text-2xl font-editorial">Your answer will appear here.</h3><p className="mt-4 leading-relaxed">Ask a question to understand an idea or find a practical next step. Your answer will appear here, ready to review, edit and save.</p><p className="mt-4 text-sm">Include the details that matter to you. You can refine your question after reading the answer.</p></>}
           </div>
         </div>
         <p id="action-storage-status" role="status" className="mt-5 text-sm">{notice}</p>

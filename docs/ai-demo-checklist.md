@@ -73,7 +73,7 @@ model-quality advantage without evidence.
 - During a request, cancel it; the question must remain and late results must be ignored.
 - Edit a reviewed draft, then change the question and force a failed request: the edited draft must remain.
 - Check the original question above each answer. Edit my question or Add details to my question should return focus to the input without erasing it.
-- Copy a draft before saving; confirm it copies the edited version.
+- Expand Edit the draft before saving to change the text. Copy a draft before saving; confirm it copies the edited version. Empty text should explain why saving is disabled.
 - Check the live status announcements using a screen reader and try the flow on a physical phone, including with the keyboard open.
 
 ## Location and consistent answers

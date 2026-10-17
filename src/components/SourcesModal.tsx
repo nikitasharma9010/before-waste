@@ -68,7 +68,7 @@ export const SourcesModal: React.FC<SourcesModalProps> = ({ isOpen, onClose, tri
       onClose={onClose}
       triggerRef={triggerRef}
       titleId="sources-dialog-title"
-      title="Sources & Environmental Methodology"
+      title="Sources & methodology"
       descriptionId="sources-dialog-description"
       description="Published reports and environmental accounting references used in the educational stories. References do not imply endorsement."
       maxWidthClass="max-w-2xl"
@@ -100,12 +100,13 @@ export const SourcesModal: React.FC<SourcesModalProps> = ({ isOpen, onClose, tri
                 {source.scopeSummary}
               </p>
               <a
+                aria-label={`Read ${source.reportName} (opens in a new tab)`}
                 href={source.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-xs font-medium text-ink hover:text-forest focus-visible:ring-2 focus-visible:ring-forest rounded transition-colors"
+                className="inline-flex min-h-[44px] items-center gap-1.5 py-2 text-sm font-semibold text-ink hover:text-forest focus-visible:ring-2 focus-visible:ring-forest rounded transition-colors"
               >
-                <span>Visit official documentation</span>
+                <span>Read the source</span><span className="sr-only"> (opens in a new tab)</span>
                 <ExternalLink className="w-3.5 h-3.5" aria-hidden="true" />
               </a>
             </div>
@@ -121,7 +122,7 @@ export const SourcesModal: React.FC<SourcesModalProps> = ({ isOpen, onClose, tri
             onClick={onClose}
             className="px-4 py-2.5 min-h-[44px] text-xs font-medium rounded-xl text-white bg-forest hover:bg-forest-strong focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ink transition-colors cursor-pointer self-end sm:self-auto"
           >
-            Close Dialog
+            Close sources
           </button>
         </div>
       </div>

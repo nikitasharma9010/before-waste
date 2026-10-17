@@ -28,6 +28,8 @@ it('shows only a compact entry on home and full guidance at a directly loaded as
   expect(host.querySelectorAll('h1')).toHaveLength(1);
   expect(host.querySelector('#assistant-entry')).toBeNull();
   expect(host.querySelector('#object-preview')).toBeNull();
+  expect(host.querySelector('header a[href="/#follow-one-thing"]')?.textContent).toContain('Follow One Thing');
+  expect([...host.querySelectorAll('header a')].some(a => a.textContent?.trim() === 'Explore stories')).toBe(true);
   expect(host.querySelector<HTMLTextAreaElement>('#ai-description')?.value).toContain('small flat');
   expect(host.querySelector('#saved-action')?.textContent).toContain('Keep my existing action');
   expect(sessionStorage.getItem(QUESTION_DRAFT_KEY)).toBeNull();
