@@ -30,7 +30,7 @@ async function click(text: string) {
 it('generates, edits and saves the actual accepted plan across reload without another model call', async () => {
   const request = vi.fn().mockResolvedValue(Response.json(generated)); vi.stubGlobal('fetch', request);
   await input('ai-description', 'My coat button is loose. I want to use supplies I already have.');
-  await click('Generate AI plan');
+  await click('Get AI guidance');
   expect(host.textContent).toContain('AI-GENERATED DRAFT');
   await input('reviewed-plan', 'My edited plan: ask a friend for a matching spare button.');
   await click('Save this action');
@@ -44,14 +44,14 @@ it('generates, edits and saves the actual accepted plan across reload without an
 });
 it('shows honest basic guidance when the AI service is not configured', async () => {
   vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json({ error: 'AI planning is not configured yet.' }, { status: 503 })));
-  await input('ai-description', 'A coat button is loose and I do not know where to start.'); await click('Generate AI plan');
+  await input('ai-description', 'A coat button is loose and I do not know where to start.'); await click('Get AI guidance');
   expect(host.querySelector('[role="alert"]')?.textContent).toContain('not configured');
   expect(host.textContent).toContain('BASIC GUIDANCE · NOT AI GENERATED');
   expect(host.textContent).not.toContain('AI-GENERATED DRAFT');
 });
 it('asks for clarification and does not allow saving an unready AI draft', async () => {
   vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json({ ...generated, plan: { ...generated.plan, status: 'clarify', steps: [], questions: ['Is the fabric torn or just the stitching?'] } })));
-  await input('ai-description', 'There is something wrong with my favourite coat near the shoulder.'); await click('Generate AI plan');
+  await input('ai-description', 'There is something wrong with my favourite coat near the shoulder.'); await click('Get AI guidance');
   expect(host.textContent).toContain('Is the fabric torn');
   expect([...host.querySelectorAll('button')].some(b => b.textContent?.includes('Save this action'))).toBe(false);
 });
@@ -59,7 +59,7 @@ it('discards stale AI output after a form selection changes', async () => {
   await click('Use guided examples');
   let complete!: (value: Response) => void;
   vi.stubGlobal('fetch', vi.fn().mockReturnValue(new Promise<Response>(resolve => { complete = resolve; })));
-  await input('ai-description', 'A coat button is loose and I have no sewing supplies.'); await click('Generate AI plan');
+  await input('ai-description', 'A coat button is loose and I have no sewing supplies.'); await click('Get AI guidance');
   const select = host.querySelector('select')!;
   await act(async () => { select.value = 'headphones'; select.dispatchEvent(new Event('change', { bubbles: true })); });
   await act(async () => complete(Response.json(generated)));
@@ -74,7 +74,7 @@ it('keeps basic guidance usable with an unfinished optional AI description', asy
 it('discloses AICredits and retains provider provenance with a saved plan', async () => {
   vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json({ ...generated, model: 'openai/gpt-4o-mini', provider: 'aicredits' })));
   expect(host.querySelector('#ai-privacy')?.textContent).toContain('both services');
-  await input('ai-description', 'My coat button is loose and I have no sewing supplies.'); await click('Generate AI plan');
+  await input('ai-description', 'My coat button is loose and I have no sewing supplies.'); await click('Get AI guidance');
   expect(host.textContent).toContain('Generated via AICredits');
   await click('Save this action');
   expect(readAction().action?.customPlan?.provider).toBe('aicredits');
@@ -89,7 +89,7 @@ it('starts with free questions and preserves a broad answer across saving and re
     reason: 'Preventing surplus comes before disposal.', steps: ['Check your pantry before making a shopping list.'], resourceIds: ['food'] } }));
   vi.stubGlobal('fetch', request);
   await input('ai-description', 'How can I waste less food in a small household?');
-  await click('Generate AI plan'); await click('Save this action');
+  await click('Get AI guidance'); await click('Save this action');
   expect(readAction().action?.item).toBe('anything');
   expect(readAction().action?.customPlan?.text).toContain('Plan around what needs using first');
   await act(async () => root.unmount()); root = createRoot(host);
@@ -99,7 +99,62 @@ it('starts with free questions and preserves a broad answer across saving and re
 });
 it('never substitutes headphone advice for an open question when AI fails', async () => {
   vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json({ error: 'Unavailable' }, { status: 503 })));
-  await input('ai-description', 'What can I do with a broken wooden chair?'); await click('Generate AI plan');
+  await input('ai-description', 'What can I do with a broken wooden chair?'); await click('Get AI guidance');
   expect(host.textContent).toContain('This is general guidance, not an answer to your question.');
   expect(host.textContent).not.toContain('Check what you need your headphones to do');
+});
+
+it('offers optional starter questions without sending them automatically', async () => {
+  const request = vi.fn(); vi.stubGlobal('fetch', request);
+  await click('How can I waste less food?');
+  expect(host.querySelector<HTMLTextAreaElement>('#ai-description')?.value).toBe('How can I waste less food?');
+  expect(document.activeElement?.id).toBe('ai-description');
+  expect(host.querySelector('[aria-label="Example questions"]')).toBeNull();
+  expect(request).not.toHaveBeenCalled();
+});
+it('identifies short input inline and focuses the question without invoking AI', async () => {
+  const request = vi.fn(); vi.stubGlobal('fetch', request);
+  await input('ai-description', 'short'); await click('Get AI guidance');
+  const field = host.querySelector('#ai-description')!;
+  expect(field.getAttribute('aria-invalid')).toBe('true');
+  expect(field.getAttribute('aria-describedby')).toContain('ai-error');
+  expect(document.activeElement).toBe(field);
+  expect(host.querySelector('[role="alert"]')?.textContent).toContain('at least 10');
+  expect(request).not.toHaveBeenCalled();
+});
+it('submits AI through the question form and cancels without losing input or accepting late results', async () => {
+  let complete!: (value: Response) => void;
+  const request = vi.fn().mockReturnValue(new Promise<Response>(resolve => { complete = resolve; })); vi.stubGlobal('fetch', request);
+  await input('ai-description', 'Can I reuse glass food jars?');
+  await act(async () => host.querySelector('form')!.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true })));
+  expect(host.textContent).toContain('Preparing answer');
+  expect(host.textContent).not.toContain('BASIC GUIDANCE · NOT AI GENERATED');
+  await click('Cancel request');
+  expect(request.mock.calls[0][1].signal.aborted).toBe(true);
+  expect(host.querySelector<HTMLTextAreaElement>('#ai-description')?.value).toBe('Can I reuse glass food jars?');
+  expect(document.activeElement?.id).toBe('ai-description');
+  expect(host.textContent).toContain('Request cancelled. Your question is kept.');
+  await act(async () => complete(Response.json(generated)));
+  expect(host.textContent).not.toContain('AI-GENERATED DRAFT');
+});
+it('preserves reviewed draft edits when the question changes and a retry fails', async () => {
+  const request = vi.fn().mockResolvedValueOnce(Response.json(generated)).mockRejectedValueOnce(new Error('Network unavailable'));
+  vi.stubGlobal('fetch', request);
+  await input('ai-description', 'My coat button is loose. What should I do?'); await click('Get AI guidance');
+  await input('reviewed-plan', 'Keep my carefully edited plan.');
+  await input('ai-description', 'Can I find a matching spare without buying?');
+  expect(host.querySelector<HTMLTextAreaElement>('#reviewed-plan')?.value).toBe('Keep my carefully edited plan.');
+  expect(host.textContent).toContain('My coat button is loose. What should I do?');
+  await click('Get AI guidance');
+  expect(host.querySelector<HTMLTextAreaElement>('#reviewed-plan')?.value).toBe('Keep my carefully edited plan.');
+  expect(host.textContent).toContain('Your previous draft is still available.');
+  await click('Save this action');
+  expect(readAction().action?.customPlan?.text).toBe('Keep my carefully edited plan.');
+});
+it('takes clarification directly back to the original question', async () => {
+  vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json({ ...generated, plan: { ...generated.plan, status: 'clarify', steps: [], questions: ['What fabric is it?'] } })));
+  await input('ai-description', 'There is a tear near the shoulder of my coat.'); await click('Get AI guidance');
+  await click('Add details to my question');
+  expect(document.activeElement?.id).toBe('ai-description');
+  expect(host.querySelector<HTMLTextAreaElement>('#ai-description')?.value).toContain('tear near the shoulder');
 });

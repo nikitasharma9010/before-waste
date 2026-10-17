@@ -144,3 +144,13 @@ release checks. Browser viewport checks do not replace those checks.
 - Tested description-only API input, conceptual answers, absent catalogue matches, open-plan save/reload, honest fallback and device battery safeguarding. Provider responses in automated tests are simulated.
 - Browser checked at widths 280, 320, 375, 768, 1280 and 1440: no document horizontal overflow. Desktop and 375px layouts visually inspected. Missing-key behavior confirmed through the local API.
 - Live Gemini/AICredits output quality and production deployment still require configured Vercel credentials and the deployment demo checks.
+
+## AI assistance usability — 17 October 2026
+
+The question input is now a separate labelled form: Enter adds a newline and Ctrl/Cmd+Enter submits AI guidance. The basic-guidance button has a separate explicit action. Optional starter questions fill the field without sending a request. Short-input errors are linked to the field, identify the minimum, and focus it; service errors retain the question and expose retry. Loading has a polite live status, reduced-motion-aware spinner and cancellation that restores focus. No invented progress percentage is displayed.
+
+AI answers identify their original question and provide a direct edit/clarification control. Editing or retry failure preserves the current reviewed draft; only a successful new answer replaces it. Copying a draft does not require saving. Privacy details use a native disclosure with a visible short summary. Existing visible focus styles and 44px control minimums are retained; input text is 16px.
+
+Validation: 84 tests pass, TypeScript and production build pass. Browser verified inline validation, Ctrl+Enter, missing-key recovery, original-question context and edit focus. No horizontal overflow at 280, 320, 375, 768, 1280 and 1440px; desktop and 375px layouts visually inspected. The preview uses deterministic safety guidance, explicitly labelled as not AI-generated. Real provider quality, physical-device keyboard behavior and screen-reader testing remain deployment checks; this is not a complete WCAG conformance audit or usability study.
+
+References: [W3C form notifications](https://www.w3.org/WAI/tutorials/forms/notifications/), [WCAG status messages](https://www.w3.org/WAI/WCAG21/Understanding/status-messages), [NN/g machine-learning usability](https://www.nngroup.com/articles/machine-learning-ux/).

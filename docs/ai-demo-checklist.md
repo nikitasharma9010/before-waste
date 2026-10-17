@@ -64,3 +64,14 @@ The prompt and resource restrictions reduce some risks; they are not a guarantee
 of factual or repair safety. Judge outputs on actual scenarios. Do not claim a
 diagnosis, verified local service, measured environmental savings or an evaluated
 model-quality advantage without evidence.
+
+## AI assistance interaction checks
+
+- Choose a starter question: it should fill and focus the input without sending anything.
+- Submit fewer than 10 characters: the error should be linked to the focused field.
+- Enter should add a newline. Ctrl/Cmd+Enter should request AI guidance, never trigger basic guidance.
+- During a request, cancel it; the question must remain and late results must be ignored.
+- Edit a reviewed draft, then change the question and force a failed request: the edited draft must remain.
+- Check the original question above each answer. Edit my question or Add details to my question should return focus to the input without erasing it.
+- Copy a draft before saving; confirm it copies the edited version.
+- Check the live status announcements using a screen reader and try the flow on a physical phone, including with the keyboard open.
