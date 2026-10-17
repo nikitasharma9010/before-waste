@@ -118,7 +118,7 @@ export default function App() {
         {isNotFound ? <NotFound /> : isAssistant ? <>
           <div className="mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:px-8"><a href="/#follow-one-thing" className="inline-flex min-h-[44px] items-center font-semibold text-forest underline underline-offset-4">Back to the stories</a></div>
           <DecisionHelper standalone initialQuestion={initialQuestion} onExploreObject={id => window.location.assign(`/?story=${encodeURIComponent(id)}#follow-one-thing`)} />
-          <TrustAndMethod onOpenSources={handleOpenSources} />
+          <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6 lg:px-8"><details className="rounded-xl border border-ink/20"><summary className="min-h-[44px] cursor-pointer px-4 py-3 font-semibold">How it works and your data</summary><TrustAndMethod onOpenSources={handleOpenSources} /></details></div>
         </> : <>
         {/* 2. Opening Experience: Spark curiosity immediately */}
         <Welcome onExploreObjects={handleExploreObject} />

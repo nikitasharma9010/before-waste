@@ -89,7 +89,6 @@ export function AIPlannerForm({ decision, hasDraft, initialQuestion = '', standa
       <p id="ai-location-hint" className="mt-2 text-sm text-ink/80">Share only if relevant. No address needed; location is never detected automatically. Local services and rules still need confirmation.</p>
     </div> : <button type="button" className="min-h-[44px] py-2 text-sm font-semibold text-forest underline underline-offset-4" onClick={() => { setShowLocation(true); requestAnimationFrame(() => locationField.current?.focus()); }}>+ Add your location (optional)</button>}
     <p id="ai-privacy-summary" className="text-sm text-ink/80">{standalone ? 'Leave out private information — your question goes to an external AI service.' : 'AI can make mistakes. Leave out private information. You choose what to save.'}</p>
-    {hasDraft && <p className="text-sm">Your current draft stays available while you edit or retry. A successful new answer replaces the unsaved draft; your saved action stays.</p>}
     <div className="flex flex-wrap items-center gap-3">
       <button type="submit" disabled={busy} className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-forest px-5 py-3 font-semibold text-white hover:bg-forest-strong disabled:opacity-60 disabled:cursor-not-allowed">
         {busy ? <LoaderCircle aria-hidden="true" className="h-4 w-4 animate-spin" /> : <Sparkles aria-hidden="true" className="h-4 w-4" />}
@@ -100,12 +99,12 @@ export function AIPlannerForm({ decision, hasDraft, initialQuestion = '', standa
       }}>Cancel request</button>}
     </div>
     <details className="text-sm text-ink/80"><summary className="min-h-[44px] cursor-pointer py-3 underline underline-offset-4">How your question is used</summary>
-      <p id="ai-privacy" className="pb-3">Your question, optional location and selected answers are sent to an external AI service to prepare a response. When you follow up, your editable conversation background and up to two recent questions and abbreviated answers from this session are also sent for context. Reloading clears the conversation. Your saved notes are not sent. Answers do not include a live local-service search.</p>
+      <p id="ai-privacy" className="pb-3">Your question, optional location and selected answers are sent to an external AI service to prepare a response. When you follow up, your editable conversation background and up to two recent questions and abbreviated answers from this session are also sent for context. Reloading clears the conversation. Your saved notes are not sent. A successful new answer replaces the unsaved draft; your saved action stays. Answers do not include a live local-service search.</p>
     </details>
     {!description && !followUp && decision.item === 'anything' && <div role="group" aria-label="Example questions" className="flex flex-wrap gap-2">
       {starters.map(question => <button key={question} type="button" className="min-h-[44px] rounded-xl border border-ink/20 px-3 py-2 text-left text-sm hover:bg-sage" onClick={() => { update(question); field.current?.focus(); }}>{question}</button>)}
     </div>}
-    <p role="status" aria-live="polite" aria-atomic="true" className="text-sm">{status}</p>
+    <p role="status" aria-live="polite" aria-atomic="true" className={status === 'Your answer is ready to review.' ? 'sr-only' : 'text-sm'}>{status}</p>
     {error && <div className="rounded-xl border border-clay/30 bg-paper p-4 text-sm"><p id="ai-error" role="alert">{error}</p>{!invalid && <p className="mt-2">{standalone ? 'Your question is kept. Try again in a moment.' : 'Your question is kept. Try again or use basic guidance.'}{hasDraft ? ' Your previous draft is still available.' : ''}</p>}</div>}
   </form>;
 }

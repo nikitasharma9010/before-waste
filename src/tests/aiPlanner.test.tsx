@@ -75,7 +75,7 @@ it('keeps provider metadata compatible without displaying provider or model name
   vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json({ ...generated, model: 'openai/gpt-4o-mini', provider: 'aicredits' })));
   expect(host.querySelector('#ai-privacy')?.textContent).toContain('external AI service');
   await input('ai-description', 'My coat button is loose and I have no sewing supplies.'); await click('Get AI guidance');
-  expect(host.textContent).toContain('AI-assisted guidance');
+  expect(host.textContent).toContain('AI-GENERATED DRAFT');
   expect(host.textContent).not.toMatch(/Gemini|AICredits|gpt-4o-mini/);
   await click('Save this action');
   expect(readAction().action?.customPlan?.provider).toBe('aicredits');
@@ -253,4 +253,39 @@ it('renders explanation and refusal responses without a save button or empty act
     expect(host.querySelector('#reviewed-plan')).toBeNull();
     expect([...host.querySelectorAll('button')].some(b=>b.textContent?.includes('Save this action'))).toBe(false);
   }
+});
+it('prioritizes the first answer and keeps the submitted question in a closed disclosure', async () => {
+  await act(async () => root.render(<DecisionHelper standalone onExploreObject={() => {}} />));
+  vi.stubGlobal('fetch',vi.fn().mockImplementation(async()=>Response.json(generated)));
+  const question='My coat has a loose button and I cannot spend money on repairs.';
+  await input('ai-description',question); await click('Get AI guidance');
+  expect(host.textContent).not.toContain('You asked');
+  const summary=[...host.querySelectorAll('summary')].find(s=>s.textContent==='View your question')!;
+  const details=summary.closest('details')!;
+  expect(details.open).toBe(false); expect(details.textContent).toContain(question);
+  expect(host.querySelector('[aria-label="Your suggested next step"]')?.querySelector('h3')?.textContent).toBe(generated.plan.action);
+  await act(async()=>summary.click()); expect(details.open).toBe(true);
+  await input('ai-description','What if I cannot find a replacement button?'); await click('Get AI guidance');
+  expect(host.textContent).toContain('You asked');
+  expect(host.textContent).toContain('Earlier in this conversation');
+  expect([...host.querySelectorAll('summary')].some(s=>s.textContent==='View your question')).toBe(false);
+});
+it('shows one actionable error on standalone without adding a duplicate unavailable answer', async () => {
+  await act(async () => root.render(<DecisionHelper standalone onExploreObject={() => {}} />));
+  vi.stubGlobal('fetch',vi.fn().mockResolvedValue(Response.json({error:'Service temporarily unavailable.'},{status:503})));
+  const question='How can I reduce packaging waste at home?';
+  await input('ai-description',question); await click('Get AI guidance');
+  expect(host.querySelectorAll('[role="alert"]')).toHaveLength(1);
+  expect(host.querySelector('[aria-label="Your suggested next step"]')).toBeNull();
+  expect(host.querySelector<HTMLTextAreaElement>('#ai-description')?.value).toBe(question);
+  expect(host.textContent).not.toContain('AI guidance isn’t available right now');
+});
+it('does not show replacement warnings for a clarification that cannot be saved', async () => {
+  localStorage.setItem('beforewaste_action_v1',JSON.stringify({item:'clothes',intent:'buy',support:'myself',budget:'free',note:'Keep this note',outcome:'planned'}));
+  await act(async()=>root.render(<DecisionHelper key="saved-clarify" standalone onExploreObject={()=>{}} />));
+  vi.stubGlobal('fetch',vi.fn().mockResolvedValue(Response.json({...generated,plan:{...generated.plan,status:'clarify',steps:[],alternative:'',questions:['What fabric is it?']}})));
+  await input('ai-description','How can I repair this unidentified fabric?'); await click('Get AI guidance');
+  expect(host.textContent).toContain('What fabric is it?');
+  expect(host.textContent).not.toContain('Replacing your action starts a new note');
+  expect(readAction().action?.note).toBe('Keep this note');
 });
