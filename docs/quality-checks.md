@@ -160,3 +160,11 @@ References: [W3C form notifications](https://www.w3.org/WAI/tutorials/forms/noti
 Optional city/region and country is validated (120-character maximum), sent only with an explicit AI request, and shown alongside the answered question. Instructions use details in the location field or description, adapt to stated constraints, ask when necessary and avoid treating US guidance as local evidence elsewhere. No geolocation or live service lookup was added. Provider/model branding was removed from privacy details, answers and saved-plan labels while retaining internal metadata compatibility. Shared section labels drive answer display and copy/save text.
 
 88 automated tests pass, TypeScript and production build pass. New tests cover location validation, both provider contexts/instructions, location UI submission, absence of branding and shared formatting. Browser verified location context and section headings using deterministic safety output; narrow/desktop layouts inspected, with no horizontal overflow at 280-1440px. Live geographic relevance still requires configured credentials; automated tests do not establish model factual accuracy.
+
+## Calls to action and trust signals - 17 October 2026
+
+The header, hero and closing section now use the same primary Ask Before Waste action. Closing alternatives explicitly offer the 7-day pause and sharing; restart is a secondary footer action. The hero and footer link to a focusable How it works & your data section. Three cards explain external AI processing, human review and browser-only saves, with an actionable source/methodology dialog link. The sources dialog distinguishes educational references from AI verification and disclaims endorsement. No fabricated testimonials, usage figures, partner logos, certification or guaranteed impact claims were added.
+
+89 tests pass; TypeScript and production build pass. Tests verify primary destinations, trust disclosures, the source dialog and existing restart behavior. Browser verified the source dialog, focus restoration and desktop/mobile trust cards; no horizontal overflow at 280, 320, 375, 768, 1280 and 1440px. Existing real-model and screen-reader deployment checks remain.
+
+Design reference: [NN/g on credibility through clear disclosure and checkable information](https://www.nngroup.com/articles/trustworthy-design/).

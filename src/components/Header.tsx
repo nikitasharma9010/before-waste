@@ -105,7 +105,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSources }) => {
             onClick={handleLinkClick}
             className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 min-h-[44px] text-sm font-semibold text-white bg-forest hover:bg-forest-strong focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ink rounded-xl transition-colors whitespace-nowrap shrink-0 shadow-xs"
           >
-            <span>Find my next step</span>
+            <span>Ask Before Waste</span>
             <ArrowUpRight className="w-4 h-4" aria-hidden="true" />
           </a>
 
@@ -157,7 +157,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSources }) => {
                 onClick={handleLinkClick}
                 className="flex items-center justify-center gap-2 w-full py-3 px-4 min-h-[44px] text-center font-semibold text-white bg-forest hover:bg-forest-strong focus-visible:ring-2 focus-visible:ring-ink rounded-xl transition-colors shadow-xs"
               >
-                <span>Find my next step</span>
+                <span>Ask Before Waste</span>
                 <ArrowUpRight className="w-4 h-4" aria-hidden="true" />
               </a>
             </div>

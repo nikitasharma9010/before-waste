@@ -10,6 +10,7 @@ import { SystemsSection } from './components/SystemsSection';
 import { ClosingSection } from './components/ClosingSection';
 import { SourcesModal } from './components/SourcesModal';
 import { DecisionHelper } from './components/DecisionHelper';
+import { TrustAndMethod } from './components/TrustAndMethod';
 import { Welcome } from './components/Welcome';
 
 export default function App() {
@@ -90,6 +91,8 @@ export default function App() {
         <Welcome onExploreObjects={handleExploreObject} />
 
         <DecisionHelper onExploreObject={handleExploreObject} />
+
+        <TrustAndMethod onOpenSources={handleOpenSources} />
 
         <HeroOpening onExploreObjects={handleExploreObject} />
 
