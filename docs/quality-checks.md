@@ -47,7 +47,28 @@ navigation dismissal, destination focus, skip-link wiring, accessible branding,
 hotspot updates, keyboard scenario selection, dialog focus, restart, and reflection
 storage failures.
 
-## Scope
+## Object decision MVP
+
+The homepage offers a practical decision flow alongside story exploration. Two
+categories (clothes/headphones) and three intentions (buy/fix/pass on) provide six
+starting situations. Budget and preferred help adjust the advice. These are
+editorial starting points, not diagnoses, service availability promises or impact
+calculations. External iFixit clothing/headphone category links were checked on
+2026-10-17; local collection acceptance must be verified by the user.
+
+One saved action, an optional note and its reported outcome live in a separate,
+versioned browser-storage key. Existing seven-day reflections are preserved.
+Storage failures retain session state and failed removal keeps the action visible.
+Saving another recommendation explicitly replaces the current action and note.
+No account, analytics, notification delivery or local service directory is added.
+
+45 tests cover all six starting situations, budget/help branches, stale-result
+clearing, storage validation/failure, restoration, outcome updates and removal.
+Browser checks at 280, 320, 375, 768, 1280 and 1440px found no page overflow;
+320px and 1440px layouts were visually inspected. Result submission moves focus
+to its card; story links transfer focus to the story section.
+
+## Accessibility review scope
 
 Use the [WCAG 2.2 reference](https://www.w3.org/WAI/WCAG22/quickref/) when reviewing
 future changes, including reflow, text resize, visible focus, keyboard access, and
