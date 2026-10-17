@@ -168,3 +168,9 @@ The header, hero and closing section now use the same primary Ask Before Waste a
 89 tests pass; TypeScript and production build pass. Tests verify primary destinations, trust disclosures, the source dialog and existing restart behavior. Browser verified the source dialog, focus restoration and desktop/mobile trust cards; no horizontal overflow at 280, 320, 375, 768, 1280 and 1440px. Existing real-model and screen-reader deployment checks remain.
 
 Design reference: [NN/g on credibility through clear disclosure and checkable information](https://www.nngroup.com/articles/trustworthy-design/).
+
+## Consistent provider output - 17 October 2026
+
+Both AI adapters pass through the same answer parser. It now trims whitespace and normalizes heading prefixes, list prefixes, bold wrappers and inline code wrappers into plain-text fields before display or copying. HTML, Markdown tables, fenced answers and empty normalized fields are rejected through the existing provider fallback path rather than displayed as broken formatting. The application still owns headings, spacing and step numbering. Clarification responses keep the same layout but omit action steps until enough information is available. User-edited saved text is preserved as written.
+
+91 tests pass, including identical normalized answer/copy text from both provider adapters and rejection of unsupported presentation. TypeScript and production build pass. No visual layout change; existing responsive checks remain applicable. Live response content still depends on configured model quality.

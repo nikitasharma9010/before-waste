@@ -190,3 +190,23 @@ it('uses the same section labels for generated display and copy/save text', () =
   for (const label of [PLAN_LABELS.reason, PLAN_LABELS.steps, PLAN_LABELS.alternative, PLAN_LABELS.resources]) expect(text).toContain(label);
   expect(text).not.toContain('undefined');
 });
+
+
+it('normalizes provider formatting into the same plain-text answer structure', async () => {
+  const decorated = { ...plan, action: '### **Check model support before paying for parts**',
+    summary: '  One side of your headphones is silent after a source check.  ',
+    reason: '**You have no tools and already tried another source.**',
+    steps: ['1. Find the model number and warranty information.', '- Ask support whether an assessment has a fee.'] };
+  for (const provider of ['gemini', 'aicredits']) {
+    const upstream = vi.fn().mockResolvedValue(provider === 'gemini' ? Response.json(completed(decorated)) : chatResponse(decorated));
+    const result = await generatePlan(input, { ...backupEnv, AI_PROVIDER: provider }, upstream);
+    expect(result.plan).toEqual(plan);
+    expect(planText(result.plan)).toBe(planText(plan));
+  }
+});
+it('rejects unsupported tables, HTML and fenced answers instead of displaying broken layouts', () => {
+  for (const summary of ['<h1>Advice</h1>', '```text Advice ```', '| Option | Result |']) {
+    expect(parsePlan({ ...plan, summary })).toBeNull();
+  }
+  expect(parsePlan({ ...plan, steps: ['- '] })).toBeNull();
+});

@@ -255,4 +255,3 @@ it('connects primary calls to action and trust details to working destinations',
   await click(button('Check sources & methodology'));
   expect(document.querySelector('[role="dialog"]')?.textContent).toContain('do not endorse this project or verify individual AI answers');
 });
-
