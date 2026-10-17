@@ -41,7 +41,7 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
     clarify: 'Save is available for actionable plans. Add the requested details below to continue.',
     explanation: 'This is an explanation, so it is not saved as an action. Ask a follow-up for a practical next step you can save.',
     refused: 'This safety response is not an action plan to save. You can ask about a safer option below.',
-    unsupported: 'This reply is outside the supported theme and cannot be saved as an action.',
+    unsupported: '',
   }[generated.plan.status] : '';
   const isSameSaved = !!(saved && result && sameDecision(saved, result) &&
     (generated ? saved.question === answeredQuestion && saved.customPlan?.text === editedPlan && saved.customPlan.source === generated.source : !saved.customPlan));
