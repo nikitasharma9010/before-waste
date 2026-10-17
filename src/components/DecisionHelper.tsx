@@ -1,5 +1,5 @@
 import { CopyTextButton } from './CopyTextButton';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { LoaderCircle } from 'lucide-react';
 import { barrierLabels, intentLabels, issues, itemLabels, recommend, recoveryAdvice, sameDecision, type Barrier, type Decision } from '../data/decisionData';
 import { readAction, writeAction, type SavedAction, type Outcome } from '../utils/actionStorage';
@@ -20,10 +20,7 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
   const [undoAction, setUndoAction] = useState<SavedAction | null>(null);
   const [generated, setGenerated] = useState<GeneratedPlan | null>(null);
   const [editedPlan, setEditedPlan] = useState('');
-  const [editing, setEditing] = useState(false);
-  const moreRef = useRef<HTMLDetailsElement>(null);
-  const editorRef = useRef<HTMLTextAreaElement>(null);
-  useEffect(() => { if (editing) editorRef.current?.focus(); }, [editing]);
+  const editorDetailsRef = useRef<HTMLDetailsElement>(null);
   const [answeredQuestion, setAnsweredQuestion] = useState('');
   const [asking, setAsking] = useState(false);
   const [background, setBackground] = useState('');
@@ -79,7 +76,7 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
   </div>;
   const startConversation = () => {
     if (!window.confirm('Start a new conversation? The unsaved conversation will be cleared. Your saved action stays.')) return;
-    setGenerated(null); setResult(null); setAnsweredQuestion(''); setEditedPlan(''); setEditing(false);
+    setGenerated(null); setResult(null); setAnsweredQuestion(''); setEditedPlan('');
     setHistory([]); setNotice(''); setBackground(''); setConversationKey(key => key + 1);
     requestAnimationFrame(editQuestion);
   };
@@ -126,8 +123,8 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
               else if (!background) setBackground(question);
               setNotice('');
               setAnsweredQuestion(question);
-              setResult(snapshot); setGenerated(plan); setEditedPlan(planText(plan.plan)); setEditing(false);
-              if (moreRef.current) moreRef.current.open = false;
+              setResult(snapshot); setGenerated(plan); setEditedPlan(planText(plan.plan));
+              if (editorDetailsRef.current) editorDetailsRef.current.open = false;
               requestAnimationFrame(() => resultRef.current?.focus());
             }} onFallback={snapshot => {
               if (standalone) return;
@@ -206,22 +203,15 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
                 {(!generated || generated.plan.status === 'ready') && (isSameSaved && storageAvailable
                   ? <a href="#saved-action" onClick={() => savedRef.current?.focus({ preventScroll: true })} className="inline-flex min-h-[44px] items-center rounded py-3 font-semibold text-forest underline underline-offset-4">Saved · View my action</a>
                   : <button type="button" disabled={!!generated && !editedPlan.trim()} className={`${primary} disabled:opacity-60`} onClick={saveResult}>{saved ? (isSameSaved ? 'Try saving again' : (updatingSaved ? 'Update my saved action' : 'Replace my saved action')) : 'Save action on this device'}</button>)}
-                {generated && <details ref={moreRef} className="min-w-0 max-w-full rounded-xl border border-ink/20 bg-surface open:w-full">
-                  <summary className="min-h-[44px] cursor-pointer px-4 py-3 font-semibold">More</summary>
-                  <div className="space-y-3 border-t border-ink/15 p-4">
-                    <CopyTextButton key={answeredQuestion} text={generated.plan.status === 'ready' ? editedPlan : planText(generated.plan)} />
-                    {generated.plan.status === 'ready' && <button type="button" className="min-h-[44px] rounded py-2 font-semibold text-forest underline underline-offset-4" onClick={() => {
-                      setEditing(true); if (moreRef.current) moreRef.current.open = false;
-                    }}>Edit before saving</button>}
+                {generated?.plan.status === 'ready' && <details ref={editorDetailsRef} className="min-w-0 max-w-full rounded-xl border border-ink/20 bg-surface open:w-full">
+                  <summary className="min-h-[44px] cursor-pointer px-4 py-3 font-semibold">Edit before saving</summary>
+                  <div className="border-t border-ink/15 p-4">
+                    <label htmlFor="reviewed-plan" className="block font-semibold">Edit the action to save</label>
+                    <p className="mt-2 text-sm">Adjust the wording, then use the save button above. Edits stay in the draft until you save.</p>
+                    <textarea id="reviewed-plan" className={`${control} mt-3 min-h-48`} maxLength={6000} value={editedPlan} onChange={e => { setEditedPlan(e.target.value); setNotice('Edits are not saved yet. Save to keep the updated action.'); }} />
                   </div>
                 </details>}
               </div>
-              {generated?.plan.status === 'ready' && <div hidden={!editing} className="mt-4 rounded-xl border border-ink/15 bg-surface p-4">
-                <label htmlFor="reviewed-plan" className="block font-semibold">Edit the text to copy or save</label>
-                <p className="mt-2 text-sm">Adjust the wording to the action you want to keep. Save or copy from the controls above.</p>
-                <textarea ref={editorRef} id="reviewed-plan" className={`${control} mt-3 min-h-48`} maxLength={6000} value={editedPlan} onChange={e => { setEditedPlan(e.target.value); setNotice('Edits are not saved yet. Copy uses this edited text.'); }} />
-                <button type="button" className="mt-2 min-h-[44px] rounded py-2 font-semibold text-forest underline underline-offset-4" onClick={() => { setEditing(false); moreRef.current?.querySelector('summary')?.focus(); }}>Close editor</button>
-              </div>}
               </>}
               {feedback}
             </> : <><h3 className="text-2xl font-editorial">Your answer will appear here.</h3><p className="mt-4 leading-relaxed">Ask a question to understand an idea or find a practical next step. Your answer will appear here, ready to review, edit and save.</p><p className="mt-4 text-sm">Include the details that matter to you. You can refine your question after reading the answer.</p></>}
