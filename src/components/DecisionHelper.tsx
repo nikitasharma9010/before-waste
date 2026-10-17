@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { intentLabels, itemLabels, recommend, type Decision } from '../data/decisionData';
+import { barrierLabels, intentLabels, issues, itemLabels, recommend, recoveryAdvice, sameDecision, type Barrier, type Decision } from '../data/decisionData';
 import { readAction, writeAction, type SavedAction, type Outcome } from '../utils/actionStorage';
 
 const control = 'w-full min-h-[44px] rounded-xl border border-ink/25 bg-surface p-3 text-ink';
@@ -10,29 +10,45 @@ export function DecisionHelper({ onExploreObject }: { onExploreObject: (id: stri
   const [notice, setNotice] = useState(initial.unavailable ? 'Saved actions could not be read. You can still use this flow.' : '');
   const [decision, setDecision] = useState<Decision>({ item: 'clothes', intent: 'buy', support: 'myself', budget: 'free' });
   const [result, setResult] = useState<Decision | null>(null);
+  const [undoAction, setUndoAction] = useState<SavedAction | null>(null);
   const resultRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const savedRef = useRef<HTMLHeadingElement>(null);
   const advice = result ? recommend(result) : null;
   const change = <K extends keyof Decision>(key: K, value: Decision[K]) => {
-    setDecision({ ...decision, [key]: value });
+    setDecision({ ...decision, [key]: value, ...(key === 'item' ? { issue: 'unsure' as const } : {}) });
     setResult(null);
   };
   const persist = (next: SavedAction | null) => {
     const success = writeAction(next);
     if (!success && !next) {
       setNotice('Your saved action could not be removed. Please try again; it may return after reloading.');
-      return;
+      return false;
     }
     setSaved(next);
     setNotice(success ? (next ? 'Action saved on this browser.' : 'Saved action removed.') : 'Unable to save on this browser. Your action is available for this session only.');
+    return true;
+  };
+  const saveResult = () => {
+    if (!result) return;
+    if (saved && sameDecision(saved, result)) {
+      setNotice('This action is already saved. Your note and outcome have been kept.');
+      requestAnimationFrame(() => savedRef.current?.focus());
+      return;
+    }
+    setUndoAction(saved);
+    persist({ ...result, note: '', outcome: 'planned' });
+    requestAnimationFrame(() => savedRef.current?.focus());
   };
   return (
     <section id="decision-helper" tabIndex={-1} aria-labelledby="decision-title" className="scroll-mt-20 border-y border-ink/10 bg-sage py-16 lg:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl mb-8">
           <p className="section-kicker text-forest mb-3">ONE OBJECT. ONE NEXT STEP.</p>
-          <h2 id="decision-title" className="font-editorial text-3xl sm:text-4xl lg:text-5xl">What should I do with this?</h2>
+          <h2 ref={titleRef} tabIndex={-1} id="decision-title" className="scroll-mt-20 font-editorial text-3xl sm:text-4xl lg:text-5xl">What should I do with this?</h2>
           <p className="mt-4 text-lg">Before you buy, replace or let something go, find a starting point that fits your life.</p>
           <p className="mt-2 text-sm text-ink/80">Start with clothes or headphones. No account needed.</p>
+          {saved && <a href="#saved-action" onClick={() => savedRef.current?.focus({ preventScroll: true })} className="mt-4 inline-flex min-h-[44px] items-center font-semibold text-forest underline underline-offset-4">Return to my saved action</a>}
         </div>
         <div className="grid gap-6 lg:grid-cols-2 items-start">
           <form className="rounded-2xl border border-ink/15 bg-surface p-5 sm:p-8 space-y-5" onSubmit={event => {
@@ -50,6 +66,11 @@ export function DecisionHelper({ onExploreObject }: { onExploreObject: (id: stri
                 {Object.entries(intentLabels).map(([id, label]) => <option key={id} value={id}>{label}</option>)}
               </select>
             </label>
+            {decision.intent === 'fix' && <label className="block font-semibold">What needs attention?
+              <select className={`${control} mt-2`} value={decision.issue ?? 'unsure'} onChange={e => change('issue', e.target.value as Decision['issue'])}>
+                {issues[decision.item].map(issue => <option key={issue.id} value={issue.id}>{issue.label}</option>)}
+              </select>
+            </label>}
             {decision.intent === 'fix' && <label className="block font-semibold">How would you like to approach it?
               <select className={`${control} mt-2`} value={decision.support} onChange={e => change('support', e.target.value as Decision['support'])}>
                 <option value="myself">Explore what I can do myself</option><option value="help">Find help with it</option>
@@ -74,26 +95,50 @@ export function DecisionHelper({ onExploreObject }: { onExploreObject: (id: stri
               <div className="mt-6 border-t border-ink/15 pt-5"><h4 className="font-semibold">A possible next chapter</h4><p className="mt-2 text-sm">{advice.chapter}</p>
                 <button type="button" className="min-h-[44px] py-2 text-forest underline underline-offset-4 text-sm font-semibold" onClick={() => onExploreObject(result.item === 'clothes' ? 'tshirt' : 'smartphone')}>{result.item === 'clothes' ? 'Explore the T-shirt story' : 'Explore a related electronics story: smartphone'}</button>
               </div>
-              {result.intent === 'fix' && <p className="mt-3 text-sm">Find a matching guide: <a className="text-forest underline underline-offset-4" href={advice.resource.url}>{advice.resource.label}</a>. Check tools, difficulty and model before starting.</p>}
-              <p className="mt-3 text-xs text-ink/80">These are editorial suggestions, not a diagnosis or a measured environmental saving. Repair resources: <a className="underline" href={advice.resource.url}>{advice.resource.label}</a>. Collection and donation acceptance must be checked locally.</p>
-              <button type="button" className={`${primary} mt-6`} onClick={() => persist({ ...result, note: '', outcome: 'planned' })}>{saved ? 'Replace my saved action with this' : 'Save this action for the week'}</button>
+              <p className="mt-3 text-sm">Related guidance: <a className="underline text-forest underline-offset-4" href={advice.resource.url}>{advice.resource.label}</a>.</p>
+              {result.intent === 'fix' && <p className="mt-2 text-sm">Choose a matching guide and check tools, difficulty and model before starting.</p>}
+              {result.intent === 'pass' && <p className="mt-3 text-sm">Before travelling, contact the recipient or collection service. Ask whether they accept this item in its current condition{result.item === 'headphones' ? ', whether batteries need special handling,' : ''} and whether there is a fee. US guidance is background information; use your municipality or manufacturer for local rules.</p>}
+              <p className="mt-3 text-xs text-ink/80">Editorial starting points, not a diagnosis or a measured environmental saving. Check collection and donation acceptance locally.</p>
+              {saved && !sameDecision(saved, result) && <p className="mt-5 text-sm">Replacing your action starts a new note and outcome. Undo is available until the next replacement, removal or page reload.</p>}
+              <button type="button" className={`${primary} mt-6`} onClick={saveResult}>{saved ? (sameDecision(saved, result) ? 'View my saved action' : 'Replace my saved action with this') : 'Save this action for the week'}</button>
             </> : <><h3 className="text-2xl font-editorial">A small decision, made easier.</h3><p className="mt-4 leading-relaxed">Tell us what you are considering. You will get a practical first step, an alternative, and a little of the story behind your choice.</p><p className="mt-4 text-sm">Your budget and access to help matter. Choose what is realistic for you.</p></>}
           </div>
         </div>
         <p role="status" className="mt-5 text-sm">{notice}</p>
-        {saved && <div className="mt-8 rounded-2xl border border-forest/30 bg-surface p-5 sm:p-8 max-w-3xl" aria-labelledby="saved-action-title">
+        {undoAction && <button type="button" className="min-h-[44px] py-2 font-semibold text-forest underline underline-offset-4" onClick={() => {
+          persist(undoAction); setUndoAction(null);
+          requestAnimationFrame(() => savedRef.current?.focus());
+        }}>Undo last replacement or removal</button>}
+        {saved && <div id="saved-action" className="scroll-mt-20 mt-8 rounded-2xl border border-forest/30 bg-surface p-5 sm:p-8 max-w-3xl" aria-labelledby="saved-action-title">
           <p className="section-kicker text-forest mb-3">ONE THING THIS WEEK</p>
-          <h3 id="saved-action-title" className="text-2xl font-editorial">{recommend(saved).title}</h3>
+          <p className="text-sm mb-2">{itemLabels[saved.item]} · {intentLabels[saved.intent]}</p>
+          <h3 ref={savedRef} tabIndex={-1} id="saved-action-title" className="scroll-mt-20 text-2xl font-editorial">{recommend(saved).title}</h3>
           <p className="mt-3">{recommend(saved).step}</p>
-          {saved.intent === 'fix' && <a className="inline-flex min-h-[44px] items-center mt-2 text-forest underline underline-offset-4" href={recommend(saved).resource.url}>{recommend(saved).resource.label}</a>}
+          <a className="inline-flex min-h-[44px] items-center mt-2 text-forest underline underline-offset-4" href={recommend(saved).resource.url}>{recommend(saved).resource.label}</a>
           <p className="mt-3 text-sm text-ink/80">Saved only in this browser when storage is available. Clearing browser data removes it. No automatic reminders.</p>
           <label className="block mt-5 font-semibold" htmlFor="action-outcome">What happened?</label>
           <select id="action-outcome" className={`${control} mt-2`} value={saved.outcome} onChange={e => persist({ ...saved, outcome: e.target.value as Outcome })}>
             <option value="planned">I am planning to try it</option><option value="done">I tried it and it worked</option><option value="blocked">Something got in the way</option><option value="changed">I chose another option</option>
           </select>
+          {saved.outcome === 'blocked' && <div className="mt-5 rounded-xl border border-sage-border bg-sage p-4">
+            <label className="block font-semibold" htmlFor="action-barrier">What got in the way?</label>
+            <select id="action-barrier" className={`${control} mt-2`} value={saved.barrier ?? ''} onChange={e => persist({ ...saved, barrier: e.target.value ? e.target.value as Barrier : undefined })}>
+              <option value="">Choose a barrier (optional)</option>
+              {Object.entries(barrierLabels).map(([key, label]) => <option key={key} value={key}>{label}</option>)}
+            </select>
+            <div role="status" className="mt-3 text-sm leading-relaxed">
+              {saved.barrier ? recoveryAdvice(saved, saved.barrier) : 'Choose a barrier for another way forward. Your note and original action will stay here.'}
+            </div>
+            {(saved.barrier === 'tools' || saved.barrier === 'access') && saved.intent === 'fix' && <p className="mt-3 text-sm"><a href="https://www.repaircafe.org/en/visit/" className="text-forest underline underline-offset-4">Find a Repair Café</a>. Coverage, opening times and accepted repairs vary; contact the group first.</p>}
+          </div>}
           <label className="block mt-5 font-semibold" htmlFor="action-note">My next step or what got in the way <span className="font-normal">(optional)</span></label>
           <textarea id="action-note" className={`${control} mt-2 min-h-28`} maxLength={1000} value={saved.note} onChange={e => persist({ ...saved, note: e.target.value })} />
-          <button type="button" className="mt-4 min-h-[44px] py-2 underline underline-offset-4 text-sm" onClick={() => persist(null)}>Remove saved action</button>
+          <button type="button" className="mt-4 min-h-[44px] py-2 underline underline-offset-4 text-sm" onClick={() => {
+            if (persist(null)) {
+              setUndoAction(saved);
+              requestAnimationFrame(() => titleRef.current?.focus());
+            }
+          }}>Remove saved action</button>
           <a className="ml-5 inline-flex min-h-[44px] items-center text-sm underline underline-offset-4" href="#pause">Explore optional reflections</a>
         </div>}
       </div>

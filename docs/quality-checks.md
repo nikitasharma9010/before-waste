@@ -68,7 +68,37 @@ Browser checks at 280, 320, 375, 768, 1280 and 1440px found no page overflow;
 320px and 1440px layouts were visually inspected. Result submission moves focus
 to its card; story links transfer focus to the story section.
 
-## Accessibility review scope
+## Decision-flow review fixes (2026-10-17)
+
+The practical flow now follows a compact welcome, before the interactive object
+preview. Header calls to action point to the decision flow; a saved-action shortcut
+appears for returning visitors. At 320px the tool starts at approximately 600px,
+compared with 2020px before this change. No page overflow was found at 280, 320,
+375, 768, 1280 or 1440px.
+
+Repair advice branches on missing buttons, open seams, small holes, audio output,
+connections or ear pads, with an unsure fallback and a distinct ask-for-help path.
+Changing item resets its issue. Older saved actions keep their notes and outcomes,
+defaulting to an unsure issue; invalid optional issue/barrier values are discarded.
+
+Saving an equivalent recommendation preserves its history. Replacing it explains
+the effect and offers one session-only Undo snapshot. Removal moves keyboard focus
+to the stable decision heading and supports Undo; failed storage removal keeps the
+action shown. Browser checks confirmed Undo restores notes and outcomes and moves
+focus to the saved heading. Undo history does not survive a reload.
+
+Blocked outcomes offer cost/time/tools/access alternatives and retain the original
+action and note. Relevant EPA reuse/electronics guidance is labelled US-specific;
+local acceptance must be confirmed. Repair Café's directory is linked for repair
+help without promising local coverage. Those external resources were checked on
+2026-10-17. No location collection or automated directory lookup is added.
+
+All 52 tests, TypeScript and production build pass. New tests cover history
+preservation, replacement Undo, removal focus, barrier persistence, issue reset,
+old-record compatibility, resource selection and the new page order. Browser
+checks covered issue guidance, notes/outcome retention, Undo, focus and reload.
+
+## Remaining accessibility review scope
 
 Use the [WCAG 2.2 reference](https://www.w3.org/WAI/WCAG22/quickref/) when reviewing
 future changes, including reflow, text resize, visible focus, keyboard access, and
