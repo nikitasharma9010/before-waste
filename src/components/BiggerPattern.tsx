@@ -70,7 +70,7 @@ export const BiggerPattern: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="max-w-3xl mb-12">
-          <div className="flex items-center gap-2 text-xs font-semibold tracking-wider uppercase text-[#425BFF] mb-2">
+          <div className="section-kicker text-[#425BFF] mb-2">
             <span>THE SYSTEMIC SHIFT</span>
             <span aria-hidden="true">·</span>
             <span>REVEAL THE BIGGER PATTERN</span>
@@ -85,7 +85,7 @@ export const BiggerPattern: React.FC = () => {
 
         {/* Interactive Model Toggle */}
         <div className="bg-white rounded-3xl border border-[#202A35]/10 p-4 sm:p-7 lg:p-10 shadow-sm mb-12">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-6 border-b border-[#202A35]/8">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-8 pb-6 border-b border-[#202A35]/8">
             <div>
               <span className="text-xs font-semibold text-[#202A35]/60 uppercase tracking-wider block">
                 Interactive Model Inspector
@@ -99,7 +99,7 @@ export const BiggerPattern: React.FC = () => {
             <div
               role="group"
               aria-label="Economic model comparison"
-              className="w-full sm:w-auto grid grid-cols-2 sm:inline-flex p-1 bg-[#FFF9F0] border border-[#202A35]/15 rounded-xl"
+              className="w-full lg:w-auto grid grid-cols-1 min-[400px]:grid-cols-2 lg:inline-flex p-1 bg-[#FFF9F0] border border-[#202A35]/15 rounded-xl"
             >
               <button
                 type="button"
@@ -107,7 +107,7 @@ export const BiggerPattern: React.FC = () => {
                 aria-pressed={activeModel === 'linear'}
                 aria-controls="model-panel"
                 onClick={() => setActiveModel('linear')}
-                className={`px-3 sm:px-4 py-2 sm:py-2.5 min-h-[44px] text-xs sm:text-sm font-medium rounded-lg transition-all cursor-pointer text-center whitespace-nowrap focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#202A35] focus:outline-none ${
+                className={`px-3 sm:px-4 py-2 sm:py-2.5 min-h-[44px] text-xs sm:text-sm font-medium rounded-lg transition-all cursor-pointer text-center whitespace-normal lg:whitespace-nowrap focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#202A35] focus:outline-none ${
                   activeModel === 'linear'
                     ? 'bg-[#202A35] text-white shadow-xs'
                     : 'text-[#202A35]/80 hover:text-[#202A35]'
@@ -121,7 +121,7 @@ export const BiggerPattern: React.FC = () => {
                 aria-pressed={activeModel === 'circular'}
                 aria-controls="model-panel"
                 onClick={() => setActiveModel('circular')}
-                className={`px-3 sm:px-4 py-2 sm:py-2.5 min-h-[44px] text-xs sm:text-sm font-medium rounded-lg transition-all cursor-pointer text-center whitespace-nowrap focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#202A35] focus:outline-none ${
+                className={`px-3 sm:px-4 py-2 sm:py-2.5 min-h-[44px] text-xs sm:text-sm font-medium rounded-lg transition-all cursor-pointer text-center whitespace-normal lg:whitespace-nowrap focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#202A35] focus:outline-none ${
                   activeModel === 'circular'
                     ? 'bg-[#2840DE] text-white shadow-xs'
                     : 'text-[#202A35]/80 hover:text-[#202A35]'
@@ -147,7 +147,7 @@ export const BiggerPattern: React.FC = () => {
                     aria-controls="step-detail-panel"
                     aria-label={`Step ${item.step}: ${isLinear ? item.linearName : item.circularName}`}
                     onClick={() => setSelectedStepIndex(idx)}
-                    className={`p-3.5 sm:p-4 min-h-[44px] rounded-xl sm:rounded-2xl text-left border transition-all cursor-pointer relative focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#202A35] focus:outline-none ${
+                    className={`flex flex-col items-start justify-start p-3.5 sm:p-4 min-h-[44px] rounded-xl sm:rounded-2xl text-left border transition-all cursor-pointer relative focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#202A35] focus:outline-none ${
                       isSelected
                         ? isLinear
                           ? 'bg-[#FFF0EE] border-[#C53B27] shadow-sm ring-1 ring-[#C53B27]'
@@ -155,7 +155,7 @@ export const BiggerPattern: React.FC = () => {
                         : 'bg-[#FFF9F0] border-[#202A35]/15 hover:border-[#202A35]/40'
                     }`}
                   >
-                    <div className="flex items-center justify-between mb-2">
+                    <div className="flex w-full items-center justify-between mb-2">
                       <span className="text-xs font-mono font-bold text-[#202A35]/60">
                         {item.step}
                       </span>

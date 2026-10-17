@@ -98,7 +98,7 @@ export const SevenDayPause: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="max-w-3xl mb-12">
-          <div className="flex items-center gap-2 text-xs font-semibold tracking-wider uppercase text-[#C53B27] mb-2">
+          <div className="section-kicker text-[#C53B27] mb-2">
             <span>A GENTLE EXPERIMENT</span>
             <span aria-hidden="true">·</span>
             <span>THE 7-DAY PAUSE</span>

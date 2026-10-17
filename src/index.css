@@ -29,7 +29,8 @@ h1, h2, h3, .font-editorial {
 
 /* Accessible focus visible default */
 :focus-visible {
-  outline: none;
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
 }
 
 /* Reduced motion support */
@@ -43,4 +44,22 @@ h1, h2, h3, .font-editorial {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* Keep section labels legible as complete phrases at narrow widths. */
+.section-kicker {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.5;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.section-kicker > span { max-width: 100%; }
+@media (max-width: 639px) {
+  .section-kicker { flex-direction: column; align-items: flex-start; }
+  .section-kicker > [aria-hidden="true"] { display: none; }
 }

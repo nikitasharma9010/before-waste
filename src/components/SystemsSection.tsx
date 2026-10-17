@@ -46,7 +46,7 @@ export const SystemsSection: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="max-w-3xl mb-12">
-          <div className="flex items-center gap-2 text-xs font-semibold tracking-wider uppercase text-[#086E64] mb-2">
+          <div className="section-kicker text-[#086E64] mb-2">
             <span>COLLECTIVE CONVERSATION</span>
             <span aria-hidden="true">·</span>
             <span>INDIVIDUALS & SYSTEMS</span>

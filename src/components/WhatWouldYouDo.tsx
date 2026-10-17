@@ -30,7 +30,7 @@ export const WhatWouldYouDo: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="max-w-3xl mb-10">
-          <div className="flex items-center gap-2 text-xs font-semibold tracking-wider uppercase text-[#086E64] mb-2">
+          <div className="section-kicker text-[#086E64] mb-2">
             <span>A PLAYFUL MOMENT</span>
             <span aria-hidden="true">·</span>
             <span>WHAT WOULD YOU DO?</span>
@@ -148,7 +148,7 @@ export const WhatWouldYouDo: React.FC = () => {
 
           {/* Nuanced, Compassionate Feedback Card */}
           <div className="p-4 sm:p-6 lg:p-8 rounded-2xl bg-white border border-[#202A35]/15 shadow-2xs animate-in fade-in duration-200">
-            <div className="flex items-center gap-2 text-xs font-semibold tracking-wider uppercase text-[#086E64] mb-2">
+            <div className="section-kicker text-[#086E64] mb-2">
               <Lightbulb className="w-4 h-4 text-[#086E64]" aria-hidden="true" />
               <span>A COMPASSIONATE PERSPECTIVE</span>
             </div>

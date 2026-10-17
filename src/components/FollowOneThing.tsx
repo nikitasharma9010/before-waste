@@ -77,7 +77,7 @@ export const FollowOneThing: React.FC<FollowOneThingProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="max-w-3xl mb-10">
-          <div className="flex items-center gap-2 text-xs font-semibold tracking-wider uppercase text-[#C53B27] mb-2">
+          <div className="section-kicker text-[#C53B27] mb-2">
             <span>SIGNATURE EXPERIENCE</span>
             <span aria-hidden="true">·</span>
             <span>FOLLOW ONE THING</span>
@@ -94,7 +94,7 @@ export const FollowOneThing: React.FC<FollowOneThingProps> = ({
         <div
           role="group"
           aria-label="Select an object to follow"
-          className="flex items-center gap-2 overflow-x-auto pb-3 mb-8 scrollbar-none"
+          className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-8"
         >
           {OBJECTS_DATA.map((obj) => {
             const isActive = obj.id === activeObjectId;
@@ -107,7 +107,7 @@ export const FollowOneThing: React.FC<FollowOneThingProps> = ({
                 aria-pressed={isActive}
                 aria-controls="story-content-panel"
                 onClick={() => onSelectObject(obj.id)}
-                className={`flex items-center gap-2.5 px-4 py-2.5 min-h-[44px] rounded-xl font-medium text-sm transition-all whitespace-nowrap shrink-0 cursor-pointer focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#202A35] focus:outline-none ${
+                className={`flex flex-col items-start justify-center gap-1.5 px-3 sm:px-4 py-3 min-h-[76px] min-w-0 rounded-xl font-medium text-sm text-left transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#202A35] focus:outline-none ${
                   isActive
                     ? objTheme.tabActive
                     : 'bg-[#FFF9F0] text-[#202A35] hover:bg-[#202A35]/5 border border-[#202A35]/15'
@@ -189,11 +189,11 @@ export const FollowOneThing: React.FC<FollowOneThingProps> = ({
                       }}
                     />
                     <div className="w-full">
-                      <span className="text-[10px] sm:text-[11px] font-bold block text-[#202A35]/60 group-hover:text-[#202A35] transition-colors">
+                      <span className="text-sm sm:text-xs font-bold block text-[#202A35]/60 group-hover:text-[#202A35] transition-colors">
                         0{st.stageNumber}
                       </span>
                       <span
-                        className={`text-[10px] sm:text-xs block truncate transition-colors ${
+                        className={`hidden sm:block text-xs leading-snug break-words transition-colors ${
                           isCurrent
                             ? 'font-bold text-[#202A35]'
                             : 'font-medium text-[#202A35]/70 group-hover:text-[#202A35]'
@@ -206,12 +206,15 @@ export const FollowOneThing: React.FC<FollowOneThingProps> = ({
                 );
               })}
             </div>
+            <p className="sm:hidden text-sm text-[#202A35] mt-3 font-medium" aria-hidden="true">
+              {currentStage.stageNumber} of {currentObject.stages.length}: {currentStage.stageName}
+            </p>
           </div>
 
           {/* Active Stage Content & Visual Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
             {/* Visual Canvas (Col 1 to 6) */}
-            <div className="lg:col-span-6 order-2 lg:order-1">
+            <div className="lg:col-span-6 min-w-0">
               <StoryVisual
                 objectId={currentObject.id}
                 stageNumber={currentStage.stageNumber}
@@ -220,7 +223,7 @@ export const FollowOneThing: React.FC<FollowOneThingProps> = ({
             </div>
 
             {/* Narrative Explanation (Col 7 to 12) */}
-            <div className="lg:col-span-6 order-1 lg:order-2 space-y-5">
+            <div className="lg:col-span-6 min-w-0 space-y-5">
               <div className="inline-flex items-center gap-2 text-xs font-semibold tracking-wider uppercase">
                 <span
                   className="w-2.5 h-2.5 rounded-full"

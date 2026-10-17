@@ -23,7 +23,7 @@ export const OnePlanetDemands: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="max-w-3xl mb-12">
-          <div className="flex items-center gap-2 text-xs font-semibold tracking-wider uppercase text-[#2840DE] mb-2">
+          <div className="section-kicker text-[#2840DE] mb-2">
             <span>A MOMENT OF WONDER</span>
             <span aria-hidden="true">·</span>
             <span>ECOLOGICAL BIOCAPACITY</span>
@@ -46,7 +46,7 @@ export const OnePlanetDemands: React.FC = () => {
             <div
               role="group"
               aria-labelledby="country-tabs-label"
-              className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none"
+              className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-2"
             >
               {ECOLOGICAL_FOOTPRINT_DATA.map((item) => {
                 const isSelected = item.id === selectedCountryId;
@@ -58,7 +58,7 @@ export const OnePlanetDemands: React.FC = () => {
                     aria-pressed={isSelected}
                     aria-controls="country-demand-panel"
                     onClick={() => setSelectedCountryId(item.id)}
-                    className={`flex items-center gap-2 px-3.5 py-2.5 min-h-[44px] rounded-xl text-xs sm:text-sm font-semibold transition-all whitespace-nowrap shrink-0 cursor-pointer focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#202A35] focus:outline-none ${
+                    className={`flex flex-col items-start justify-center gap-1.5 px-3 py-3 min-h-[76px] min-w-0 rounded-xl text-sm text-left font-semibold transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#202A35] focus:outline-none ${
                       isSelected
                         ? 'bg-[#2840DE] text-white shadow-xs'
                         : 'bg-[#FFF9F0] text-[#202A35] hover:bg-[#202A35]/5 border border-[#202A35]/15'
