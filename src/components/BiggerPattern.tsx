@@ -191,7 +191,7 @@ export const BiggerPattern: React.FC = () => {
           <div id="step-detail-panel" role="region" aria-labelledby={`step-tab-${activeStep.step}`} className="p-4 sm:p-6 lg:p-8 rounded-2xl bg-paper border border-ink/10">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
               {/* Left Column: What Happens Here */}
-              <div className="lg:col-span-7 space-y-4">
+              <div className="lg:col-span-12 space-y-4">
                 <div className="flex items-center gap-2 text-xs font-semibold tracking-wider uppercase text-ink/75">
                   <span>STEP {activeStep.step} OF 05</span>
                   <span aria-hidden="true">·</span>
@@ -231,21 +231,6 @@ export const BiggerPattern: React.FC = () => {
                 </div>
               </div>
 
-              {/* Right Column: Comparative Insight */}
-              <div className="lg:col-span-5 bg-surface p-5 rounded-xl border border-ink/10 space-y-3">
-                <span className="text-xs font-semibold tracking-wider uppercase text-ink/75 block">
-                  Why Earlier Interventions Matter
-                </span>
-                <p className="text-xs sm:text-sm text-ink/80 leading-relaxed">
-                  Intervening earlier at Step 01 (asking &quot;Do I need this?&quot;) or Step 04 (caring and repairing) can significantly reduce demand for new virgin materials, processing energy, and long-distance transport, while recognizing that repair, cleaning, and maintenance also require modest energy and resources.
-                </p>
-                <div className="pt-2 border-t border-ink/8 flex items-center justify-between text-xs text-ink/75">
-                  <span>Current active node:</span>
-                  <span className="font-mono font-bold text-ink">
-                    {activeStep.step} / 05
-                  </span>
-                </div>
-              </div>
             </div>
           </div>
 
@@ -255,7 +240,7 @@ export const BiggerPattern: React.FC = () => {
               “Not a perfect circle. A better next turn.”
             </h3>
             <p className="text-sm text-ink/75 leading-relaxed">
-              Recycling remains essential for recovered glass, aluminum, cardboard, and clean polymers. But recycling is like the ambulance at the bottom of the hill: avoiding unnecessary consumption, choosing durable goods, and caring for what we have preserves far more planetary value.
+              Avoiding unnecessary purchases and keeping useful items in use can reduce demand for new materials. Repair and maintenance also use resources; recycling remains important when reuse is no longer practical.
             </p>
           </div>
         </div>

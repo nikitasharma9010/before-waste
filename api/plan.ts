@@ -48,7 +48,7 @@ export default async function handler(req: Request, res: ServerResponse) {
     if (!input) { send(400, { error: 'Ask a question or describe your situation in 10-1500 characters.' }); return; }
     send(200, await generatePlan(input));
   } catch (error) {
-    if (error instanceof PlannerError) send(error.status, { error: error.message });
+    if (error instanceof PlannerError) send(error.status, { error: error.message, code: error.code });
     else send(400, { error: 'The request could not be read. Please try again.' });
   }
 }
