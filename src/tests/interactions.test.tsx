@@ -33,6 +33,51 @@ function button(text: string, scope: ParentNode = document) {
 }
 
 describe('real application interactions', () => {
+
+  it('provides a skip target, shared accessible home links, and named story illustrations', async () => {
+    await render(<App />);
+    expect(host.querySelector('.skip-link')?.getAttribute('href')).toBe('#main-content');
+    expect(host.querySelector('#main-content')?.getAttribute('tabindex')).toBe('-1');
+    expect(host.querySelectorAll('a[aria-label="Before Waste home"]')).toHaveLength(2);
+    expect(Array.from(host.querySelectorAll('.brand-mark')).every(el => el.getAttribute('alt') === '')).toBe(true);
+    expect(host.querySelector('svg[role="img"][aria-label^="Cotton T-Shirt:"]')).not.toBeNull();
+  });
+
+  it('closes mobile navigation on Escape and returns focus to its toggle', async () => {
+    await render(<App />);
+    const toggle = host.querySelector<HTMLButtonElement>('[aria-label="Toggle navigation menu"]')!;
+    await click(toggle);
+    expect(toggle.getAttribute('aria-expanded')).toBe('true');
+    await act(async () => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' })));
+    expect(host.querySelector('#mobile-navigation-menu')).toBeNull();
+    expect(document.activeElement).toBe(toggle);
+  });
+
+  it('focuses the selected destination and closes the navigation drawer', async () => {
+    await render(<App />);
+    await click(host.querySelector('[aria-label="Toggle navigation menu"]')!);
+    const link = host.querySelector('#mobile-navigation-menu a[href="#pause"]')!;
+    await click(link);
+    expect(host.querySelector('#mobile-navigation-menu')).toBeNull();
+    expect(document.activeElement).toBe(host.querySelector('#pause'));
+  });
+
+  it('dismisses the menu when pressing outside the header', async () => {
+    await render(<App />);
+    await click(host.querySelector('[aria-label="Toggle navigation menu"]')!);
+    await act(async () => host.querySelector('main')!.dispatchEvent(new Event('pointerdown', { bubbles: true })));
+    expect(host.querySelector('#mobile-navigation-menu')).toBeNull();
+  });
+
+  it('announces a newly selected hotspot and offers a multiline reflection field', async () => {
+    await render(<App />);
+    await click(host.querySelector('[aria-label^="Inspect Bottom Hem"]')!);
+    const details = host.querySelector('#hotspot-details')!;
+    expect(details.getAttribute('aria-live')).toBe('polite');
+    expect(details.textContent).toContain('Wear & care');
+    expect(host.querySelector('textarea')?.getAttribute('rows')).toBe('3');
+  });
+
   it('selects scenario radio cards with arrows, wraps, and supports Home/End', async () => {
     await render(<WhatWouldYouDo />);
     const radios = Array.from(host.querySelectorAll<HTMLButtonElement>('[role="radio"]'));
@@ -114,12 +159,12 @@ describe('real application interactions', () => {
     localStorage.setItem(STORAGE_KEY_COMPLETED, '{broken');
     localStorage.setItem(STORAGE_KEY_NOTES, '{"1":"Keep this note","9":"ignore"}');
     await render(<SevenDayPause />);
-    expect(host.querySelector<HTMLInputElement>('input')?.value).toBe('Keep this note');
+    expect(host.querySelector<HTMLTextAreaElement>('textarea')?.value).toBe('Keep this note');
     expect(host.querySelector('[aria-checked="true"]')).toBeNull();
     await click(button('Reset Progress'));
     await click(button('Yes, Reset All'));
     expect(localStorage.getItem(STORAGE_KEY_NOTES)).toBeNull();
-    expect(host.querySelector<HTMLInputElement>('input')?.value).toBe('');
+    expect(host.querySelector<HTMLTextAreaElement>('textarea')?.value).toBe('');
     expect(document.activeElement?.getAttribute('aria-label')).toBe('7-Day Pause progress');
   });
 
@@ -138,7 +183,7 @@ describe('real application interactions', () => {
     await click(button('Reset Progress'));
     await click(button('Yes, Reset All'));
     expect(host.textContent).toContain('Unable to clear saved reflections');
-    expect(host.querySelector<HTMLInputElement>('input')?.value).toBe('Do not lose this note');
+    expect(host.querySelector<HTMLTextAreaElement>('textarea')?.value).toBe('Do not lose this note');
     expect(localStorage.getItem(STORAGE_KEY_NOTES)).toContain('Do not lose this note');
   });
 });

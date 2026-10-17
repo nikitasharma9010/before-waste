@@ -2,11 +2,12 @@ import React from 'react';
 
 interface StoryVisualProps {
   objectId: string;
+  label: string;
   stageNumber: number; // 1 to 5
   accentColor: string;
 }
 
-export const StoryVisual: React.FC<StoryVisualProps> = ({ objectId, stageNumber, accentColor }) => {
+export const StoryVisual: React.FC<StoryVisualProps> = ({ objectId, stageNumber, accentColor, label }) => {
   // Render distinct SVG scenes according to object and stage
   return (
     <div className="w-full aspect-[4/3] bg-[#FFF9F0] rounded-2xl border border-[#202A35]/10 p-3.5 sm:p-5 lg:p-6 flex flex-col items-center justify-center relative overflow-hidden shadow-inner select-none transition-all duration-300">
@@ -21,6 +22,8 @@ export const StoryVisual: React.FC<StoryVisualProps> = ({ objectId, stageNumber,
       {/* SVG Canvas */}
       <svg
         viewBox="0 0 400 300"
+        role="img"
+        aria-label={label}
         className="w-full h-full drop-shadow-sm transition-all duration-500"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"

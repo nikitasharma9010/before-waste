@@ -88,7 +88,7 @@ export const SourcesModal: React.FC<SourcesModalProps> = ({ isOpen, onClose, tri
                 <span className="text-xs font-bold text-[#2840DE]">
                   {source.institution}
                 </span>
-                <span className="text-[11px] text-[#202A35]/60 font-mono">
+                <span className="text-[11px] text-[#202A35]/75 font-mono">
                   {source.yearOrEdition}
                 </span>
               </div>
@@ -112,7 +112,7 @@ export const SourcesModal: React.FC<SourcesModalProps> = ({ isOpen, onClose, tri
         </div>
 
         <div className="pt-4 border-t border-[#202A35]/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <span className="text-xs text-[#202A35]/65">
+          <span className="text-xs text-[#202A35]/75">
             These references provide background. Estimates vary by study, product, location, and data year.
           </span>
           <button

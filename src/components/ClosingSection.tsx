@@ -1,3 +1,4 @@
+import { Brand } from './Brand';
 import React, { useState } from 'react';
 import { Share2, RotateCcw, Check, Sparkles } from 'lucide-react';
 
@@ -82,7 +83,7 @@ export const ClosingSection: React.FC<ClosingSectionProps> = ({ onRestart, onOpe
           </p>
 
           {/* Primary Action Button Bar */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 pt-4">
+          <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center justify-center gap-3 pt-4">
             <a
               href="#pause"
               className="inline-flex items-center justify-center gap-2 px-6 py-3.5 min-h-[44px] rounded-xl font-bold text-sm text-[#202A35] bg-[#FFC857] hover:bg-[#EBB442] focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white transition-all shadow-md cursor-pointer text-center"
@@ -119,31 +120,31 @@ export const ClosingSection: React.FC<ClosingSectionProps> = ({ onRestart, onOpe
         {/* Divider */}
         <div className="border-t border-white/15 pt-10 pb-8 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-6 text-center sm:text-left">
-            <span className="font-editorial text-xl font-bold tracking-tight text-white">
-              BEFORE WASTE
-            </span>
-            <span className="text-xs text-white/60">
+            <a href="#hero" aria-label="Before Waste home" className="inline-flex min-h-[44px] items-center rounded text-white">
+              <Brand footer />
+            </a>
+            <span className="text-xs text-white/75">
               Think before it becomes waste.
             </span>
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-6 text-xs text-white/80">
-            <a href="#hero" className="hover:text-white focus-visible:ring-2 focus-visible:ring-white p-1 rounded transition-colors">
+            <a href="#hero" className="hover:text-white focus-visible:ring-2 focus-visible:ring-white px-1 py-2 min-h-[44px] inline-flex items-center rounded transition-colors">
               Top
             </a>
-            <a href="#follow-one-thing" className="hover:text-white focus-visible:ring-2 focus-visible:ring-white p-1 rounded transition-colors">
+            <a href="#follow-one-thing" className="hover:text-white focus-visible:ring-2 focus-visible:ring-white px-1 py-2 min-h-[44px] inline-flex items-center rounded transition-colors">
               The 4 Objects
             </a>
-            <a href="#bigger-pattern" className="hover:text-white focus-visible:ring-2 focus-visible:ring-white p-1 rounded transition-colors">
+            <a href="#bigger-pattern" className="hover:text-white focus-visible:ring-2 focus-visible:ring-white px-1 py-2 min-h-[44px] inline-flex items-center rounded transition-colors">
               The Pattern
             </a>
-            <a href="#pause" className="hover:text-white focus-visible:ring-2 focus-visible:ring-white p-1 rounded transition-colors">
+            <a href="#pause" className="hover:text-white focus-visible:ring-2 focus-visible:ring-white px-1 py-2 min-h-[44px] inline-flex items-center rounded transition-colors">
               7-Day Pause
             </a>
             <button
               type="button"
               onClick={(e) => onOpenSources(e.currentTarget)}
-              className="hover:text-white focus-visible:ring-2 focus-visible:ring-white p-1 rounded transition-colors cursor-pointer underline underline-offset-4 decoration-white/40"
+              className="hover:text-white focus-visible:ring-2 focus-visible:ring-white px-1 py-2 min-h-[44px] inline-flex items-center rounded transition-colors cursor-pointer underline underline-offset-4 decoration-white/40"
             >
               Sources & Methodology
             </button>
@@ -151,7 +152,7 @@ export const ClosingSection: React.FC<ClosingSectionProps> = ({ onRestart, onOpe
         </div>
 
         {/* Quiet attribution */}
-        <div className="text-center text-xs text-white/50 pt-2">
+        <div className="text-center text-xs text-white/75 pt-2">
           <p>
             An independent educational exploration dedicated to mindful consumption and ecological curiosity.
           </p>

@@ -98,7 +98,7 @@ export const SevenDayPause: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="max-w-3xl mb-12">
-          <div className="flex items-center gap-2 text-xs font-semibold tracking-wider uppercase text-[#C53B27] mb-2">
+          <div className="section-kicker text-[#C53B27] mb-2">
             <span>A GENTLE EXPERIMENT</span>
             <span aria-hidden="true">·</span>
             <span>THE 7-DAY PAUSE</span>
@@ -126,7 +126,7 @@ export const SevenDayPause: React.FC = () => {
         <div ref={progressRef} tabIndex={-1} aria-label="7-Day Pause progress" className="bg-[#FFF9F0] rounded-2xl border border-[#202A35]/10 p-4 sm:p-5 mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div
-              className="w-12 h-12 rounded-xl bg-white border border-[#202A35]/15 flex items-center justify-center text-[#C53B27] font-bold font-mono text-base"
+              className="w-12 h-12 shrink-0 rounded-xl bg-white border border-[#202A35]/15 flex items-center justify-center text-[#C53B27] font-bold font-mono text-base"
               aria-label={`${completedDays.length} of 7 days completed`}
             >
               {completedDays.length}/7
@@ -139,7 +139,7 @@ export const SevenDayPause: React.FC = () => {
                   ? 'All seven days explored! You noticed everything.'
                   : `${completedDays.length} of 7 questions explored`}
               </p>
-              <p className="text-xs text-[#202A35]/65">
+              <p className="text-xs text-[#202A35]/75">
                 {storageUnavailableNotice ? 'Device storage could not be confirmed. See the notice above.' : 'Saved privately on this browser only.'}
               </p>
             </div>
@@ -222,7 +222,7 @@ export const SevenDayPause: React.FC = () => {
                       role="checkbox"
                       aria-checked={isCompleted}
                       onClick={() => toggleDayCompletion(day.day)}
-                      className="mt-0.5 sm:mt-0 p-1.5 sm:p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-[#202A35]/50 hover:text-[#086E64] focus-visible:ring-2 focus-visible:ring-[#086E64] rounded-lg transition-colors cursor-pointer"
+                      className="mt-0.5 sm:mt-0 p-1.5 sm:p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-[#202A35]/75 hover:text-[#086E64] focus-visible:ring-2 focus-visible:ring-[#086E64] rounded-lg transition-colors cursor-pointer"
                       aria-label={`Day ${day.day}: ${day.shortLabel} — ${isCompleted ? 'Marked complete' : 'Mark complete'}`}
                     >
                       {isCompleted ? (
@@ -233,7 +233,7 @@ export const SevenDayPause: React.FC = () => {
                     </button>
 
                     <div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                         <span className="text-xs font-mono font-bold text-[#C53B27]">
                           DAY 0{day.day}
                         </span>
@@ -314,14 +314,14 @@ export const SevenDayPause: React.FC = () => {
                       <label htmlFor={inputId} className="text-xs font-medium text-[#202A35]/80 block mb-1.5">
                         Your quiet reflection or what you noticed ({storageUnavailableNotice ? 'saving unavailable' : 'saved locally'}):
                       </label>
-                      <input
-                        type="text"
+                      <textarea
+                        rows={3}
                         id={inputId}
                         name={inputId}
                         value={notes[day.day] || ''}
                         onChange={(e) => handleNoteChange(day.day, e.target.value)}
                         placeholder="e.g. Almost bought a thermal mug, but found one in the cupboard..."
-                        className="w-full text-xs sm:text-sm px-3.5 py-2.5 rounded-xl border border-[#202A35]/20 bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C53B27]"
+                        className="w-full resize-y min-h-[96px] text-base px-3.5 py-2.5 rounded-xl border border-[#202A35]/20 bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C53B27]"
                       />
                     </div>
                   </div>

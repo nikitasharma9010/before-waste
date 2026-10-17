@@ -76,11 +76,12 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#FFF9F0] text-[#202A35] flex flex-col font-sans selection:bg-[#C53B27]/20 selection:text-[#202A35]">
+      <a href="#main-content" className="skip-link">Skip to content</a>
       {/* 1. Header (Top Bar Contract: 3 Zones) */}
       <Header onOpenSources={handleOpenSources} />
 
       {/* Main Narrative Flow */}
-      <main className="flex-1">
+      <main id="main-content" tabIndex={-1} className="flex-1">
         {/* 2. Opening Experience: Spark curiosity immediately */}
         <HeroOpening onExploreObjects={handleExploreObject} />
 

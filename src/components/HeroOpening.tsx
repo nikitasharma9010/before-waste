@@ -82,24 +82,22 @@ export const HeroOpening: React.FC<HeroOpeningProps> = ({ onExploreObjects }) =>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Editorial Kicker */}
-        <div className="flex items-center gap-2 text-xs font-semibold tracking-wider uppercase text-[#202A35]/70 mb-3">
+        <div className="section-kicker text-[#202A35]/70 mb-3">
           <span>BEFORE WASTE</span>
           <span aria-hidden="true">·</span>
           <span>AN INTERACTIVE STORY OF CONSUMPTION</span>
         </div>
 
-        {/* Headline */}
-        <h1 className="font-editorial text-3xl sm:text-5xl lg:text-6xl font-normal leading-[1.15] text-[#202A35] text-balance mb-6 lg:mb-10 max-w-4xl">
-          Where was your <span className="italic font-semibold text-[#C53B27]">T-shirt</span> before it was yours?
-        </h1>
-
-        {/* 2-Column Desktop Grid / Responsive Mobile Stack (Interactive T-shirt placed early on mobile) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-start">
+        {/* Headline and illustration align at the top on desktop; mobile keeps the visual next. */}
+        <div className="hero-layout grid grid-cols-1 lg:grid-cols-12 lg:grid-rows-[min-content_1fr] gap-6 lg:gap-x-14 lg:gap-y-8 items-start">
+          <h1 className="lg:col-span-7 lg:row-start-1 order-0 font-editorial text-3xl sm:text-5xl lg:text-6xl font-normal leading-[1.15] text-[#202A35] text-balance min-w-0">
+            Where was your <span className="italic font-semibold text-[#C53B27]">T-shirt</span> before it was yours?
+          </h1>
 
           {/* Interactive T-Shirt Visual (Appears first on mobile right below headline!) */}
-          <div className="lg:col-span-5 order-1 lg:order-2 w-full">
+          <div className="lg:col-span-5 lg:col-start-8 lg:row-start-1 lg:row-span-2 order-1 w-full min-w-0">
             <div className="bg-white rounded-3xl p-4 sm:p-6 lg:p-7 border border-[#202A35]/15 shadow-sm relative">
-              <div className="flex items-center justify-between mb-3">
+              <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5 mb-3">
                 <div className="flex items-center gap-2">
                   <span className="w-2.5 h-2.5 rounded-full bg-[#C53B27]" aria-hidden="true" />
                   <span className="text-xs font-semibold tracking-wider uppercase text-[#202A35]/80">
@@ -199,6 +197,7 @@ export const HeroOpening: React.FC<HeroOpeningProps> = ({ onExploreObjects }) =>
                         }`}
                         aria-label={`Inspect ${hotspot.name}: ${hotspot.label}`}
                         aria-pressed={isSelected}
+                        aria-controls="hotspot-details"
                       >
                         <div
                           className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
@@ -220,12 +219,16 @@ export const HeroOpening: React.FC<HeroOpeningProps> = ({ onExploreObjects }) =>
 
               {/* Active Hotspot Info Card */}
               <div
+                id="hotspot-details"
+                role="status"
+                aria-live="polite"
+                aria-atomic="true"
                 className="mt-4 p-4 rounded-xl border bg-white transition-all duration-200"
                 style={{
                   borderColor: `${activeHotspot.accent}60`
                 }}
               >
-                <div className="flex items-center justify-between gap-2 mb-1">
+                <div className="flex flex-wrap items-center justify-between gap-2 mb-1">
                   <div className="flex items-center gap-2">
                     <span
                       className="w-2.5 h-2.5 rounded-full"
@@ -249,29 +252,32 @@ export const HeroOpening: React.FC<HeroOpeningProps> = ({ onExploreObjects }) =>
               </div>
 
               {/* Bottom Quick Object Selector (Wrap without clipping at 320px/375px) */}
-              <div className="mt-4 pt-4 border-t border-[#202A35]/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+              <div className="mt-4 pt-4 border-t border-[#202A35]/10 flex flex-col gap-2.5">
                 <span className="text-xs font-medium text-[#202A35]/70 shrink-0">Also exploring:</span>
                 <div className="flex flex-wrap items-center gap-2">
                   <button
                     type="button"
+                    aria-label="Follow the Smartphone story"
                     onClick={() => onExploreObjects('smartphone')}
-                    className="flex-1 sm:flex-none px-3 py-2 min-h-[40px] text-xs font-semibold rounded-lg bg-[#EEF1FF] text-[#1E32B6] hover:bg-[#2840DE] hover:text-white focus-visible:ring-2 focus-visible:ring-[#2840DE] transition-colors cursor-pointer text-center"
+                    className="flex-1 px-3 py-2 min-h-[44px] text-xs font-semibold rounded-lg bg-[#EEF1FF] text-[#1E32B6] hover:bg-[#2840DE] hover:text-white focus-visible:ring-2 focus-visible:ring-[#2840DE] transition-colors cursor-pointer text-center"
                   >
-                    Smartphone
+                    Phone
                   </button>
                   <button
                     type="button"
+                    aria-label="Follow the Fresh Apple story"
                     onClick={() => onExploreObjects('food')}
-                    className="flex-1 sm:flex-none px-3 py-2 min-h-[40px] text-xs font-semibold rounded-lg bg-[#E6F8F6] text-[#06574F] hover:bg-[#086E64] hover:text-white focus-visible:ring-2 focus-visible:ring-[#086E64] transition-colors cursor-pointer text-center"
+                    className="flex-1 px-3 py-2 min-h-[44px] text-xs font-semibold rounded-lg bg-[#E6F8F6] text-[#06574F] hover:bg-[#086E64] hover:text-white focus-visible:ring-2 focus-visible:ring-[#086E64] transition-colors cursor-pointer text-center"
                   >
-                    Fresh Apple
+                    Apple
                   </button>
                   <button
                     type="button"
+                    aria-label="Follow the Delivery Box story"
                     onClick={() => onExploreObjects('package')}
-                    className="flex-1 sm:flex-none px-3 py-2 min-h-[40px] text-xs font-semibold rounded-lg bg-[#FFF9EB] text-[#202A35] border border-[#202A35]/15 hover:bg-[#FFC857] focus-visible:ring-2 focus-visible:ring-[#B88000] transition-colors cursor-pointer text-center"
+                    className="flex-1 px-3 py-2 min-h-[44px] text-xs font-semibold rounded-lg bg-[#FFF9EB] text-[#202A35] border border-[#202A35]/15 hover:bg-[#FFC857] focus-visible:ring-2 focus-visible:ring-[#B88000] transition-colors cursor-pointer text-center"
                   >
-                    Delivery Box
+                    Box
                   </button>
                 </div>
               </div>
@@ -279,7 +285,7 @@ export const HeroOpening: React.FC<HeroOpeningProps> = ({ onExploreObjects }) =>
           </div>
 
           {/* Narrative & Progressive Disclosure (Order 2 on mobile, col-span-7 on desktop) */}
-          <div className="lg:col-span-7 order-2 lg:order-1 space-y-6">
+          <div className="lg:col-span-7 lg:col-start-1 lg:row-start-2 order-2 space-y-6 min-w-0">
             {/* Supporting quote */}
             <div>
               <blockquote className="font-editorial text-xl sm:text-2xl text-[#202A35]/95 italic leading-snug border-l-0 pl-0">
@@ -300,7 +306,7 @@ export const HeroOpening: React.FC<HeroOpeningProps> = ({ onExploreObjects }) =>
                 <button
                   type="button"
                   onClick={() => setShowAllFragments(!showAllFragments)}
-                  className="inline-flex items-center gap-1 text-xs font-semibold text-[#202A35] hover:text-[#C53B27] cursor-pointer focus-visible:ring-2 focus-visible:ring-[#202A35] rounded p-1"
+                  className="inline-flex items-center gap-1 text-xs font-semibold text-[#202A35] hover:text-[#C53B27] cursor-pointer focus-visible:ring-2 focus-visible:ring-[#202A35] rounded px-2 py-2 min-h-[44px]"
                   aria-expanded={showAllFragments}
                 >
                   <span>{showAllFragments ? 'Show fewer' : 'Read details'}</span>
