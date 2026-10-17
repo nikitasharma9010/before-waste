@@ -66,7 +66,7 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
           <p className="mt-2 text-sm text-ink/80">{standalone ? 'No account needed. You choose what to save.' : 'Ask about any item, reducing waste or sustainable living. No account needed.'}</p>
           {saved && <a href="#saved-action" onClick={() => savedRef.current?.focus({ preventScroll: true })} className="mt-4 inline-flex min-h-[44px] items-center font-semibold text-forest underline underline-offset-4">Return to my saved action</a>}
         </div>
-        <div className={standalone ? 'mx-auto flex max-w-3xl flex-col gap-6' : 'grid gap-6 lg:grid-cols-2 items-start'}>
+        <div className={standalone ? 'flex max-w-3xl flex-col gap-6' : 'grid gap-6 lg:grid-cols-2 items-start'}>
           <div className="min-w-0 rounded-2xl border border-ink/15 bg-surface p-5 sm:p-8 space-y-5">
             {!standalone && <div role="group" className="flex flex-wrap gap-2" aria-label="Question mode">
               {[['anything', 'Ask freely'], ['clothes', 'Use guided examples']].map(([item, label]) => <button key={item} type="button" aria-pressed={item === 'anything' ? decision.item === 'anything' : decision.item !== 'anything'} className="min-h-[44px] rounded-xl border border-forest px-4 py-2 font-semibold aria-pressed:bg-forest aria-pressed:text-white" onClick={() => {
