@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { readAction } from '../utils/actionStorage';
-export function Welcome({ onExploreObjects }: { onExploreObjects: (id?: string) => void }) {
+export function Welcome() {
   const [saved] = useState(() => readAction().action);
   return <section id="hero" tabIndex={-1} aria-labelledby="welcome-title" className="scroll-mt-20 py-10 sm:py-14 lg:py-16">
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -9,13 +9,13 @@ export function Welcome({ onExploreObjects }: { onExploreObjects: (id?: string) 
       <p className="mt-5 text-lg leading-relaxed max-w-2xl">Find a practical next step before buying, replacing or letting something go. Ask about any item, reducing waste or sustainable living, at your own pace.</p>
       <div className="mt-6 flex flex-col sm:flex-row gap-3 sm:items-center">
         <a href="/ask"  className="inline-flex justify-center items-center min-h-[44px] px-5 py-3 rounded-xl bg-forest text-white font-semibold hover:bg-forest-strong">Ask Before Waste</a>
-        <a href="#follow-one-thing" onClick={() => onExploreObjects()} className="inline-flex justify-center items-center min-h-[44px] px-5 py-3 rounded-xl border border-ink/25 font-semibold hover:bg-sage">Explore an object’s story</a>
+        <a href="#follow-one-thing" className="inline-flex justify-center items-center min-h-[44px] px-5 py-3 rounded-xl border border-ink/25 font-semibold hover:bg-sage">Explore an object’s story</a>
       </div>
       {saved && <a href="/ask#saved-action" className="mt-4 inline-flex min-h-[44px] items-center font-semibold text-forest underline underline-offset-4">Continue my saved action</a>}
-      <p className="mt-4 max-w-2xl text-sm text-ink/80">Ask → review the guidance → save one realistic step. Exploring a story is optional.</p>
+      <p className="mt-4 max-w-2xl text-sm text-ink/80">Ask directly for guidance, or explore first: follow an object → try a choice → choose your next step.</p>
       <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-ink/80" aria-label="Before you start">
         <span>No account needed</span><span>Review before saving</span>
-        <a href="#how-it-works" onClick={() => document.getElementById('how-it-works')?.focus({ preventScroll: true })} className="inline-flex min-h-[44px] items-center font-semibold text-forest underline underline-offset-4">How it works &amp; your data</a>
+        <a href="#how-it-works" className="inline-flex min-h-[44px] items-center font-semibold text-forest underline underline-offset-4">How it works &amp; your data</a>
       </div>
     </div>
   </section>;

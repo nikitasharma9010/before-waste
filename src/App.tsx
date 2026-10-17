@@ -5,11 +5,9 @@ import { useState, useRef, useEffect } from 'react';
 import { Header } from './components/Header';
 import { HeroOpening } from './components/HeroOpening';
 import { FollowOneThing } from './components/FollowOneThing';
-import { BiggerPattern } from './components/BiggerPattern';
+import { LearningSection } from './components/LearningSection';
 import { WhatWouldYouDo } from './components/WhatWouldYouDo';
-import { OnePlanetDemands } from './components/OnePlanetDemands';
 import { SevenDayPause } from './components/SevenDayPause';
-import { SystemsSection } from './components/SystemsSection';
 import { ClosingSection } from './components/ClosingSection';
 import { SourcesModal } from './components/SourcesModal';
 import { DecisionHelper } from './components/DecisionHelper';
@@ -64,19 +62,6 @@ export default function App() {
     setSourcesModalOpen(true);
   };
 
-  const handleExploreObject = (objectId?: string) => {
-    if (objectId) {
-      setSelectedObjectId(objectId);
-      setSelectedStageIndex(0);
-    }
-    const element = document.getElementById('follow-one-thing');
-    if (element) {
-      element.tabIndex = -1;
-      element.focus({ preventScroll: true });
-      element.scrollIntoView({ behavior: getScrollBehavior() });
-    }
-  };
-
   // Reliable restart behavior: returns to top AND resets object story to T-shirt stage 1
   // Preserves 7-Day Pause reflections and progress untouched!
   const handleRestart = () => {
@@ -121,7 +106,7 @@ export default function App() {
           <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6 lg:px-8"><details className="rounded-xl border border-ink/20"><summary className="min-h-[44px] cursor-pointer px-4 py-3 font-semibold">How it works and your data</summary><TrustAndMethod onOpenSources={handleOpenSources} /></details></div>
         </> : <>
         {/* 2. Opening Experience: Spark curiosity immediately */}
-        <Welcome onExploreObjects={handleExploreObject} />
+        <Welcome />
 
         {/* 3. Signature Experience: Follow One Thing (Single Source of Truth) */}
         <FollowOneThing
@@ -139,19 +124,7 @@ export default function App() {
         </div>}
         <WhatWouldYouDo />
         <AssistantEntry />
-        <section id="learn" tabIndex={-1} aria-labelledby="learn-title" className="scroll-mt-20 border-y border-ink/10 bg-paper px-4 py-10 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-7xl">
-            <p className="section-kicker text-forest">THE BIGGER PICTURE</p>
-            <h2 id="learn-title" className="mt-3 font-editorial text-2xl sm:text-3xl">Good choices need supportive systems.</h2>
-            <p className="mt-3 max-w-3xl leading-relaxed">Keeping useful things in use can avoid unnecessary replacements. What is possible also depends on product design, affordable repair and local services. Individuals cannot solve these challenges alone.</p>
-            <p className="mt-3 text-sm text-ink/80">Explore how waste happens, what we use and what needs to change. Choose a topic below.</p>
-            <div className="mt-5 space-y-3">
-              <details name="learning-topic" open className="rounded-xl border border-ink/20"><summary className="min-h-[44px] cursor-pointer px-4 py-3 font-semibold">Preventing waste</summary><BiggerPattern /></details>
-              <details name="learning-topic" className="rounded-xl border border-ink/20"><summary className="min-h-[44px] cursor-pointer px-4 py-3 font-semibold">Resource demand</summary><OnePlanetDemands /></details>
-              <details name="learning-topic" className="rounded-xl border border-ink/20"><summary className="min-h-[44px] cursor-pointer px-4 py-3 font-semibold">Design and collective change</summary><SystemsSection /></details>
-            </div>
-          </div>
-        </section>
+        <LearningSection />
         <SevenDayPause />
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           <details className="mt-4 rounded-xl border border-ink/20"><summary className="min-h-[44px] cursor-pointer px-4 py-4 font-semibold">How it works, sources and your data</summary><TrustAndMethod onOpenSources={handleOpenSources} /></details>
