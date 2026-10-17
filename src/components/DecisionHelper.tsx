@@ -191,7 +191,7 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
               {(!generated || generated.plan.status === 'ready') && <button type="button" disabled={!!generated && !editedPlan.trim()} className={`${primary} disabled:opacity-60`} onClick={saveResult}>{saved ? (isSameSaved ? (storageAvailable ? 'View my saved action' : 'Try saving again') : (updatingSaved ? 'Update my saved action' : 'Replace my saved action')) : 'Save this action'}</button>}
               {generated && <CopyTextButton key={answeredQuestion} text={generated.plan.status === 'ready' ? editedPlan : planText(generated.plan)} />}
               </div>
-              {generated?.plan.status === 'ready' && <div className="mt-4"><details className="rounded-xl border border-ink/15 bg-surface p-4"><summary className="min-h-[44px] cursor-pointer py-2 font-semibold">Edit answer (optional)</summary>
+              {generated?.plan.status === 'ready' && <div className="mt-4"><details className="rounded-xl border border-ink/15 bg-surface p-4"><summary className="min-h-[44px] cursor-pointer py-2 font-semibold">Edit answer</summary>
                   <label htmlFor="reviewed-plan" className="block font-semibold">Edit the text to copy or save</label>
                   <p className="mt-2 text-sm">Adjust the wording to the action you want to keep.</p>
                   <textarea id="reviewed-plan" className={`${control} mt-3 min-h-48`} maxLength={6000} value={editedPlan} onChange={e => { setEditedPlan(e.target.value); setNotice('Edits are not saved yet. Copy uses this edited text.'); }} />
@@ -243,7 +243,7 @@ export function DecisionHelper({ onExploreObject, standalone = false, initialQue
               requestAnimationFrame(() => titleRef.current?.focus());
             }
           }}>Remove saved action</button>
-          <a className="ml-5 inline-flex min-h-[44px] items-center text-sm underline underline-offset-4" href={standalone ? '/#pause' : '#pause'}>Explore optional reflections</a>
+          <a className="ml-5 inline-flex min-h-[44px] items-center text-sm underline underline-offset-4" href={standalone ? '/#pause' : '#pause'}>Try the 7-Day Pause</a>
         </div>}
       </div>
     </section>

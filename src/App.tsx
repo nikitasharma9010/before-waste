@@ -141,19 +141,19 @@ export default function App() {
         <AssistantEntry />
         <section id="learn" tabIndex={-1} aria-labelledby="learn-title" className="scroll-mt-20 border-y border-ink/10 bg-paper px-4 py-10 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-7xl">
-            <p className="section-kicker text-forest">THE BIGGER PICTURE · OPTIONAL</p>
+            <p className="section-kicker text-forest">THE BIGGER PICTURE</p>
             <h2 id="learn-title" className="mt-3 font-editorial text-2xl sm:text-3xl">Good choices need supportive systems.</h2>
             <p className="mt-3 max-w-3xl leading-relaxed">Keeping useful things in use can avoid unnecessary replacements. What is possible also depends on product design, affordable repair and local services. Individuals cannot solve these challenges alone.</p>
-            <p className="mt-3 text-sm text-ink/80">Explore any topic below, or continue to an optional reflection. Your action does not depend on completing these sections.</p>
+            <p className="mt-3 text-sm text-ink/80">Explore how waste happens, what we use and what needs to change. Choose a topic below.</p>
             <div className="mt-5 space-y-3">
-              <details className="rounded-xl border border-ink/20"><summary className="min-h-[44px] cursor-pointer px-4 py-3 font-semibold">The Pattern: how earlier choices can prevent waste</summary><BiggerPattern /></details>
-              <details className="rounded-xl border border-ink/20"><summary className="min-h-[44px] cursor-pointer px-4 py-3 font-semibold">One Planet: explore resource demand</summary><OnePlanetDemands /></details>
-              <details className="rounded-xl border border-ink/20"><summary className="min-h-[44px] cursor-pointer px-4 py-3 font-semibold">Systems: design, access and collective change</summary><SystemsSection /></details>
+              <details name="learning-topic" open className="rounded-xl border border-ink/20"><summary className="min-h-[44px] cursor-pointer px-4 py-3 font-semibold">Preventing waste</summary><BiggerPattern /></details>
+              <details name="learning-topic" className="rounded-xl border border-ink/20"><summary className="min-h-[44px] cursor-pointer px-4 py-3 font-semibold">Resource demand</summary><OnePlanetDemands /></details>
+              <details name="learning-topic" className="rounded-xl border border-ink/20"><summary className="min-h-[44px] cursor-pointer px-4 py-3 font-semibold">Design and collective change</summary><SystemsSection /></details>
             </div>
           </div>
         </section>
+        <SevenDayPause />
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-          <details className="rounded-xl border border-ink/20 bg-surface"><summary className="min-h-[44px] cursor-pointer px-4 py-4 font-semibold">Optional reflection: try the 7-Day Pause</summary><p className="px-4 pb-4 text-sm text-ink/80">A separate buying-reflection exercise. It does not track your saved action or measure waste avoided.</p><SevenDayPause /></details>
           <details className="mt-4 rounded-xl border border-ink/20"><summary className="min-h-[44px] cursor-pointer px-4 py-4 font-semibold">How it works, sources and your data</summary><TrustAndMethod onOpenSources={handleOpenSources} /></details>
         </div>
         </>}
