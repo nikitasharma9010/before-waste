@@ -15,7 +15,7 @@ beforeEach(() => {
   vi.stubGlobal('requestAnimationFrame', (fn: FrameRequestCallback) => { fn(0); return 0; });
 });
 afterEach(async () => { await act(async () => root.unmount()); host.remove(); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
-async function render() { await act(async () => root.render(<DecisionHelper onExploreObject={() => {}} />)); }
+async function render() { await act(async () => root.render(<DecisionHelper onExploreObject={() => {}} />)); await click("Use guided examples"); }
 async function click(text: string) {
   const el = [...host.querySelectorAll('button')].find(b => b.textContent?.includes(text));
   if (!el) throw new Error(`Missing ${text}`);

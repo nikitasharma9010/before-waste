@@ -2,7 +2,7 @@
 
 An everyday-object decision tool and interactive educational site built with React,
 TypeScript, Vite and Tailwind CSS. An optional AI planner turns a visitor's
-description and constraints into an editable action plan for clothes or headphones.
+question or description into an editable answer or action plan about waste prevention and sustainable living. Any item can be discussed; clothes and headphones remain optional guided examples.
 
 ## Enable AI planning on Vercel
 
@@ -18,8 +18,7 @@ description and constraints into an editable action plan for clothes or headphon
    from your AICredits dashboard; the documented example is not a quality ranking.
 4. Redeploy after setting variables. Vercel environment changes do not update an
    existing deployment. Keep default Vite settings: `npm run build`, output `dist`.
-5. Open the deployed site without signing in. Describe a fictional clothes or
-   headphones situation, generate a plan, edit it, save it and reload. The accepted
+5. Open the deployed site without signing in. Ask a fictional question about food waste, reuse, repair or sustainable living, generate a plan, edit it, save it and reload. The accepted
    text should remain unchanged, with no second provider call.
 
 No browser key entry is needed. Without a key, the server returns a clear setup
@@ -111,3 +110,6 @@ Environmental estimates depend on product, geography, and study assumptions. The
 Sources dialog provides background references; the garment-care story also links
 directly to WRAP's 2017 UK clothing-sector report. This is educational content, not
 a product-specific footprint calculator or a comprehensive independent fact audit.
+
+### Open questions
+The default Ask freely mode requires no item selection. It accepts 10–1500 characters, including conceptual questions. The model receives only the description in this mode, without hidden budget or repair preferences. Guided examples still send selected constraints. Resource links come from a curated catalogue; if none is relevant, no link is fabricated. Answers are not live research or local collection verification. Unrelated requests should be redirected to the waste-prevention theme. When AI fails, clearly labelled general guidance is shown rather than a fabricated answer. Existing saved actions remain compatible.

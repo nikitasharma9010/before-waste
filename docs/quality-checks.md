@@ -136,3 +136,11 @@ future changes, including reflow, text resize, visible focus, keyboard access, a
 target size. This work is not a formal accessibility certification. Safari/Firefox,
 physical-device testing, text-only zoom, and a full screen-reader audit remain
 release checks. Browser viewport checks do not replace those checks.
+
+## Open sustainability questions — 17 October 2026
+
+- 79 automated tests pass; TypeScript check and production build pass.
+- Free questions are the default. Guided clothing/headphone flows and old saved actions remain supported.
+- Tested description-only API input, conceptual answers, absent catalogue matches, open-plan save/reload, honest fallback and device battery safeguarding. Provider responses in automated tests are simulated.
+- Browser checked at widths 280, 320, 375, 768, 1280 and 1440: no document horizontal overflow. Desktop and 375px layouts visually inspected. Missing-key behavior confirmed through the local API.
+- Live Gemini/AICredits output quality and production deployment still require configured Vercel credentials and the deployment demo checks.

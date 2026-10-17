@@ -137,3 +137,27 @@ it('throttles repeated requests to the API handler', async () => {
   for (let i = 0; i < 6; i++) statuses.push((await invoke(input, { 'x-vercel-forwarded-for': 'same-test-client' })).status);
   expect(statuses.slice(0, 5)).toEqual([503, 503, 503, 503, 503]); expect(statuses[5]).toBe(429);
 });
+
+it('accepts short description-only questions without forcing an item category', () => {
+  const question = parsePlannerRequest({ description: 'Can I compost rice?' });
+  expect(question).toMatchObject({ item: 'anything', intent: 'explore', description: 'Can I compost rice?' });
+  expect(parsePlannerRequest({ ...input, item: 'anything' })).toBeNull();
+});
+it('sends open questions without invented budget or repair constraints and allows uncatalogued topics', async () => {
+  const question = parsePlannerRequest({ description: 'How does a circular economy reduce resource use?' })!;
+  const upstream = vi.fn().mockResolvedValue(Response.json(completed({ ...plan, resourceIds: [] })));
+  await generatePlan(question, env, upstream);
+  const body = JSON.parse(upstream.mock.calls[0][1].body);
+  expect(JSON.parse(body.input).userSituation).toEqual({ description: question.description });
+  expect(body.system_instruction).toContain('There is no fixed list');
+  expect(body.system_instruction).toContain('Answer conceptual questions directly');
+  expect(parsePlan({ ...plan, resourceIds: [] })).not.toBeNull();
+});
+it('protects open battery questions without mistaking ordinary food waste for a device fault', async () => {
+  const upstream = vi.fn().mockResolvedValue(Response.json(completed({ ...plan, resourceIds: ['food'] })));
+  const battery = parsePlannerRequest({ description: 'My laptop battery is swollen. Can I repair it?' })!;
+  expect((await generatePlan(battery, {}, upstream)).source).toBe('safety');
+  expect(upstream).not.toHaveBeenCalled();
+  const food = parsePlannerRequest({ description: 'My potatoes are bulging out of the bag. How can I waste less?' })!;
+  expect((await generatePlan(food, env, upstream)).source).toBe('ai');
+});

@@ -11,8 +11,8 @@ export function readAction(): { action: SavedAction | null; unavailable: boolean
     if (typeof d !== 'object' || !d) return { action: null, unavailable: false };
     const a = d as Record<string, unknown>;
     if (
-      (a.item !== 'clothes' && a.item !== 'headphones') ||
-      (a.intent !== 'buy' && a.intent !== 'fix' && a.intent !== 'pass') ||
+      (a.item !== 'clothes' && a.item !== 'headphones' && a.item !== 'anything') ||
+      (a.intent !== 'buy' && a.intent !== 'fix' && a.intent !== 'pass' && a.intent !== 'explore') ||
       (a.support !== 'myself' && a.support !== 'help') ||
       (a.budget !== 'free' && a.budget !== 'flexible') ||
       (a.outcome !== 'planned' && a.outcome !== 'done' && a.outcome !== 'blocked' && a.outcome !== 'changed') ||

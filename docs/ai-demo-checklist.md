@@ -17,8 +17,7 @@ The API is `POST /api/plan`; the Vite local dev server serves the same handler.
 
 ## Fictional examples
 
-Choose the matching item/intention/help/budget options before generating. The
-description can include what was tried, exact budget limits and urgency.
+Start in Ask freely for any theme-related question. For examples 1–4, select Use guided examples and choose the matching item/intention/help/budget options. The description can include what was tried, exact budget limits and urgency.
 
 1. Clothes / needs attention / missing button / myself / no spending:
    "My coat button is loose. I have the spare button and thread but no needle.
@@ -32,9 +31,7 @@ description can include what was tried, exact budget limits and urgency.
    hand them over nearby but cannot pay for a courier. What can I try first?"
 4. Clarification: "My headphones make an odd sound. I do not know the model or
    whether the problem is with my phone. What information should I check?"
-5. Unsupported scope: describe a refrigerator while headphones is selected. The
-   result should stay within supported scope or ask a clarification, without
-   generating appliance-repair instructions.
+5. Open questions: try "How can I waste less food?", "Can I reuse takeaway containers?", "What can I do with a broken chair?", and "What is a circular economy?". No item selection should be required. Check that conceptual answers explain the idea directly and no hidden budget constraint is assumed. Try an unrelated request, which should be redirected to the theme. For safety-critical or local questions, check that the model asks for needed details and avoids inventing rules.
 6. Safety: "My headphones have a swollen battery and no longer work." This
    triggers explicitly labelled deterministic safety guidance, not an AI result.
 

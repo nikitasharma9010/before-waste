@@ -1,11 +1,12 @@
-export type Item = 'clothes' | 'headphones';
-export type Intent = 'buy' | 'fix' | 'pass';
+export type Item = 'clothes' | 'headphones' | 'anything';
+export type Intent = 'buy' | 'fix' | 'pass' | 'explore';
 export type Support = 'myself' | 'help';
 export type Budget = 'free' | 'flexible';
 export type Issue = 'unsure' | 'button' | 'seam' | 'hole' | 'sound' | 'connection' | 'pads';
 export type Barrier = 'cost' | 'time' | 'tools' | 'access';
 export interface Decision { item: Item; intent: Intent; support: Support; budget: Budget; issue?: Issue }
 export const issues: Record<Item, { id: Issue; label: string; step: string }[]> = {
+  anything: [],
   clothes: [
     { id: 'unsure', label: 'Another issue / I am not sure', step: 'Identify the issue and look for a matching guide before starting.' },
     { id: 'button', label: 'Missing or loose button', step: 'Check whether you have the button or a suitable spare. Find a button-sewing guide and check the needle and thread needed for the fabric.' },
@@ -26,6 +27,7 @@ export function sameDecision(a: Decision, b: Decision) {
 }
 export const barrierLabels: Record<Barrier, string> = { cost: 'Cost', time: 'Time', tools: 'Tools or skills', access: 'Help or services unavailable' };
 export function recoveryAdvice(d: Decision, barrier: Barrier): string {
+  if (d.item === 'anything') return 'Choose a smaller step that fits your time and resources. Note what is missing, then check a relevant local service or trusted guide before acting.';
   switch (barrier) {
     case 'cost': return d.intent === 'buy' ? 'Write down the requirement and ask whether you can borrow something suitable. Revisit the purchase when it fits your budget.' : d.intent === 'pass' ? 'If transport or collection costs are a barrier, ask a nearby recipient about a direct handover or a service about free collection. Confirm acceptance and any fees before arranging it.' : 'Ask about a free assessment or community help before paying. Confirm fees and parts costs first; you can pause this action if it is unaffordable.';
     case 'time': return 'Make the next step smaller: write down the model or condition and one person or service to contact when you have time. You do not have to finish today.';
@@ -33,11 +35,20 @@ export function recoveryAdvice(d: Decision, barrier: Barrier): string {
     case 'access': return d.intent === 'pass' ? 'Ask a potential recipient directly if the item is usable. If it is not, check your municipality or manufacturer for an accepted collection route before travelling.' : 'Try manufacturer support or ask a community repair group whether remote advice is possible. If no practical option exists, choosing a suitable replacement is reasonable.';
   }
 }
-export const itemLabels: Record<Item, string> = { clothes: 'Clothes', headphones: 'Headphones' };
-export const intentLabels: Record<Intent, string> = { buy: 'Thinking of buying', fix: 'Something needs attention', pass: 'No longer needed' };
+export const itemLabels: Record<Item, string> = { clothes: 'Clothes', headphones: 'Headphones', anything: 'Your question' };
+export const intentLabels: Record<Intent, string> = { explore: 'Waste prevention & sustainable living', buy: 'Thinking of buying', fix: 'Something needs attention', pass: 'No longer needed' };
 
 // Editorial suggestions, not product-specific diagnoses or calculated impact claims.
 export function recommend(d: Decision) {
+  if (d.item === 'anything') return {
+    title: 'Start with one avoidable source of waste',
+    step: 'This is general guidance, not an answer to your question. Notice what gets wasted, check whether you can prevent it, and look for safe reuse before considering disposal.',
+    effort: 'One observation and one small change', cost: 'Start with what you already have',
+    alternative: 'For a specific item or local disposal rule, check its instructions and your municipality or a qualified service.',
+    chapter: 'Explore how everyday objects move through use, reuse and recovery.',
+    resource: { label: 'US EPA: reducing and reusing (US guidance)', url: 'https://www.epa.gov/recycle/what-you-can-do' },
+  };
+
   const clothing = d.item === 'clothes';
   const resource = d.intent === 'fix'
     ? { label: clothing ? 'iFixit clothing guides' : 'iFixit headphone guides', url: clothing ? 'https://www.ifixit.com/Device/Clothing' : 'https://www.ifixit.com/Device/Headphone' }

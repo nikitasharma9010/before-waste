@@ -1,6 +1,9 @@
 import { issues, type Decision } from './decisionData.js';
 
 export const PLAN_RESOURCES = {
+  compost: { label: 'US EPA: composting at home (US guidance)', url: 'https://www.epa.gov/recycle/composting-home', note: 'Home composting differs from commercial collection; check accepted materials for your system.' },
+  recycling: { label: 'US EPA: recycling questions (US guidance)', url: 'https://www.epa.gov/recycle/frequent-questions-recycling', note: 'Acceptance varies by local program. Check your collector directly; a recycling symbol is not a guarantee.' },
+  food: { label: 'US EPA: sustainable management of food (US guidance)', url: 'https://www.epa.gov/sustainable-management-food', note: 'Prioritize preventing wasted food. Do not assess food safety from a description.' },
   clothing: { label: 'iFixit clothing guides', url: 'https://www.ifixit.com/Device/Clothing', note: 'Match fabric, fault, tools and difficulty before repair.' },
   headphones: { label: 'iFixit headphone guides', url: 'https://www.ifixit.com/Device/Headphone', note: 'Model-specific guides; not every model is repairable by its owner.' },
   reuse: { label: 'US EPA: reuse and donation (US guidance)', url: 'https://www.epa.gov/recycle/what-you-can-do', note: 'Background guidance. Check local acceptance and fees directly.' },
@@ -30,7 +33,7 @@ export function parsePlan(v: unknown): AIPlan | null {
     !shortText(v.alternative, 600) || !texts(v.steps, 3) || !texts(v.questions, 2) ||
     !Array.isArray(v.resourceIds) || v.resourceIds.length > 3 ||
     !v.resourceIds.every(id => typeof id === 'string' && Object.hasOwn(PLAN_RESOURCES, id)) ||
-    (v.status === 'ready' && (v.steps.length === 0 || v.resourceIds.length === 0)) ||
+    (v.status === 'ready' && v.steps.length === 0) ||
     (v.status !== 'ready' && v.steps.length !== 0) || (v.status === 'clarify' && v.questions.length === 0)) return null;
   return { status: v.status as AIPlan['status'], summary: v.summary, action: v.action, reason: v.reason,
     steps: [...v.steps], alternative: v.alternative, questions: [...v.questions], resourceIds: [...new Set(v.resourceIds)] } as AIPlan;
@@ -42,10 +45,15 @@ export function parseGeneratedPlan(v: unknown): GeneratedPlan | null {
   return plan ? { plan, source: v.source, model: v.model, ...(v.provider ? { provider: v.provider } : {}) } : null;
 }
 export function parsePlannerRequest(v: unknown): PlannerRequest | null {
-  if (!record(v) || (v.item !== 'clothes' && v.item !== 'headphones') ||
-    (v.intent !== 'buy' && v.intent !== 'fix' && v.intent !== 'pass') ||
+  if (!record(v)) return null;
+  if (v.item === undefined && v.intent === undefined && v.support === undefined && v.budget === undefined && v.issue === undefined) {
+    v = { ...v, item: 'anything', intent: 'explore', support: 'myself', budget: 'free' };
+  }
+  if (!record(v) || (v.item !== 'clothes' && v.item !== 'headphones' && v.item !== 'anything') ||
+    (v.intent !== 'buy' && v.intent !== 'fix' && v.intent !== 'pass' && v.intent !== 'explore') ||
     (v.support !== 'myself' && v.support !== 'help') || (v.budget !== 'free' && v.budget !== 'flexible') ||
-    typeof v.description !== 'string' || v.description.trim().length < 20 || v.description.length > 1500 ||
+    typeof v.description !== 'string' || v.description.trim().length < 10 || v.description.length > 1500 ||
+    ((v.item === 'anything') !== (v.intent === 'explore')) ||
     (v.issue !== undefined && !issues[v.item].some(i => i.id === v.issue))) return null;
   return { item: v.item, intent: v.intent, support: v.support, budget: v.budget,
     issue: v.issue as PlannerRequest['issue'], description: v.description.trim() };

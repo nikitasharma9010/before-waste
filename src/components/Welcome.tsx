@@ -3,7 +3,7 @@ export function Welcome({ onExploreObjects }: { onExploreObjects: (id: string) =
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <p className="section-kicker text-ink/75 mb-4">BEFORE WASTE · EVERYDAY OBJECTS. THOUGHTFUL NEXT STEPS.</p>
       <h1 id="welcome-title" className="max-w-4xl font-editorial text-3xl sm:text-5xl lg:text-6xl leading-[1.15] text-balance">Before it becomes waste, <span className="italic font-semibold text-clay">what comes next?</span></h1>
-      <p className="mt-5 text-lg leading-relaxed max-w-2xl">Find a practical next step before buying, replacing or letting something go. Start with clothes or headphones, at your own pace.</p>
+      <p className="mt-5 text-lg leading-relaxed max-w-2xl">Find a practical next step before buying, replacing or letting something go. Ask about any item, reducing waste or sustainable living, at your own pace.</p>
       <div className="mt-6 flex flex-col sm:flex-row gap-3 sm:items-center">
         <a href="#decision-helper" onClick={() => document.getElementById('decision-helper')?.focus({ preventScroll: true })} className="inline-flex justify-center items-center min-h-[44px] px-5 py-3 rounded-xl bg-forest text-white font-semibold hover:bg-forest-strong">Help me with a thing</a>
         <a href="#follow-one-thing" onClick={() => onExploreObjects('tshirt')} className="inline-flex justify-center items-center min-h-[44px] px-5 py-3 rounded-xl border border-ink/25 font-semibold hover:bg-sage">Explore an object’s story</a>
