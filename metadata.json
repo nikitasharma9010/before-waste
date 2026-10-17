@@ -1,0 +1,6 @@
+{
+  "name": "BEFORE WASTE — Think Before It Becomes Waste",
+  "description": "An interactive digital exhibition exploring the hidden stories of the things we consume, from their origins to circular futures.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

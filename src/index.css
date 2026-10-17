@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+@theme {
+  --font-serif: "Fraunces", Georgia, serif;
+  --font-sans: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  
+  --color-warm-ivory: #FFF9F0;
+  --color-deep-ink: #202A35;
+  --color-vibrant-coral: #FF654F;
+  --color-electric-cobalt: #425BFF;
+  --color-sunny-marigold: #FFC857;
+  --color-fresh-teal: #0D9F91;
+  --color-soft-lavender: #EAE3FF;
+}
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  font-family: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: #FFF9F0;
+  color: #202A35;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, .font-editorial {
+  font-family: "Fraunces", Georgia, serif;
+}
