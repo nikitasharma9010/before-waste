@@ -8,6 +8,7 @@ export function useSectionNavigation() {
       try { id = decodeURIComponent(window.location.hash.slice(1)); } catch { return; }
       const target = id ? document.getElementById(id) : null;
       if (!target) return;
+      if (target.closest('[data-learning-panel][hidden]')) target.dispatchEvent(new Event('section-reveal', { bubbles: true }));
       for (let parent: HTMLElement | null = target; parent; parent = parent.parentElement) {
         if (parent instanceof HTMLDetailsElement) {
           const group = parent.getAttribute('name');
@@ -27,12 +28,17 @@ export function useSectionNavigation() {
     // Clicking an already-current hash should reopen a collapsed section too.
     function onClick(event: MouseEvent) {
       const anchor = event.target instanceof Element ? event.target.closest('a') : null;
-      if (!anchor || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      if (!anchor || anchor.hasAttribute('download') || (anchor.target && anchor.target !== '_self') || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
       const url = new URL(anchor.href);
       if (url.origin === location.origin && url.pathname === location.pathname && url.search === location.search && url.hash) {
+        let targetId: string;
+        try { targetId = decodeURIComponent(url.hash.slice(1)); } catch { return; }
+        if (!document.getElementById(targetId)) return;
         event.preventDefault();
-        if (url.hash !== location.hash) window.history.pushState(null, '', url.hash);
-        reveal(true);
+        if (url.hash !== location.hash) {
+          window.history.pushState(null, '', url.hash);
+          window.dispatchEvent(new HashChangeEvent('hashchange'));
+        } else reveal(true);
       }
     }
     document.addEventListener('click', onClick);

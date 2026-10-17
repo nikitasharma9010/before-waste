@@ -1,3 +1,4 @@
+import { SITE_NAVIGATION } from '../data/siteNavigation';
 import React, { useState, useRef, useEffect } from 'react';
 import { Menu, X, ArrowUpRight } from 'lucide-react';
 import { Brand } from './Brand';
@@ -8,8 +9,13 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ onOpenSources }) => {
   const isAssistant = /^\/ask\/?$/.test(window.location.pathname);
-  const actionHref = isAssistant ? '/#follow-one-thing' : '/ask';
-  const actionLabel = isAssistant ? 'Explore stories' : 'Ask Before Waste';
+  const [sectionHash, setSectionHash] = useState(window.location.hash);
+  useEffect(() => {
+    const update = () => setSectionHash(window.location.hash);
+    window.addEventListener('hashchange', update);
+    window.addEventListener('popstate', update);
+    return () => { window.removeEventListener('hashchange', update); window.removeEventListener('popstate', update); };
+  }, []);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const sourcesButtonRef = useRef<HTMLButtonElement>(null);
@@ -38,21 +44,12 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSources }) => {
     };
   }, [mobileMenuOpen]);
 
-  const navLinks = [
-    { label: 'Follow One Thing', href: '/#follow-one-thing' },
-    { label: 'Learn more', href: '/#learn' },
-    { label: 'Ask Before Waste', href: '/ask' },
-    { label: 'The 7-Day Pause', href: '/#pause' },
-  ];
+  const navLinks = SITE_NAVIGATION;
+  const activeSection = ['#bigger-pattern', '#one-planet', '#systems'].includes(sectionHash) ? '#learn' : sectionHash === '#object-preview' ? '#follow-one-thing' : sectionHash;
+  const currentDestination = (href: string) => href === '/ask' && isAssistant ? 'page' as const
+    : !isAssistant && href === `/${activeSection}` ? 'location' as const : undefined;
 
-  const handleLinkClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
-    setMobileMenuOpen(false);
-    const target = event.currentTarget.hash ? document.getElementById(event.currentTarget.hash.slice(1)) : null;
-    if (target) {
-      target.tabIndex = -1;
-      target.focus({ preventScroll: true });
-    }
-  };
+  const handleLinkClick = () => setMobileMenuOpen(false);
 
   return (
     <header
@@ -83,10 +80,10 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSources }) => {
           {navLinks.filter(link => link.href !== '/ask' || isAssistant).map((link) => (
             <a
               key={link.href}
-              aria-current={link.href === '/ask' && isAssistant ? 'page' : undefined}
+              aria-current={currentDestination(link.href)}
               href={link.href}
               onClick={handleLinkClick}
-              className="inline-flex items-center min-h-[44px] py-2 hover:text-ink hover:underline underline-offset-4 decoration-clay decoration-2 focus-visible:ring-2 focus-visible:ring-ink rounded transition-colors whitespace-nowrap shrink-0 aria-[current=page]:font-semibold aria-[current=page]:text-forest aria-[current=page]:underline aria-[current=page]:decoration-forest"
+              className="inline-flex items-center min-h-[44px] py-2 hover:text-ink hover:underline underline-offset-4 decoration-clay decoration-2 focus-visible:ring-2 focus-visible:ring-ink rounded transition-colors whitespace-nowrap shrink-0 aria-[current=location]:font-semibold aria-[current=location]:underline aria-[current=page]:font-semibold aria-[current=page]:text-forest aria-[current=page]:underline aria-[current=page]:decoration-forest"
             >
               {link.label}
             </a>
@@ -103,14 +100,14 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSources }) => {
 
         {/* Zone 3: 1 Primary Action & Mobile Toggle */}
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-          <a
-            href={actionHref}
+          {!isAssistant && <a
+            href="/ask"
             onClick={handleLinkClick}
             className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 min-h-[44px] text-sm font-semibold text-white bg-forest hover:bg-forest-strong focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ink rounded-xl transition-colors whitespace-nowrap shrink-0 shadow-xs"
           >
-            <span>{actionLabel}</span>
+            <span>Ask Before Waste</span>
             <ArrowUpRight className="w-4 h-4" aria-hidden="true" />
-          </a>
+          </a>}
 
           {/* Mobile Menu Button (Accessible min 44x44 target) */}
           <button
@@ -137,10 +134,10 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSources }) => {
             {navLinks.filter(link => link.href !== '/ask' || isAssistant).map((link) => (
               <a
                 key={link.href}
-                aria-current={link.href === '/ask' && isAssistant ? 'page' : undefined}
-              href={link.href}
+                aria-current={currentDestination(link.href)}
+                href={link.href}
                 onClick={handleLinkClick}
-                className="py-3 px-4 min-h-[44px] flex items-center rounded-xl aria-[current=page]:bg-sage aria-[current=page]:font-semibold text-base font-medium text-ink hover:bg-ink/5 focus-visible:ring-2 focus-visible:ring-ink transition-colors"
+                className="py-3 px-4 min-h-[44px] flex items-center rounded-xl aria-[current=page]:bg-sage aria-[current=location]:font-semibold aria-[current=location]:underline aria-[current=page]:font-semibold text-base font-medium text-ink hover:bg-ink/5 focus-visible:ring-2 focus-visible:ring-ink transition-colors"
               >
                 {link.label}
               </a>
@@ -155,16 +152,16 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSources }) => {
             >
               Sources & Methodology
             </button>
-            <div className="pt-2">
+            {!isAssistant && <div className="pt-2">
               <a
-                href={actionHref}
+                href="/ask"
                 onClick={handleLinkClick}
                 className="flex items-center justify-center gap-2 w-full py-3 px-4 min-h-[44px] text-center font-semibold text-white bg-forest hover:bg-forest-strong focus-visible:ring-2 focus-visible:ring-ink rounded-xl transition-colors shadow-xs"
               >
-                <span>{actionLabel}</span>
+                <span>Ask Before Waste</span>
                 <ArrowUpRight className="w-4 h-4" aria-hidden="true" />
               </a>
-            </div>
+            </div>}
           </nav>
         </div>
       )}

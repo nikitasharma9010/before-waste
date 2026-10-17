@@ -106,11 +106,13 @@ export const SevenDayPause: React.FC = () => {
             You don&apos;t have to change everything. Start by noticing one thing.
           </h2>
           <p className="mt-3 text-lg text-ink/80 font-normal leading-relaxed">
-            For seven days, pause for a quiet breath before buying something. No accounts, no leaderboards, no streaks—just seven simple questions to explore at your own pace.
+            For seven days, pause for a quiet breath before buying something. Explore one question each day, or choose the one that fits today.
           </p>
         </div>
 
-        {/* Optional Storage Notice Banner */}
+        <p className="mb-6 text-sm text-ink/80">These reflections are separate from your saved action. Completion records the questions you explored, rather than measuring waste avoided.</p>
+
+        {/* Storage Notice Banner */}
         {storageUnavailableNotice && (
           <div
             role="status"

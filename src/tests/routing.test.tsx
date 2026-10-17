@@ -29,7 +29,7 @@ it('shows only a compact entry on home and full guidance at a directly loaded as
   expect(host.querySelector('#assistant-entry')).toBeNull();
   expect(host.querySelector('#object-preview')).toBeNull();
   expect(host.querySelector('header a[href="/#follow-one-thing"]')?.textContent).toContain('Follow One Thing');
-  expect([...host.querySelectorAll('header a')].some(a => a.textContent?.trim() === 'Explore stories')).toBe(true);
+  expect(host.querySelectorAll('header a[href="/#follow-one-thing"]')).toHaveLength(1);
   expect(host.querySelector<HTMLTextAreaElement>('#ai-description')?.value).toContain('small flat');
   expect(host.querySelector('#saved-action')?.textContent).toContain('Keep my existing action');
   expect(sessionStorage.getItem(QUESTION_DRAFT_KEY)).toBeNull();
@@ -100,16 +100,16 @@ it('connects the final story stage to an editable question without calling AI', 
 it('opens learning deep links and makes reflection directly accessible', async () => {
   window.history.replaceState({}, '', '/#one-planet');
   await act(async () => root.render(<App />));
-  expect(host.querySelector('#one-planet')?.closest('details')?.open).toBe(true);
-  expect(host.querySelector('#systems')?.closest('details')?.open).toBe(false);
+  expect(host.querySelector<HTMLElement>('#one-planet')?.closest<HTMLElement>('[data-learning-panel]')?.hidden).toBe(false);
+  expect(host.querySelector<HTMLElement>('#systems')?.closest<HTMLElement>('[data-learning-panel]')?.hidden).toBe(true);
   expect(document.activeElement?.id).toBe('one-planet');
   await act(async () => {
     window.history.replaceState({}, '', '/#systems'); window.dispatchEvent(new HashChangeEvent('hashchange'));
   });
-  expect(host.querySelector('#systems')?.closest('details')?.open).toBe(true);
+  expect(host.querySelector<HTMLElement>('#systems')?.closest<HTMLElement>('[data-learning-panel]')?.hidden).toBe(false);
   expect(document.activeElement?.id).toBe('systems');
   expect(host.querySelector('#pause')?.closest('details')).toBeNull();
-  expect(host.querySelector('#one-planet')?.closest('details')?.open).toBe(false);
+  expect(host.querySelector<HTMLElement>('#one-planet')?.closest<HTMLElement>('[data-learning-panel]')?.hidden).toBe(true);
 });
 it('resumes a selected story and stage after visiting the assistant', async () => {
   await act(async () => root.render(<App />));
@@ -160,7 +160,7 @@ it('limits the materials detail to its hotspots and the selected T-shirt', async
 it('starts learning open and smoothly follows repeated section links while respecting reduced motion', async () => {
   const scroll = vi.fn(); Element.prototype.scrollIntoView = scroll;
   await act(async () => root.render(<App />));
-  expect(host.querySelector('#bigger-pattern')?.closest('details')?.open).toBe(true);
+  expect(host.querySelector<HTMLElement>('#bigger-pattern')?.closest<HTMLElement>('[data-learning-panel]')?.hidden).toBe(false);
   const link = host.querySelector<HTMLAnchorElement>('header a[href="/#learn"]')!;
   await act(async () => link.click());
   expect(location.hash).toBe('#learn');
@@ -169,4 +169,55 @@ it('starts learning open and smoothly follows repeated section links while respe
   vi.stubGlobal('matchMedia', vi.fn().mockReturnValue({ matches: true }));
   await act(async () => link.click());
   expect(scroll).toHaveBeenLastCalledWith({ block: 'start', behavior: 'auto' });
+});
+
+it('keeps section navigation in content order and marks the chosen destination', async () => {
+  await act(async () => root.render(<App />));
+  const nav = host.querySelector('nav[aria-label="Primary navigation"]')!;
+  expect([...nav.querySelectorAll('a')].map(a => a.hash)).toEqual(['#follow-one-thing', '#what-would-you-do', '#learn', '#pause']);
+  const choice = nav.querySelector<HTMLAnchorElement>('a[href="/#what-would-you-do"]')!;
+  await act(async () => choice.click());
+  expect(document.activeElement?.id).toBe('what-would-you-do');
+  expect(choice.getAttribute('aria-current')).toBe('location');
+  await act(async () => {
+    history.replaceState(null, '', '/#pause'); window.dispatchEvent(new HashChangeEvent('hashchange'));
+  });
+  expect(nav.querySelector('a[aria-current="location"]')?.getAttribute('href')).toBe('/#pause');
+  expect(choice.hasAttribute('aria-current')).toBe(false);
+});
+it('preserves browser handling for new-tab, download and unknown section links', async () => {
+  await act(async () => root.render(<App />));
+  for (const attrs of [{ target: '_blank', href: '#learn' }, { download: '', href: '#learn' }, { href: '#not-a-section' }]) {
+    const link = document.createElement('a');
+    Object.entries(attrs).forEach(([key, value]) => link.setAttribute(key, value)); host.append(link);
+    const event = new MouseEvent('click', { bubbles: true, cancelable: true });
+    await act(async () => link.dispatchEvent(event));
+    expect(event.defaultPrevented).toBe(false);
+    link.remove();
+  }
+});
+it('connects each learning topic to the next and opens the destination', async () => {
+  await act(async () => root.render(<App />));
+  const link = host.querySelector<HTMLAnchorElement>('#bigger-pattern + nav a[href="#one-planet"]')!;
+  await act(async () => link.click());
+  expect(document.activeElement?.id).toBe('one-planet');
+  expect(host.querySelector<HTMLElement>('#one-planet')?.closest<HTMLElement>('[data-learning-panel]')?.hidden).toBe(false);
+  expect(host.querySelector<HTMLElement>('#bigger-pattern')?.closest<HTMLElement>('[data-learning-panel]')?.hidden).toBe(true);
+  const next = host.querySelector<HTMLAnchorElement>('a[href="#systems"]')!;
+  await act(async () => next.click());
+  expect(document.activeElement?.id).toBe('systems');
+  expect(host.querySelector('header a[aria-current="location"]')?.textContent).toBe('Understand waste');
+  expect(host.querySelector<HTMLElement>('#one-planet')?.closest<HTMLElement>('[data-learning-panel]')?.hidden).toBe(true);
+});
+
+it('keeps all learning topics available and preserves exploration when switching', async () => {
+  await act(async () => root.render(<App />));
+  const topics = host.querySelector('nav[aria-label="Learning topics"]')!;
+  expect(topics.querySelectorAll('a')).toHaveLength(3);
+  await act(async () => host.querySelector<HTMLButtonElement>('#tab-linear')!.click());
+  await act(async () => topics.querySelector<HTMLAnchorElement>('a[href="#systems"]')!.click());
+  expect(topics.querySelector('a[aria-current="true"]')?.textContent).toBe('Design and collective change');
+  await act(async () => topics.querySelector<HTMLAnchorElement>('a[href="#bigger-pattern"]')!.click());
+  expect(host.querySelector('#tab-linear')?.getAttribute('aria-pressed')).toBe('true');
+  expect(host.querySelectorAll('[data-learning-panel]:not([hidden])')).toHaveLength(1);
 });
