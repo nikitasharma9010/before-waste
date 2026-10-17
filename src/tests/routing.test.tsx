@@ -63,6 +63,14 @@ it('never puts the homepage question into a URL or sends it to AI on continue', 
   expect(takeQuestionDraft()).toBe('How can I reuse glass jars?');
   expect(request).not.toHaveBeenCalled();
 });
+it('renders the branded not-found page for an unknown route instead of a blank or crashed app', async () => {
+  window.history.replaceState({}, '', '/this-page-does-not-exist');
+  await act(async () => root.render(<App />));
+  expect(host.querySelector('h1')?.textContent).toContain("doesn't exist");
+  expect(host.querySelector('a[href="/"]')?.textContent).toContain('Back to the homepage');
+  expect(document.title).toContain('Page Not Found');
+  expect(host.querySelector('header')).not.toBeNull();
+});
 it('preserves the draft and offers manual recovery when tab storage is unavailable', async () => {
   await act(async () => root.render(<App />));
   vi.spyOn(Storage.prototype,'setItem').mockImplementation(() => { throw new Error('blocked'); });
