@@ -1,8 +1,40 @@
 # Before Waste
 
-An everyday-object decision tool and interactive educational site built with React,
-TypeScript, Vite and Tailwind CSS. An optional AI planner turns a visitor's
-question or description into an editable answer or action plan about waste prevention and sustainable living. Any item can be discussed; clothes and headphones remain optional guided examples.
+Before Waste helps people choose a practical next step before buying, replacing or
+discarding an everyday item. It connects interactive object stories and everyday
+choice scenarios with an AI assistant for questions about waste prevention and
+sustainable living.
+
+**Live app:** [before-waste.vercel.app](https://before-waste.vercel.app/)
+
+## Who it helps
+
+People making everyday decisions about things they own, especially when money,
+tools or repair experience are limited. A student, renter or household member can
+describe their situation in ordinary language and explore options that fit their
+circumstances.
+
+## What people can achieve
+
+- Understand an object's lifecycle and compare choices before replacing or
+  discarding it.
+- Explore maintenance, repair and reuse options with guidance that takes account
+  of the budget, skills, supplies and optional location they provide.
+- Ask practical or conceptual questions about waste prevention and sustainable
+  living, beyond the guided examples.
+- Review, edit and save useful answers in their browser for later reference.
+- Use the 7-Day Pause to reflect before a nonessential purchase.
+
+The aim is to make thoughtful, lower-waste decisions easier to understand and put
+into practice. The assistant offers a draft to review; people decide what fits
+their situation. Local services are not checked live, and saved content stays in
+the browser on that device.
+
+## Built with
+
+React, TypeScript, Vite and Tailwind CSS, with a server-side API for AI guidance.
+The project was initially built in Google AI Studio. Development tools are
+separate from the AI assistance people use in the app.
 
 ## Enable AI planning on Vercel
 
