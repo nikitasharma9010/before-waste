@@ -91,6 +91,9 @@ it.each(['gemini','aicredits'])('supports actionable button-check guidance throu
   expect(instructions).toContain('A request for checks or decision criteria should receive useful checks');
   expect(instructions).toContain('Reserve clarify for a missing fact that materially changes safety');
   expect(instructions).toContain('Resources are not a quota');
+  expect(instructions).toContain('never present your suggestion as their final decision');
+  expect(instructions).toContain('where the button is sewn');
+  expect(instructions).toContain('does not ensure or guarantee');
   expect(instructions).toContain('Food safety, hazardous materials, structural damage and electrical risks retain their stricter boundaries');
 });
 
