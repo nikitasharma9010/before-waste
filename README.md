@@ -47,7 +47,8 @@ keep useful things in use longer. These choices can help avoid costs and waste
 while supporting more thoughtful use of Earth's resources and care for those
 who come after us.
 
-The assistant offers a draft to review; people decide what fits their situation.
+The assistant offers options and a draft to review, not a final decision.
+People decide what is appropriate for their own circumstances.
 Local services are not checked live, and saved content stays in the browser on
 that device. The app does not calculate environmental savings.
 
