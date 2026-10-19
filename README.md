@@ -10,6 +10,11 @@ at once.
 
 **Live app:** [before-waste.vercel.app](https://before-waste.vercel.app/)
 
+## Feedback
+
+Feedback and suggestions are welcome.
+[Share feedback](https://docs.google.com/forms/d/e/1FAIpQLSfuQbhpDFuQXq2N9SQue6fF-coyQaDuZ9K6UDpj_X4Rh3Y2OA/viewform)
+
 ## The problem
 
 Waste is often treated as a disposal problem, after decisions about buying,
