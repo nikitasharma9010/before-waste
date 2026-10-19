@@ -11,7 +11,7 @@ guidance before things become waste.
 
 Waste is often treated as a disposal problem, after decisions about buying,
 using and replacing things have already been made. That view can hide the
-materials, water, energy and human effort behind an object, and the opportunities
+materials, water, energy and human effort behind an object and the opportunities
 to prevent waste earlier. Before Waste addresses the gap between understanding
 that wider story and finding an action that fits someone's circumstances.
 
@@ -20,10 +20,10 @@ possible. The responsibility does not sit with individuals alone.
 
 ## Who it helps
 
-Everyday consumers, especially students, young adults and households deciding
-what to buy, how to use what they have and what happens when they are finished
-with it. The experience respects different budgets, skills, time and access to
-alternatives, without expecting perfect choices.
+Before Waste is for everyday consumers, especially students, young adults and
+households deciding what to buy, how to use what they have and what happens when
+they no longer need an item. The experience respects differences in budget,
+skills, available time and access to alternatives, without expecting perfect choices.
 
 ## From awareness to action
 
@@ -118,12 +118,12 @@ remain subject to their policies. This is not a zero-retention guarantee.
 - Suggestions are grounded in the editorial starting point and a vetted resource
   catalogue. The model returns resource IDs; code supplies the links. There is no
   live local-directory search, diagnosis, price quote or impact calculation.
-- Ready plans can be edited and saved. Clarification/unsupported responses are not
+- Ready plans can be edited and saved. Clarification and unsupported responses are not
   savable as action plans. Some explicit battery-risk descriptions use deterministic
   safety guidance labelled as not AI generated. Other risks still depend on model
   compliance and user review; this is not a certified repair or safety system.
-- API requests have a shared 20-second upstream budget, payload/schema validation, same-
-  origin browser checks and best-effort per-instance throttles (5 requests/client
+- API requests have a shared 20-second upstream budget, payload/schema validation, same-origin
+  browser checks and best-effort per-instance throttles (5 requests/client
   and 30 total per minute). The in-memory counters reset on cold starts and do not
   coordinate across instances. For public traffic, configure a Vercel Firewall
   rate-limit rule on `/api/plan` and provider spending/quota controls. The code
@@ -160,20 +160,20 @@ selection, dialog focus and background isolation, mobile Sources focus restorati
 story restart, reflection storage failures, AI plan editing and restoration,
 stale-request cancellation, API validation, provider errors, quota and timeouts.
 They do not verify live model quality or visual layout.
-Before release, manually check narrow viewports, text zoom, and screen-reader behavior.
+Before release, manually check narrow viewports, text zoom and screen-reader behaviour.
 
 ## Content
 
-Environmental estimates depend on product, geography, and study assumptions. The
+Environmental estimates depend on product, geography and study assumptions. The
 Sources dialog provides background references; the garment-care story also links
 directly to WRAP's 2017 UK clothing-sector report. This is educational content, not
 a product-specific footprint calculator or a comprehensive independent fact audit.
 
 ### Open questions
-The default Ask freely mode requires no item selection. It accepts 10–1500 characters, including conceptual questions. The model receives only the description in this mode, without hidden budget or repair preferences. Guided examples still send selected constraints. Resource links come from a curated catalogue; if none is relevant, no link is fabricated. Answers are not live research or local collection verification. Unrelated requests should be redirected to the waste-prevention theme. When AI fails, clearly labelled general guidance is shown rather than a fabricated answer. Existing saved actions remain compatible.
+The default Ask freely mode requires no item selection. It accepts 10–1500 characters, including conceptual questions. The model receives the question and any supplied location context in this mode, without hidden budget or repair preferences. Guided examples still send selected constraints. Resource links come from a curated catalogue; if none is relevant, no link is fabricated. Answers are not live research or local collection verification. Unrelated requests should be redirected to the waste-prevention theme. When AI fails, clearly labelled general guidance is shown rather than a fabricated answer. Existing saved actions remain compatible.
 
 ### Location and answer presentation
-Visitors can optionally provide city/region and country, or mention their location and other details in the question. No geolocation is requested or inferred. Both configured services receive the supplied context. Instructions require respecting stated budget, currency, housing, tools and access; ambiguous locations require clarification. Local rules and service availability are not live-verified. US references remain background outside the US. Answer display and copy/save formatting share section labels; provider/model names are not rendered on the page.
+Visitors can optionally provide city/region and country, or mention their location and other details in the question. No geolocation is requested or inferred. The configured service handling a request receives the supplied context; a backup service may also receive it if fallback is used. Instructions require respecting stated budget, currency, housing, tools and access; ambiguous locations require clarification. Local rules and service availability are not live-verified. US references remain background outside the US. Answer display and copy/save formatting share section labels; provider/model names are not rendered on the page.
 
 ### Dedicated assistant page
 The homepage keeps the stories and a compact question entry. `/ask` (and `/ask/`) renders the full assistant, location/context controls and separate Ask and Saved tabs for multiple answers. Normal links support browser back/forward navigation. Vercel rewrites only these two paths to `index.html`; API routes remain untouched. A homepage question is carried through tab-scoped session storage, never URL parameters. It expires after 15 minutes and is consumed on arrival; no AI request is made until Get AI guidance is chosen. If session storage is blocked, the homepage keeps the text and offers manual copy/open recovery. Unsaved input is not a persistent chat history; save an accepted action to retain it across reloads. Follow-ups work by editing the current question with added details.
