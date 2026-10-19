@@ -26,18 +26,18 @@ const cases: { id: string; description: string; location?: string; background?: 
   { id:'language', description:'Please explain the circular economy in Hindi, using Devanagari text.', statuses:['explanation'] },
 ];
 const dryRun = process.argv.includes('--dry-run');
-const provider = process.argv.find(arg=>arg.startsWith('--provider='))?.split('=')[1];
+const provider = process.argv.find(arg=>arg.startsWith('--provider='))?.split('=')[1] || 'aicredits';
 if (dryRun) {
   console.log(JSON.stringify({ cases, note:'Dry run: no external calls. Live results require human factual and safety review.' },null,2));
-} else if (provider !== 'gemini' && provider !== 'aicredits') {
-  console.error('Choose --provider=gemini or --provider=aicredits, or use --dry-run.'); process.exitCode=1;
-} else if (!(provider === 'gemini' ? process.env.GEMINI_API_KEY : process.env.AICREDITS_API_KEY)?.trim()) {
+} else if (provider !== 'aicredits') {
+  console.error('Only --provider=aicredits is supported; use --dry-run for no external calls.'); process.exitCode=1;
+} else if (!process.env.AICREDITS_API_KEY?.trim()) {
   console.error('Set the chosen provider’s server-side API key in the environment before running.'); process.exitCode=1;
 } else {
   const results: { id:string; checksPassed:boolean; result?:GeneratedPlan; error?:string; review?:string[] }[]=[];
   for (const scenario of cases) {
     try {
-      const result = await generatePlan(parsePlannerRequest(scenario)!,{...process.env,AI_PROVIDER:provider});
+      const result = await generatePlan(parsePlannerRequest(scenario)!,process.env);
       let checksPassed = scenario.statuses.includes(result.plan.status);
       if (scenario.allowedResources) checksPassed &&= result.plan.resourceIds.every(id => scenario.allowedResources!.includes(id));
       if (scenario.maxResources !== undefined) checksPassed &&= result.plan.resourceIds.length <= scenario.maxResources;

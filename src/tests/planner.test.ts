@@ -6,22 +6,22 @@ import { planText, PLAN_LABELS, parsePlan, parsePlannerRequest, type AIPlan, typ
 
 const input: PlannerRequest = { item: 'headphones', intent: 'fix', support: 'myself', budget: 'free', description: 'Only the left side plays. I have no tools and already tried another device.' };
 const plan: AIPlan = { status: 'ready', summary: 'One side of your headphones is silent after a source check.', action: 'Check model support before paying for parts', reason: 'You have no tools and already tried another source.', steps: ['Find the model number and warranty information.', 'Ask support whether an assessment has a fee.'], alternative: 'Borrow a suitable pair if you need audio before support responds.', questions: [], resourceIds: ['headphones'] };
-const completed = (value: unknown) => ({ status: 'completed', steps: [{ type: 'thought', content: [{ type: 'text', text: 'not output' }] }, { type: 'model_output', content: [{ type: 'text', text: JSON.stringify(value) }] }] });
-const env = { GEMINI_API_KEY: 'test-api-key', GEMINI_MODEL: 'gemini-3.8-flash' };
+const completed = (value: unknown) => ({ choices: [{ finish_reason: 'stop', message: { content: JSON.stringify(value) } }] });
+const env = { AICREDITS_API_KEY: 'test-api-key', AICREDITS_MODEL: 'openai/gpt-4o-mini' };
 afterEach(() => { vi.restoreAllMocks(); vi.unstubAllGlobals(); vi.unstubAllEnvs(); vi.useRealTimers(); });
 
-it('calls Gemini with a server-side key, bounded output, structured schema and no stored interaction', async () => {
+it('calls AICredits with a server-side key and bounded JSON output', async () => {
   const upstream = vi.fn().mockResolvedValue(Response.json(completed(plan)));
   const result = await generatePlan(input, env, upstream);
-  expect(result).toEqual({ source: 'ai', model: env.GEMINI_MODEL, plan });
+  expect(result).toEqual({ source: 'ai', model: env.AICREDITS_MODEL, provider: 'aicredits', plan });
   const [url, options] = upstream.mock.calls[0];
-  expect(url).toBe('https://generativelanguage.googleapis.com/v1beta/interactions');
-  expect(options.headers['x-goog-api-key']).toBe('test-api-key');
+  expect(url).toBe('https://api.aicredits.in/v1/chat/completions');
+  expect(options.headers.Authorization).toBe('Bearer test-api-key');
   const body = JSON.parse(options.body);
-  expect(body.store).toBe(false);
-  expect(body.response_format.mime_type).toBe('application/json');
-  expect(body.generation_config.max_output_tokens).toBe(4096);
-  expect(body.input).toContain('already tried another device');
+  expect(body.no_cache).toBe(true);
+  expect(body.response_format.type).toBe('json_object');
+  expect(body.max_tokens).toBe(4096);
+  expect(body.messages[1].content).toContain('already tried another device');
   expect(JSON.stringify(result)).not.toContain('test-api-key');
 });
 it('provides deterministic battery safety without a key or provider call', async () => {
@@ -55,57 +55,19 @@ it('validates input scope, size and optional issue', () => {
 
 const backupEnv = { ...env, AICREDITS_API_KEY: 'test-aicredits-key', AICREDITS_MODEL: 'openai/gpt-4o-mini' };
 const chatResponse = (value: unknown = plan) => Response.json({ choices: [{ finish_reason: 'stop', message: { content: JSON.stringify(value) } }] });
-it('fails over to AICredits with separate credentials and validated JSON', async () => {
-  const upstream = vi.fn().mockResolvedValueOnce(new Response('private error', { status: 503 })).mockResolvedValueOnce(chatResponse());
-  const result = await generatePlan(input, backupEnv, upstream);
-  expect(result).toMatchObject({ provider: 'aicredits', model: 'openai/gpt-4o-mini', plan });
-  expect(upstream).toHaveBeenCalledTimes(2);
-  const [url, options] = upstream.mock.calls[1];
-  expect(url).toBe('https://api.aicredits.in/v1/chat/completions');
-  expect(options.headers).toEqual({ 'Content-Type': 'application/json', Authorization: 'Bearer test-aicredits-key' });
-  expect(JSON.stringify(options)).not.toContain('test-api-key');
-  const body = JSON.parse(options.body);
-  expect(body.response_format).toEqual({ type: 'json_object' });
-  expect(body.no_cache).toBe(true); expect(body.messages[0].content).toContain('JSON schema');
-});
-it('uses AICredits directly when Gemini is unconfigured or AICredits mode is selected', async () => {
-  for (const config of [{ AICREDITS_API_KEY: 'test-aicredits-key' }, { ...backupEnv, AI_PROVIDER: 'aicredits' }]) {
+it('ignores legacy Gemini settings and always routes to AICredits', async () => {
+  for (const AI_PROVIDER of ['auto', 'gemini', 'aicredits']) {
     const upstream = vi.fn().mockResolvedValue(chatResponse());
-    expect((await generatePlan(input, config, upstream)).provider).toBe('aicredits');
+    expect((await generatePlan(input, {...env, AI_PROVIDER, GEMINI_API_KEY:'unused'}, upstream)).provider).toBe('aicredits');
     expect(upstream).toHaveBeenCalledTimes(1);
-    expect(upstream.mock.calls[0][0]).toContain('api.aicredits.in');
+    expect(upstream.mock.calls[0][0]).toBe('https://api.aicredits.in/v1/chat/completions');
+    expect(JSON.stringify(upstream.mock.calls)).not.toContain('unused');
   }
 });
-it('does not spend backup credits after a successful Gemini answer, including clarification', async () => {
-  const upstream = vi.fn().mockResolvedValue(Response.json(completed({ ...plan, status: 'clarify', alternative: '', steps: [], questions: ['Which model is it?'] })));
-  expect((await generatePlan(input, backupEnv, upstream)).plan.status).toBe('clarify');
-  expect(upstream).toHaveBeenCalledTimes(1);
-});
-it('respects Gemini-only mode even when backup credentials exist', async () => {
-  const upstream = vi.fn().mockResolvedValue(new Response('', { status: 429 }));
-  await expect(generatePlan(input, { ...backupEnv, AI_PROVIDER: 'gemini' }, upstream)).rejects.toMatchObject({ status: 429 });
-  expect(upstream).toHaveBeenCalledTimes(1);
-});
-it('rejects malformed fallback output and sanitises exhausted-credit errors', async () => {
-  const config = { ...backupEnv, AI_PROVIDER: 'aicredits' };
-  await expect(generatePlan(input, config, vi.fn().mockResolvedValue(chatResponse({ ...plan, resourceIds: ['fake'] })))).rejects.toThrow('usable plan');
-  await expect(generatePlan(input, config, vi.fn().mockResolvedValue(new Response('wallet details and secrets', { status: 402 })))).rejects.toThrow('temporarily unavailable');
-});
-it('falls back after an 8-second primary timeout within the shared request budget', async () => {
-  vi.useFakeTimers();
-  const upstream = vi.fn().mockImplementationOnce((_url: unknown, options: RequestInit) => new Promise<Response>((_resolve, reject) => {
-    options.signal?.addEventListener('abort', () => reject(new Error('aborted')));
-  })).mockResolvedValueOnce(chatResponse());
-  const pending = generatePlan(input, backupEnv, upstream);
-  await vi.advanceTimersByTimeAsync(8001);
-  expect((await pending).provider).toBe('aicredits'); expect(upstream).toHaveBeenCalledTimes(2);
-});
-it('fails over for invalid model output and quota errors without retrying the primary', async () => {
-  for (const response of [Response.json(completed({ invalid: true })), new Response('', { status: 429 })]) {
-    const upstream = vi.fn().mockResolvedValueOnce(response).mockResolvedValueOnce(chatResponse());
-    expect((await generatePlan(input, backupEnv, upstream)).provider).toBe('aicredits');
-    expect(upstream).toHaveBeenCalledTimes(2);
-  }
+it('requires AICredits credentials even if an old Gemini key exists', async () => {
+  const upstream = vi.fn();
+  await expect(generatePlan(input, {GEMINI_API_KEY:'unused'}, upstream)).rejects.toMatchObject({code:'AI_NOT_CONFIGURED'});
+  expect(upstream).not.toHaveBeenCalled();
 });
 
 let requestId = 0;
@@ -124,7 +86,7 @@ it('enforces method, origin, media type, malformed and oversized body constraint
   expect((await invoke({ ...input, description: 'a'.repeat(41000) })).status).toBe(413);
 });
 it('returns validated AI output through the actual API handler without exposing configuration', async () => {
-  vi.stubEnv('GEMINI_API_KEY', 'test-api-key'); vi.stubEnv('GEMINI_MODEL', 'gemini-3.8-flash');
+  vi.stubEnv('AICREDITS_API_KEY', 'test-api-key'); vi.stubEnv('AICREDITS_MODEL', 'openai/gpt-4o-mini');
   vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json(completed(plan))));
   const result = await invoke();
   expect(result.status).toBe(200); expect(result.body.plan.action).toBe(plan.action);
@@ -132,7 +94,7 @@ it('returns validated AI output through the actual API handler without exposing 
   expect(JSON.stringify(result.body)).not.toContain('test-api-key');
 });
 it('throttles repeated requests to the API handler', async () => {
-  vi.stubEnv('GEMINI_API_KEY', '');
+  vi.stubEnv('AICREDITS_API_KEY', '');
   const statuses = [];
   for (let i = 0; i < 6; i++) statuses.push((await invoke(input, { 'x-vercel-forwarded-for': 'same-test-client' })).status);
   expect(statuses.slice(0, 5)).toEqual([503, 503, 503, 503, 503]); expect(statuses[5]).toBe(429);
@@ -148,9 +110,9 @@ it('sends open questions without invented budget or repair constraints and allow
   const upstream = vi.fn().mockResolvedValue(Response.json(completed({ ...plan, resourceIds: [] })));
   await generatePlan(question, env, upstream);
   const body = JSON.parse(upstream.mock.calls[0][1].body);
-  expect(JSON.parse(body.input).userSituation).toEqual({ description: question.description });
-  expect(body.system_instruction).toContain('There is no fixed list');
-  expect(body.system_instruction).toContain('Answer conceptual questions directly');
+  expect(JSON.parse(body.messages[1].content).userSituation).toEqual({ description: question.description });
+  expect(body.messages[0].content).toContain('There is no fixed list');
+  expect(body.messages[0].content).toContain('Answer conceptual questions directly');
   expect(parsePlan({ ...plan, resourceIds: [] })).not.toBeNull();
 });
 it('protects open battery questions without mistaking ordinary food waste for a device fault', async () => {
@@ -170,12 +132,12 @@ it('validates optional location without breaking location-free requests', () => 
 });
 it('passes provided location and constraints to both services with locality and formatting rules', async () => {
   const question = parsePlannerRequest({ description: 'I live in a small flat in Pune. How can I reduce food waste without spending more than INR 200?', location: 'Pune, India' })!;
-  for (const provider of ['gemini', 'aicredits']) {
-    const upstream = vi.fn().mockResolvedValue(provider === 'gemini' ? Response.json(completed(plan)) : chatResponse());
+  for (const provider of ['aicredits']) {
+    const upstream = vi.fn().mockResolvedValue(chatResponse());
     await generatePlan(question, { ...backupEnv, AI_PROVIDER: provider }, upstream);
     const body = JSON.parse(upstream.mock.calls[0][1].body);
-    const context = JSON.parse(provider === 'gemini' ? body.input : body.messages[1].content);
-    const instructions = provider === 'gemini' ? body.system_instruction : body.messages[0].content;
+    const context = JSON.parse(body.messages[1].content);
+    const instructions = body.messages[0].content;
     expect(context.userSituation.location).toBe('Pune, India');
     expect(context.userSituation.description).toContain('INR 200');
     expect(context.userSituation.budget).toBeUndefined();
@@ -197,8 +159,8 @@ it('normalizes provider formatting into the same plain-text answer structure', a
     summary: '  One side of your headphones is silent after a source check.  ',
     reason: '**You have no tools and already tried another source.**',
     steps: ['1. Find the model number and warranty information.', '- Ask support whether an assessment has a fee.'] };
-  for (const provider of ['gemini', 'aicredits']) {
-    const upstream = vi.fn().mockResolvedValue(provider === 'gemini' ? Response.json(completed(decorated)) : chatResponse(decorated));
+  for (const provider of ['aicredits']) {
+    const upstream = vi.fn().mockResolvedValue(chatResponse(decorated));
     const result = await generatePlan(input, { ...backupEnv, AI_PROVIDER: provider }, upstream);
     expect(result.plan).toEqual(plan);
     expect(planText(result.plan)).toBe(planText(plan));
@@ -222,8 +184,8 @@ it('forwards bounded previous turns and rejects extra steps for an explicit one-
   const upstream = vi.fn().mockResolvedValue(Response.json(completed(plan)));
   await expect(generatePlan(requestInput, env, upstream)).rejects.toThrow('usable plan');
   const body = JSON.parse(upstream.mock.calls[0][1].body);
-  expect(body.response_format.schema.properties.steps.maxItems).toBe(1);
-  expect(JSON.parse(body.input).previousTurns).toEqual(requestInput.context);
+  expect(body.messages[0].content).toContain('"maxItems":1');
+  expect(JSON.parse(body.messages[1].content).previousTurns).toEqual(requestInput.context);
   const one = { ...plan, alternative: '', steps: [plan.steps[0]] };
   expect((await generatePlan(requestInput, env, vi.fn().mockResolvedValue(Response.json(completed(one))))).plan.steps).toHaveLength(1);
 });
@@ -233,10 +195,9 @@ it('retains essential deterministic safety guidance even when one action is requ
   expect(result.plan.steps).toHaveLength(2);
 });
 it('accepts a whole-response JSON fence without weakening content validation', async () => {
-  const value = { status:'completed',steps:[{type:'model_output',content:[{type:'text',text:'```json\n'+JSON.stringify(plan)+'\n```'}]}] };
-  expect((await generatePlan(input,env,vi.fn().mockResolvedValue(Response.json(value)))).plan).toEqual(plan);
-  const bad={...value,steps:[{type:'model_output',content:[{type:'text',text:'```json\n'+JSON.stringify({...plan,steps:['Open the battery casing.']})+'\n```'}]}]};
-  await expect(generatePlan(input,env,vi.fn().mockResolvedValue(Response.json(bad)))).rejects.toMatchObject({code:'AI_OUTPUT_POLICY'});
+  const wrapped = (value: unknown) => Response.json({choices:[{finish_reason:'stop',message:{content:'```json\n'+JSON.stringify(value)+'\n```'}}]});
+  expect((await generatePlan(input,env,vi.fn().mockResolvedValue(wrapped(plan)))).plan).toEqual(plan);
+  await expect(generatePlan(input,env,vi.fn().mockResolvedValue(wrapped({...plan,steps:['Open the battery casing.']})))).rejects.toMatchObject({code:'AI_OUTPUT_POLICY'});
 });
 it('distinguishes upstream access, credits, rate limits and malformed answers without logging private data', async () => {
   const log=vi.spyOn(console,'warn').mockImplementation(()=>{});
@@ -247,4 +208,36 @@ it('distinguishes upstream access, credits, rate limits and malformed answers wi
   await expect(generatePlan(input,env,vi.fn().mockRejectedValue(new TypeError('secret network error')))).rejects.toMatchObject({code:'AI_NETWORK'});
   const recorded=JSON.stringify(log.mock.calls);
   expect(recorded).not.toContain('Private user'); expect(recorded).not.toContain('test-api-key'); expect(recorded).not.toContain('secret');
+});
+
+
+it('retries a single-provider 503 once after backoff and can recover', async () => {
+  vi.useFakeTimers();
+  const upstream = vi.fn().mockResolvedValueOnce(new Response('', {status:503})).mockResolvedValueOnce(Response.json(completed(plan)));
+  const pending = generatePlan(input,env,upstream);
+  await vi.advanceTimersByTimeAsync(499);
+  expect(upstream).toHaveBeenCalledTimes(1);
+  await vi.advanceTimersByTimeAsync(1);
+  expect((await pending).plan).toEqual(plan);
+  expect(upstream).toHaveBeenCalledTimes(2);
+});
+it('bounds persistent single-provider 503 failures to two attempts', async () => {
+  vi.useFakeTimers();
+  const upstream = vi.fn().mockResolvedValue(new Response('', {status:503}));
+  const pending = expect(generatePlan(input,env,upstream)).rejects.toMatchObject({code:'AI_UPSTREAM'});
+  await vi.advanceTimersByTimeAsync(500); await pending;
+  expect(upstream).toHaveBeenCalledTimes(2);
+});
+it('does not retry a 503 when the shared budget has nearly expired', async () => {
+  vi.useFakeTimers();
+  const upstream = vi.fn().mockImplementation(async () => {
+    vi.setSystemTime(Date.now()+19000); return new Response('', {status:503});
+  });
+  await expect(generatePlan(input,env,upstream)).rejects.toMatchObject({code:'AI_UPSTREAM'});
+  expect(upstream).toHaveBeenCalledTimes(1);
+});
+it.each([400,401,402,404,429,500])('does not repeat non-retryable upstream status %s', async status => {
+  const upstream = vi.fn().mockResolvedValue(new Response('', {status}));
+  await expect(generatePlan(input,env,upstream)).rejects.toBeDefined();
+  expect(upstream).toHaveBeenCalledTimes(1);
 });

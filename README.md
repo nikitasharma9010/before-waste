@@ -76,14 +76,11 @@ separate from the AI assistance people use in the app.
 
 1. Deploy this branch including `api/plan.ts`. Vercel's Vite preset builds the
    frontend and discovers the Node.js API function. Use Node.js 24.
-2. In Project Settings > Environment Variables, set `GEMINI_API_KEY` for Gemini
-   and/or `AICREDITS_API_KEY` for AICredits. Select Production and, if needed,
-   Preview. Never use a `VITE_` prefix for secrets.
-3. Set `AI_PROVIDER=auto` for Gemini then AICredits, `aicredits` for AICredits
-   only, or `gemini` for Gemini only. Default: auto. Optional model settings:
-   `GEMINI_MODEL=gemini-3.8-flash` and
-   `AICREDITS_MODEL=openai/gpt-4o-mini`. Choose an available text/chat model ID
-   from your AICredits dashboard; the documented example is not a quality ranking.
+2. In Project Settings > Environment Variables, set `AICREDITS_API_KEY` for
+   Production and, if needed, Preview. Never use a `VITE_` prefix for secrets.
+3. Optionally set `AICREDITS_MODEL` (default: `openai/gpt-4o-mini`) to an available
+   text/chat model ID in your dashboard. Gemini is no longer called. Legacy
+   `AI_PROVIDER`, `GEMINI_API_KEY` and `GEMINI_MODEL` settings are ignored and may be deleted.
 4. Redeploy after setting variables. Vercel environment changes do not update an
    existing deployment. Keep default Vite settings: `npm run build`, output `dist`.
 5. Open the deployed site without signing in. Ask a fictional question about food waste, reuse, repair or sustainable living, generate a plan, edit it, save it and reload. The accepted
@@ -93,28 +90,16 @@ No browser key entry is needed. Without a key, the server returns a clear setup
 message and the existing basic guidance remains available. `npm run preview`
 serves only the frontend; use `npm run dev` for local API testing.
 
-The endpoint uses Google's Interactions REST API with structured output,
-`store: false`, low thinking and a 4096-token cap. See the official
-[Interactions guide](https://ai.google.dev/gemini-api/docs/interactions-overview)
-and [structured-output guide](https://ai.google.dev/gemini-api/docs/structured-output).
-Provider processing is still subject to Google's terms and your API tier.
+The server calls only `https://api.aicredits.in/v1/chat/completions`, using a
+server-side Bearer key, JSON-object mode, a 4096-token cap and schema validation.
+See the [AICredits API reference](https://aicredits.in/docs/api-reference).
+An explicit upstream 503 gets one retry after 500 ms when enough of the shared
+20-second budget remains. Authentication, credits, quota, invalid-output and
+ambiguous timeout failures are not retried. There are at most two upstream
+attempts per visitor request; persistent outages can still prevent generation.
 
-AICredits uses `https://api.aicredits.in/v1/chat/completions` with its own Bearer
-key, documented JSON-object mode and server-side schema validation. The API key
-and model are read from `AICREDITS_API_KEY` and `AICREDITS_MODEL`. We do not send
-the Gemini key to AICredits or the AICredits key to Google. See the
-[AICredits API reference](https://aicredits.in/docs/api-reference).
-
-In auto mode, providers without keys are skipped. Gemini failures (including quota,
-timeout, invalid configuration and unusable output) trigger one AICredits attempt
-when configured. A valid clarification or unsupported response is successful and
-does not trigger fallback. With both configured, Gemini gets up to 8 seconds and
-AICredits gets the remaining shared 20-second budget. Provider-only modes allow
-20 seconds and never switch providers. If all configured providers fail, basic
-non-AI guidance is shown. One visitor request can therefore incur charges from
-both services. This is bounded failover, not repeated automatic retries.
-
-The page uses provider-neutral AI disclosures, including possible backup processing. Internal provider/model metadata is retained for compatibility but is not displayed in answer or saved-plan labels. AICredits requests disable semantic caching via
+Provider/model metadata is retained internally for compatibility and is not shown
+in answer or saved-plan labels. Requests disable semantic caching via
 `no_cache: true`; processing/retention by AICredits and its upstream model provider
 remain subject to their policies. This is not a zero-retention guarantee.
 
@@ -183,7 +168,7 @@ a product-specific footprint calculator or a comprehensive independent fact audi
 The default Ask freely mode requires no item selection. It accepts 10–1500 characters, including conceptual questions. The model receives the question and any supplied location context in this mode, without hidden budget or repair preferences. Guided examples still send selected constraints. Resource links come from a curated catalogue; if none is relevant, no link is fabricated. Answers are not live research or local collection verification. Unrelated requests should be redirected to the waste-prevention theme. When AI fails, clearly labelled general guidance is shown rather than a fabricated answer. Existing saved actions remain compatible.
 
 ### Location and answer presentation
-Visitors can optionally provide city/region and country, or mention their location and other details in the question. No geolocation is requested or inferred. The configured service handling a request receives the supplied context; a backup service may also receive it if fallback is used. Instructions require respecting stated budget, currency, housing, tools and access; ambiguous locations require clarification. Local rules and service availability are not live-verified. US references remain background outside the US. Answer display and copy/save formatting share section labels; provider/model names are not rendered on the page.
+Visitors can optionally provide city/region and country, or mention their location and other details in the question. No geolocation is requested or inferred. The configured service handling a request receives the supplied context; AICredits and its upstream model provider process this context. Instructions require respecting stated budget, currency, housing, tools and access; ambiguous locations require clarification. Local rules and service availability are not live-verified. US references remain background outside the US. Answer display and copy/save formatting share section labels; provider/model names are not rendered on the page.
 
 ### Dedicated assistant page
 The homepage keeps the stories and a compact question entry. `/ask` (and `/ask/`) renders the full assistant, location/context controls and separate Ask and Saved tabs for multiple answers. Normal links support browser back/forward navigation. Vercel rewrites only these two paths to `index.html`; API routes remain untouched. A homepage question is carried through tab-scoped session storage, never URL parameters. It expires after 15 minutes and is consumed on arrival; no AI request is made until Get AI guidance is chosen. If session storage is blocked, the homepage keeps the text and offers manual copy/open recovery. Unsaved input is not a persistent chat history; save an accepted action to retain it across reloads. Follow-ups work by editing the current question with added details.
