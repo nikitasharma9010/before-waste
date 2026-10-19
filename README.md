@@ -1,20 +1,19 @@
 # Before Waste
 
-Before Waste connects awareness of everyday objects and Earth's resources with
-practical choices that prevent waste before it is created. It brings together
-interactive lifecycle stories, reflection and AI guidance to support thoughtful
-buying, use, care and passing things on.
+Before Waste starts with a simple responsibility: we are caretakers of Earth and
+the resources we will pass on to future generations. It connects this idea with
+everyday choices through interactive object stories, reflection and practical
+guidance before things become waste.
 
 **Live app:** [before-waste.vercel.app](https://before-waste.vercel.app/)
 
 ## The problem
 
-Waste is often noticed only when something is thrown away. Earlier choices about
-buying, using and replacing everyday objects can feel disconnected from the
-materials, water, energy and human effort behind them. People may want to act
-with care but lack an accessible way to connect that bigger picture with choices
-that fit their lives. This gap between awareness and practical action can lead
-to avoidable consumption and waste.
+Waste is often treated as a disposal problem, after decisions about buying,
+using and replacing things have already been made. That view can hide the
+materials, water, energy and human effort behind an object, and the opportunities
+to prevent waste earlier. Before Waste addresses the gap between understanding
+that wider story and finding an action that fits someone's circumstances.
 
 Product design, affordable alternatives and local services also shape what is
 possible. The responsibility does not sit with individuals alone.
@@ -31,10 +30,13 @@ alternatives, without expecting perfect choices.
 - **Understand:** follow familiar objects from natural resources and human work
   through daily use and their next possible chapter.
 - **Reflect:** compare everyday choices, explore resource demand and supportive
-  systems, and use the 7-Day Pause before nonessential purchases.
+  systems, and use the written 7-Day Pause prompts before nonessential purchases.
 - **Apply:** ask practical or conceptual questions about waste prevention and
   sustainable living. Guidance considers the context a visitor chooses to give.
 - **Choose and keep:** review, edit and save useful answers in the browser.
+
+The stories, scenarios and pause prompts work without AI generation. AI supports
+questions that need explanation or guidance for a particular situation.
 
 Repair is one example within this wider journey. The aim is to help people avoid
 unnecessary purchases, consider borrowing or reuse, care for what they have and
@@ -51,6 +53,7 @@ that device. The app does not calculate environmental savings.
 These sources explain the resource-use and waste-prevention principles behind
 the project; they do not evaluate this MVP or establish its impact.
 
+- [MoEFCC: Mission LiFE sustainable lifestyle actions](https://missionlife-moefcc.nic.in/assets/pdf/ML%20Brochure_English_V5.pdf) - mindful resource use through individual and collective action.
 - [UNEP International Resource Panel: Global Resources Outlook 2024](https://www.unep.org/resources/Global-Resource-Outlook-2024)
 - [Ellen MacArthur Foundation: Circular economy overview](https://www.ellenmacarthurfoundation.org/topics/circular-economy-introduction/overview)
 
@@ -110,8 +113,8 @@ remain subject to their policies. This is not a zero-retention guarantee.
 
 - Descriptions, optional location and selected answers are sent only when AI guidance is requested. Saved
   reflection notes and saved-action notes are not sent. Original descriptions are
-  not automatically persisted by this app; the reviewed plan is stored locally
-  only when the visitor saves it.
+  not automatically persisted by this app; the accepted answer and its original
+  question are stored locally when the visitor explicitly saves them.
 - Suggestions are grounded in the editorial starting point and a vetted resource
   catalogue. The model returns resource IDs; code supplies the links. There is no
   live local-directory search, diagnosis, price quote or impact calculation.
@@ -173,4 +176,4 @@ The default Ask freely mode requires no item selection. It accepts 10–1500 cha
 Visitors can optionally provide city/region and country, or mention their location and other details in the question. No geolocation is requested or inferred. Both configured services receive the supplied context. Instructions require respecting stated budget, currency, housing, tools and access; ambiguous locations require clarification. Local rules and service availability are not live-verified. US references remain background outside the US. Answer display and copy/save formatting share section labels; provider/model names are not rendered on the page.
 
 ### Dedicated assistant page
-The homepage keeps the stories and a compact question entry. `/ask` (and `/ask/`) renders the full assistant, location/context controls and existing saved action. Normal links support browser back/forward navigation. Vercel rewrites only these two paths to `index.html`; API routes remain untouched. A homepage question is carried through tab-scoped session storage, never URL parameters. It expires after 15 minutes and is consumed on arrival; no AI request is made until Get AI guidance is chosen. If session storage is blocked, the homepage keeps the text and offers manual copy/open recovery. Unsaved input is not a persistent chat history; save an accepted action to retain it across reloads. Follow-ups work by editing the current question with added details.
+The homepage keeps the stories and a compact question entry. `/ask` (and `/ask/`) renders the full assistant, location/context controls and separate Ask and Saved tabs for multiple answers. Normal links support browser back/forward navigation. Vercel rewrites only these two paths to `index.html`; API routes remain untouched. A homepage question is carried through tab-scoped session storage, never URL parameters. It expires after 15 minutes and is consumed on arrival; no AI request is made until Get AI guidance is chosen. If session storage is blocked, the homepage keeps the text and offers manual copy/open recovery. Unsaved input is not a persistent chat history; save an accepted action to retain it across reloads. Follow-ups work by editing the current question with added details.
