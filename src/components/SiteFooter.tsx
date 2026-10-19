@@ -52,6 +52,7 @@ export function SiteFooter({ assistant = false, onRestart, onOpenSources }: {
           <h2 className="text-sm font-semibold text-white">About this project</h2>
           <ul className="mt-2">
             <li><a href="#how-it-works" className={link}>How it works &amp; your data</a></li>
+            <li><a href="https://docs.google.com/forms/d/e/1FAIpQLSfuQbhpDFuQXq2N9SQue6fF-coyQaDuZ9K6UDpj_X4Rh3Y2OA/viewform" className={link}>Share feedback</a></li>
             <li><button type="button" className={`${link} text-left`} onClick={event => onOpenSources(event.currentTarget)}>Sources &amp; Methodology</button></li>
           </ul>
           <button type="button" disabled={sharing} onClick={() => void share()} className={`${link} gap-2 text-left disabled:opacity-60`}>
