@@ -1,9 +1,12 @@
 # Before Waste
 
-Before Waste starts with a simple responsibility: we are caretakers of Earth and
-the resources we will pass on to future generations. It connects this idea with
-everyday choices through interactive object stories, reflection and practical
-guidance before things become waste.
+Earth's resources are finite, and the things we use draw on materials, water,
+energy and human effort. Before Waste helps people understand that connection
+and make thoughtful choices about what they buy, use, care for and pass on.
+
+As caretakers, we can begin with one practical choice that fits our circumstances,
+with care for Earth and future generations. The experience supports learning and
+action without expecting perfection or asking people to change everything at once.
 
 **Live app:** [before-waste.vercel.app](https://before-waste.vercel.app/)
 
@@ -44,7 +47,8 @@ keep useful things in use longer. These choices can help avoid costs and waste
 while supporting more thoughtful use of Earth's resources and care for those
 who come after us.
 
-The assistant offers a draft to review; people decide what fits their situation.
+The assistant offers options and a draft to review, not a final decision.
+People decide what is appropriate for their own circumstances.
 Local services are not checked live, and saved content stays in the browser on
 that device. The app does not calculate environmental savings.
 
