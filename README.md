@@ -1,12 +1,12 @@
 # Before Waste
 
-Earth's resources are finite, and the things we use draw on materials, water,
-energy and human effort. Before Waste helps people understand that connection
-and make thoughtful choices about what they buy, use, care for and pass on.
+Earth's resources are finite, and everyday objects depend on materials, water,
+energy and human effort. How we buy, use and care for these objects affects what
+remains for future generations.
 
-As caretakers, we can begin with one practical choice that fits our circumstances,
-with care for Earth and future generations. The experience supports learning and
-action without expecting perfection or asking people to change everything at once.
+Before Waste helps people understand these connections and explore practical
+options that fit their circumstances, without expecting them to change everything
+at once.
 
 **Live app:** [before-waste.vercel.app](https://before-waste.vercel.app/)
 
@@ -15,8 +15,8 @@ action without expecting perfection or asking people to change everything at onc
 Waste is often treated as a disposal problem, after decisions about buying,
 using and replacing things have already been made. That view can hide the
 materials, water, energy and human effort behind an object and the opportunities
-to prevent waste earlier. Before Waste addresses the gap between understanding
-that wider story and finding an action that fits someone's circumstances.
+to prevent waste earlier. People may understand why waste prevention matters but still be unsure what
+options fit their everyday circumstances.
 
 Product design, affordable alternatives and local services also shape what is
 possible. The responsibility does not sit with individuals alone.
@@ -43,7 +43,7 @@ questions that need explanation or guidance for a particular situation.
 
 Repair is one example within this wider journey. The aim is to help people avoid
 unnecessary purchases, consider borrowing or reuse, care for what they have and
-keep useful things in use longer. These choices can help avoid costs and waste
+keep useful things in use longer. These choices may help avoid unnecessary spending and waste
 while supporting more thoughtful use of Earth's resources and care for those
 who come after us.
 
@@ -120,7 +120,8 @@ remain subject to their policies. This is not a zero-retention guarantee.
   not automatically persisted by this app; the accepted answer and its original
   question are stored locally when the visitor explicitly saves them.
 - Suggestions are grounded in the editorial starting point and a vetted resource
-  catalogue. The model returns resource IDs; code supplies the links. There is no
+  catalogue. The model returns resource IDs; code supplies the links. Response-format checks
+  do not verify the factual accuracy of every claim. There is no
   live local-directory search, diagnosis, price quote or impact calculation.
 - Ready plans can be edited and saved. Clarification and unsupported responses are not
   savable as action plans. Some explicit battery-risk descriptions use deterministic
