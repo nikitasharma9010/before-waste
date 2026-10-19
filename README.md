@@ -51,6 +51,7 @@ that device. The app does not calculate environmental savings.
 These sources explain the resource-use and waste-prevention principles behind
 the project; they do not evaluate this MVP or establish its impact.
 
+- [MoEFCC: Mission LiFE sustainable lifestyle actions](https://missionlife-moefcc.nic.in/assets/pdf/ML%20Brochure_English_V5.pdf) - practical individual and collective actions for mindful resource use.
 - [UNEP International Resource Panel: Global Resources Outlook 2024](https://www.unep.org/resources/Global-Resource-Outlook-2024)
 - [Ellen MacArthur Foundation: Circular economy overview](https://www.ellenmacarthurfoundation.org/topics/circular-economy-introduction/overview)
 
