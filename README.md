@@ -1,34 +1,58 @@
 # Before Waste
 
-Before Waste helps people choose a practical next step before buying, replacing or
-discarding an everyday item. It connects interactive object stories and everyday
-choice scenarios with an AI assistant for questions about waste prevention and
-sustainable living.
+Before Waste connects awareness of everyday objects and Earth's resources with
+practical choices that prevent waste before it is created. It brings together
+interactive lifecycle stories, reflection and AI guidance to support thoughtful
+buying, use, care and passing things on.
 
 **Live app:** [before-waste.vercel.app](https://before-waste.vercel.app/)
 
+## The problem
+
+Waste is often noticed only when something is thrown away. Earlier choices about
+buying, using and replacing everyday objects can feel disconnected from the
+materials, water, energy and human effort behind them. People may want to act
+with care but lack an accessible way to connect that bigger picture with choices
+that fit their lives. This gap between awareness and practical action can lead
+to avoidable consumption and waste.
+
+Product design, affordable alternatives and local services also shape what is
+possible. The responsibility does not sit with individuals alone.
+
 ## Who it helps
 
-People making everyday decisions about things they own, especially when money,
-tools or repair experience are limited. A student, renter or household member can
-describe their situation in ordinary language and explore options that fit their
-circumstances.
+Everyday consumers, especially students, young adults and households deciding
+what to buy, how to use what they have and what happens when they are finished
+with it. The experience respects different budgets, skills, time and access to
+alternatives, without expecting perfect choices.
 
-## What people can achieve
+## From awareness to action
 
-- Understand an object's lifecycle and compare choices before replacing or
-  discarding it.
-- Explore maintenance, repair and reuse options with guidance that takes account
-  of the budget, skills, supplies and optional location they provide.
-- Ask practical or conceptual questions about waste prevention and sustainable
-  living, beyond the guided examples.
-- Review, edit and save useful answers in their browser for later reference.
-- Use the 7-Day Pause to reflect before a nonessential purchase.
+- **Understand:** follow familiar objects from natural resources and human work
+  through daily use and their next possible chapter.
+- **Reflect:** compare everyday choices, explore resource demand and supportive
+  systems, and use the 7-Day Pause before nonessential purchases.
+- **Apply:** ask practical or conceptual questions about waste prevention and
+  sustainable living. Guidance considers the context a visitor chooses to give.
+- **Choose and keep:** review, edit and save useful answers in the browser.
 
-The aim is to make thoughtful, lower-waste decisions easier to understand and put
-into practice. The assistant offers a draft to review; people decide what fits
-their situation. Local services are not checked live, and saved content stays in
-the browser on that device.
+Repair is one example within this wider journey. The aim is to help people avoid
+unnecessary purchases, consider borrowing or reuse, care for what they have and
+keep useful things in use longer. These choices can help avoid costs and waste
+while supporting more thoughtful use of Earth's resources and care for those
+who come after us.
+
+The assistant offers a draft to review; people decide what fits their situation.
+Local services are not checked live, and saved content stays in the browser on
+that device. The app does not calculate environmental savings.
+
+## Background references
+
+These sources explain the resource-use and waste-prevention principles behind
+the project; they do not evaluate this MVP or establish its impact.
+
+- [UNEP International Resource Panel: Global Resources Outlook 2024](https://www.unep.org/resources/Global-Resource-Outlook-2024)
+- [Ellen MacArthur Foundation: Circular economy overview](https://www.ellenmacarthurfoundation.org/topics/circular-economy-introduction/overview)
 
 ## Built with
 
